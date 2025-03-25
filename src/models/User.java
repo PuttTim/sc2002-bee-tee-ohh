@@ -1,9 +1,9 @@
 package models;
 
 public abstract class User {
-    private String userID;
-    private String name;
-    private String role;
+    protected String userID;
+    protected String name;
+    protected String role;
 
     public User(String userID, String name, String role) {
         this.userID = userID;
