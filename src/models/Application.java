@@ -47,7 +47,7 @@ public class Application {
     }
 
     public Applicant getApplicant() {
-        return applicant;
+        return applicant; // Check this again 
     }
 
     public Project getProject() {
@@ -101,5 +101,15 @@ public class Application {
 
     public void setApprovedBy(String approvedBy) {
         this.approvedBy = approvedBy;
+    }
+
+    // Others (Might need to move this)
+    public void withdrawApplication() {
+        this.withdrawalRequested = true;
+    }
+    
+    public void approve(String manager) {
+        this.applicationStatus = ApplicationStatus.SUCCESSFUL;
+        this.approvedBy = manager;
     }
 }

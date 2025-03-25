@@ -12,11 +12,11 @@ public class Officer extends User {
 
     // Getters
     public Project getProject() {
-        return project;
+        return project; // Check this again
     }
 
     // Setters
     public void setProject(Project project) {
-        this.project = project; // Check this again
+        this.project = project;
     }
 }
