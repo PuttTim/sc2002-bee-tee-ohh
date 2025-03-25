@@ -5,7 +5,7 @@ import enums.Role;
 public class Officer extends User {
     private Project project;
 
-    public Officer(String nric, String name, String password) {
+    public Officer(String nric, String name, String password, Project project) {
         super(nric, name, password, Role.OFFICER);
         this.project = null;
     }
@@ -14,7 +14,6 @@ public class Officer extends User {
     public Project getProject() {
         return project;
     }
-
 
     // Setters
     public void setProject(Project project) {

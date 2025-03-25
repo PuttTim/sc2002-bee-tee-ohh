@@ -3,10 +3,10 @@ package models;
 import enums.Role;
 
 public abstract class User {
-    private String nric;
-    private String name;
-    private String password;
-    private Role role;
+    protected String nric;
+    protected String name;
+    protected String password;
+    protected Role role;
 
     public User(String nric, String name, String password, Role role) {
         this.nric = nric;
@@ -42,7 +42,7 @@ public abstract class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;   // Hash password
+        this.password = password;   // Hash password here
     }
 
     public void setRole(Role role) {

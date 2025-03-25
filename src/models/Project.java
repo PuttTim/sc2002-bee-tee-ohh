@@ -12,7 +12,10 @@ public class Project {
     private int officerSlots;
     private boolean visibility;
 
-    public Project (String projectId, Manager manager, String projectName, String location, LocalDate applicationStart, LocalDate applicationEnd, int officerSlots, boolean visibility) {
+
+    // Might need to add minimal constructor
+    public Project (String projectId, Manager manager, String projectName, String location,
+    LocalDate applicationStart, LocalDate applicationEnd, int officerSlots, boolean visibility) {
         this.projectId = projectId;
         this.manager = manager;
         this.projectName = projectName;
@@ -20,7 +23,7 @@ public class Project {
         this.applicationStart = applicationStart;
         this.applicationEnd = applicationEnd;
         this.officerSlots = 10;
-        this.visibility = false;
+        this.visibility = false; // Might need to add array of officers and applicants instead
     }
 
     // Getters
