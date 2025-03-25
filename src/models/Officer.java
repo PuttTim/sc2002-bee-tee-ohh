@@ -1,24 +1,23 @@
 package models;
 
+import enums.Role;
+
 public class Officer extends User {
-    private String officerID;
-    private String nric;
+    private Project project;
 
-    public Officer(String officerID, String name, String nric) {
-        super(officerID, name, "Officer");
-        this.officerID = officerID;
-        this.nric = nric;
+    public Officer(String nric, String name, String password) {
+        super(nric, name, password, Role.OFFICER);
+        this.project = null;
     }
 
-    public String getOfficerID() {
-        return officerID;
+    // Getters
+    public Project getProject() {
+        return project;
     }
 
-    public String getOfficerName() {
-        return super.name;
-    }
 
-    public String getNric() {
-        return nric;
+    // Setters
+    public void setProject(Project project) {
+        this.project = project; // Check this again
     }
 }

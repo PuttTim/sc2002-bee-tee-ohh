@@ -1,37 +1,51 @@
 package models;
 
-public abstract class User {
-    protected String userID;
-    protected String name;
-    protected String role;
+import enums.Role;
 
-    public User(String userID, String name, String role) {
-        this.userID = userID;
+public abstract class User {
+    private String nric;
+    private String name;
+    private String password;
+    private Role role;
+
+    public User(String nric, String name, String password, Role role) {
+        this.nric = nric;
         this.name = name;
+        this.password = password;
         this.role = role;
     }
 
-    public String getUserID() {
-        return this.userID;
+    // Getters
+    public String getNric() {
+        return nric;
     }
 
-    public void setUserID(String userID) {
-		this.userID = userID;
-	}
-
     public String getName() {
-		return name;
-	}
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getPassword() {
+            return password;
+    }
 
-    public String getRole() {
+    public Role getRole() {
 		return role;
 	}
 
-    public void setRole(String role) {
+    // Setters
+    public void setNric(String nric) {
+		this.nric = nric;
+	}
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;   // Hash password
+    }
+
+    public void setRole(Role role) {
 		this.role = role;
 	}
 }
