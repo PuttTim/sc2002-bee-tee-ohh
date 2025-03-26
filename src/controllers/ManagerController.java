@@ -35,12 +35,16 @@ public class ManagerController {
 
     // view all projects, regardless of visibility setting
     public void viewAllProjects(){
-        // list each project in the Project array
+        // list each project in the Project array (for loop)
     }
 
     // filter and view lists of projects created by a manager
 
     // view pending and approved Officer registration
+    public void viewOfficerRegistrations(){
+        // list each approved registrations (for loop)
+        // list each pending registrations (for loop)
+    }
 
     // approve or reject Officer registrations
     public void approveOfficerRegistration(Project project, boolean approve){
@@ -49,10 +53,21 @@ public class ManagerController {
             // add the officer and the registration to the list of approved registrations
         }
         else{
-            System.out.println("Registration rejected");
+            System.out.println("Officer registration rejected");
         }
     }
+
     // approve or reject applicant registrations
+    public void approveApplicantRegistration(Project project, boolean approve){
+        if(approve){
+            if(DatabaseStore.getlocation(project.getLocation()) > 0){ // check if there are available supply of the selected flat
+                // add the applicant and the registration to the list of approved registrations
+            }
+        }
+        else{
+            System.out.println("Applicant registration rejected");
+        }
+    }
 
     // approve or reject applicant registration withdrawal
 
