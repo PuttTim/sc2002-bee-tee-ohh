@@ -1,31 +1,44 @@
 package models;
 
 import enums.Role;
+import enums.MaritalStatus;
 
 public abstract class User {
-    protected String nric;
     protected String name;
+    protected String nric;
+    protected int age;
+    protected MaritalStatus maritalStatus;
     protected String password;
     protected Role role;
 
-    public User(String nric, String name, String password, Role role) {
-        this.nric = nric;
+    public User(String name, String nric, int age, MaritalStatus maritalStatus, String password, Role role) {
         this.name = name;
+        this.nric = nric;
+        this.age = age;
+        this.maritalStatus = maritalStatus;
         this.password = password;
         this.role = role;
     }
 
     // Getters
-    public String getNric() {
-        return nric;
-    }
-
     public String getName() {
         return name;
     }
 
+    public String getNric() {
+        return nric;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public MaritalStatus getMaritalStatus() {
+        return maritalStatus;
+    }
+
     public String getPassword() {
-            return password;
+        return password;
     }
 
     public Role getRole() {
@@ -33,12 +46,19 @@ public abstract class User {
 	}
 
     // Setters
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setNric(String nric) {
 		this.nric = nric;
 	}
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAge(int age) {
+        this.age = age;
+    }
+    public void setMaritalStatus(MaritalStatus maritalStatus) {
+        this.maritalStatus = maritalStatus;
     }
 
     public void setPassword(String password) {
