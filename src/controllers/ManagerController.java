@@ -52,7 +52,7 @@ public class ManagerController {
                 System.out.println("Invalid date! Please enter a valid date (e.g 25/12/2023)");
             }
         }
-        // get project start date
+        // get project end date
         LocalDate endDate;
         while (true) {
             System.out.print("Enter the Project end date in (dd/mm/yyyy):");
@@ -108,18 +108,45 @@ public class ManagerController {
     }
 
     // delete a project
-    public void deleteProject(Project project){
-        databaseRemoveProject(project);
+    public void deleteProject(String projectName){
+        if(databaseRemoveProject(projectName)){
+            System.out.println("Project deleted successfully.");
+        }
+        else{
+            System.out.println("Unable to delete, Project not found!");
+        }
     }
 
     // toggle visibility of a project
-    public void toggleVisibility(Project project, boolean visibility){
-        project.setVisibility(visibility);
+    public void toggleVisibility(){
+        System.out.println("Enter Project name:");
+        Scanner sc = new Scanner(System.in);
+        String projectName = sc.nextLine();
+        if(databaseFindProject(projectName)){
+            while (true){
+                System.out.println("Make Project visible? (yes/no):");
+                String input = sc.nextLine();
+                if(input != "yes" && input != "no"){
+                    System.out.println("Invalid input! Please enter (yes/no):");
+                    continue;
+                }
+                else if(input == "yes"){
+                    databaseSetProjectVisibility(projectName, true);
+                    System.out.println("Project is now visible to applicants.");
+                    break;
+                }
+                else if(input == "no"){
+                    databaseSetProjectVisibility(projectName, false);
+                    System.out.println("Project is now hidden from applicants.");
+                    break;
+                }
+            }
+        }
     }
 
     // view all projects, regardless of visibility setting
     public void viewAllProjects(){
-        // list each project in the Project array (for loop)
+        
     }
 
     // filter and view lists of projects created by a manager
