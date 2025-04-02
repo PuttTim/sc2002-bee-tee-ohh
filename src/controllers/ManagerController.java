@@ -3,6 +3,7 @@ package controllers;
 import models.*;
 import enums.MaritalStatus;
 import enums.Role;
+import stores.Database;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -131,7 +132,8 @@ public class ManagerController {
 
     // delete a project
     public void deleteProject(String projectName){
-        if(databaseRemoveProject(projectName)){
+        Database db = new Database();
+        if(db.databaseRemoveProject(projectName)){
             System.out.println("Project deleted successfully.");
         }
         else{
@@ -144,7 +146,8 @@ public class ManagerController {
         System.out.println("Enter Project name:");
         Scanner sc = new Scanner(System.in);
         String projectName = sc.nextLine();
-        if(databaseFindProject(projectName)){
+        Database db = new Database();
+        if(db.databaseFindProject(projectName)){
             while (true){
                 System.out.println("Make Project visible? (yes/no):");
                 String input = sc.nextLine();
