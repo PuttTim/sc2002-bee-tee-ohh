@@ -16,7 +16,10 @@ public class Project {
     private List<String> applicants;
     private List<String> officers;
 
-    public Project(String projectId, String managerNric, String projectName, String location, LocalDateTime applicationStart, LocalDateTime applicationEnd, int availableOfficerSlots, boolean isVisible) {
+    public Project(String projectId, String managerNric, String projectName, String location,
+                   LocalDateTime applicationStart, LocalDateTime applicationEnd,
+                   int availableOfficerSlots, boolean isVisible,
+                   List<String> applicants, List<String> officers) {
         this.projectId = projectId;
         this.managerNric = managerNric;
         this.projectName = projectName;
@@ -25,8 +28,8 @@ public class Project {
         this.applicationEnd = applicationEnd;
         this.availableOfficerSlots = availableOfficerSlots;
         this.isVisible = isVisible;
-        this.applicants = new ArrayList<>();
-        this.officers = new ArrayList<>();
+        this.applicants = applicants != null ? applicants : new ArrayList<>();
+        this.officers = officers != null ? officers : new ArrayList<>();
     }
 
     // Getters
@@ -71,6 +74,14 @@ public class Project {
     }
 
     // Setters
+    public void setApplicants(List<String> applicants) {
+        this.applicants = applicants != null ? applicants : new ArrayList<>();
+    }
+
+    public void setOfficers(List<String> officers) {
+        this.officers = officers != null ? officers : new ArrayList<>();
+    }
+
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
@@ -103,11 +114,16 @@ public class Project {
         this.isVisible = isVisible;
     }
 
+    // Helpers
     public void addApplicant(String applicantNric) {
-        this.applicants.add(applicantNric);
+        if (!applicants.contains(applicantNric)) {
+            applicants.add(applicantNric);
+        }
     }
 
     public void addOfficer(String officerNric) {
-        this.officers.add(officerNric);
+        if (!officers.contains(officerNric)) {
+            officers.add(officerNric);
+        }
     }
 }
