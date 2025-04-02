@@ -8,6 +8,6 @@ import models.Project;
 public interface IOfficerRegistrationService {
     public OfficerRegistration createRegistration(Officer officer, Project project);
     public void saveRegistration(OfficerRegistration officerRegistration);
-    public RegistrationStatus checkRegistrationStatus(Officer officer);
+    public RegistrationStatus getRegistrationStatus(Officer officer);
 }
 

@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface IProjectService {
     public boolean hasOfficerSlots(Project project);
-    public List<Project> findHandledProjects(Officer officer);
+    public List<Project> getHandledProjects(Officer officer);
 
 }
