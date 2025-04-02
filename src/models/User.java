@@ -21,16 +21,24 @@ public abstract class User {
     }
 
     // Getters
-    public String getNric() {
-        return nric;
-    }
-
     public String getName() {
         return name;
     }
 
+    public String getNric() {
+        return nric;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public MaritalStatus getMaritalStatus() {
+        return maritalStatus;
+    }
+
     public String getPassword() {
-            return password;
+        return password;
     }
 
     public Role getRole() {
@@ -46,12 +54,19 @@ public abstract class User {
     }
 
     // Setters
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setNric(String nric) {
 		this.nric = nric;
 	}
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAge(int age) {
+        this.age = age;
+    }
+    public void setMaritalStatus(MaritalStatus maritalStatus) {
+        this.maritalStatus = maritalStatus;
     }
 
     public void setPassword(String password) {
