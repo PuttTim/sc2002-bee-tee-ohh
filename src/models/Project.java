@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Project {
     private String projectId;
-    private Manager manager;
+    private Manager managerNric;
     private String projectName;
     private String location;
     private LocalDate applicationStart;
@@ -14,16 +14,16 @@ public class Project {
 
 
     // Might need to add minimal constructor
-    public Project (String projectId, Manager manager, String projectName, String location,
+    public Project (String projectId, Manager managerNric, String projectName, String location,
     LocalDate applicationStart, LocalDate applicationEnd, int officerSlots, boolean visibility) {
         this.projectId = projectId;
-        this.manager = manager;
+        this.managerNric = managerNric;
         this.projectName = projectName;
         this.location = location;
         this.applicationStart = applicationStart;
         this.applicationEnd = applicationEnd;
         this.officerSlots = 10;
-        this.visibility = false; // Might need to add array of officers and applicants instead
+        this.visibility = false; // Might need to add array of officers and applicantNrics instead
     }
 
     // Getters
@@ -31,8 +31,8 @@ public class Project {
         return projectId;
     }
 
-    public Manager getManager() {
-        return manager; // Check this again
+    public Manager getManagerNric() {
+        return managerNric;
     }
 
     public String getProjectName() {
@@ -64,8 +64,8 @@ public class Project {
         this.projectId = projectId;
     }
 
-    public void setManager(Manager manager) {
-        this.manager = manager;
+    public void setManagerNric(Manager managerNric) {
+        this.managerNric = managerNric;
     }
 
     public void setProjectName(String projectName) {

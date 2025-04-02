@@ -6,21 +6,21 @@ import enums.ApplicationStatus;
 
 public class Application {
     private String applicationId;
-    private Applicant applicant;
-    private Project project;
+    private Applicant applicantNric;
+    private Project projectId;
     private String selectedFlatType;
     private ApplicationStatus applicationStatus;
     private Boolean withdrawalRequested;
     private LocalDate applicationDate;
-    private String approvedBy;
+    private String approvedBy; // Might need to connect this to manager
 
 
     // Minimal constructor
-    public Application(String applicationId, Applicant applicant, Project project, String selectedFlatType,
+    public Application(String applicationId, Applicant applicantNric, Project projectId, String selectedFlatType,
     Boolean withdrawalRequested, String approvedBy) {
         this.applicationId = applicationId;
-        this.applicant = applicant;
-        this.project = project;
+        this.applicantNric = applicantNric;
+        this.projectId = projectId;
         this.selectedFlatType = selectedFlatType;
         this.applicationStatus = ApplicationStatus.PENDING;
         this.withdrawalRequested = false;
@@ -29,11 +29,11 @@ public class Application {
     }
 
     // Full constructor
-    public Application(String applicationId, Applicant applicant, Project project, String selectedFlatType,
+    public Application(String applicationId, Applicant applicantNric, Project projectId, String selectedFlatType,
     ApplicationStatus applicationStatus, Boolean withdrawalRequested, LocalDate applicationDate, String approvedBy) {
         this.applicationId = applicationId;
-        this.applicant = applicant;
-        this.project = project;
+        this.applicantNric = applicantNric;
+        this.projectId = projectId;
         this.selectedFlatType = selectedFlatType;
         this.applicationStatus = applicationStatus;
         this.withdrawalRequested = withdrawalRequested;
@@ -46,12 +46,12 @@ public class Application {
         return applicationId;
     }
 
-    public Applicant getApplicant() {
-        return applicant; // Check this again 
+    public Applicant getApplicantNric() {
+        return applicantNric;
     }
 
-    public Project getProject() {
-        return project;
+    public Project getProjectId() {
+        return projectId;
     }
 
     public String getSelectedFlatType() {
@@ -75,41 +75,41 @@ public class Application {
     }
 
     // Setters
-    public void setApplicant(Applicant applicant) {
-        this.applicant = applicant;
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setApplicantNric(Applicant applicantNric) {
+        this.applicantNric = applicantNric;
+    }
+
+    public void setProjectId(Project projectId) {
+        this.projectId = projectId;
     }
 
     public void setSelectedFlatType(String selectedFlatType) {
         this.selectedFlatType = selectedFlatType;
     }
 
-    public void setApplicationStatus(ApplicationStatus applicationStatus) {
-        this.applicationStatus = applicationStatus;
+    public void approve(String manager) {
+        this.applicationStatus = ApplicationStatus.SUCCESSFUL;
+        this.approvedBy = manager;
     }
 
-    public void setWithdrawalRequested(Boolean withdrawalRequested) {
-        this.withdrawalRequested = withdrawalRequested;
+    public void reject(String manager) {
+        this.applicationStatus = ApplicationStatus.UNSUCCESSFUL;
+        this.approvedBy = manager;
+    }
+
+    public void book() { // Edit this
+        this.applicationStatus = ApplicationStatus.BOOKED;
+    }
+
+    public void requestWithdrawal() {
+        this.withdrawalRequested = true;
     }
 
     public void setApplicationDate(LocalDate applicationDate) {
         this.applicationDate = applicationDate;
-    }
-
-    public void setApprovedBy(String approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    // Others (Might need to move this)
-    public void withdrawApplication() {
-        this.withdrawalRequested = true;
-    }
-    
-    public void approve(String manager) {
-        this.applicationStatus = ApplicationStatus.SUCCESSFUL;
-        this.approvedBy = manager;
     }
 }
