@@ -1,25 +1,26 @@
 package models;
 
-import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 import enums.EnquiryStatus;
 
 public class Enquiry {
     private String enquiryId;
-    private Applicant applicantNric;
-    private Project projectId;
-    private String content;
+    private String applicantNric;
+    private String projectId;
+    private String query;
+    private String response;
     private EnquiryStatus enquiryStatus;
-    private LocalDate enquiryDate;
-    private String respondedBy; // Might need to connect this to officer and manager
+    private LocalDateTime enquiryDate;
+    private String respondedBy;
 
-    public Enquiry(String enquiryId, Applicant applicantNric, Project projectId, String content, String respondedBy) {
+    public Enquiry(String enquiryId, String applicantNric, String projectId, String query, String respondedBy) {
         this.enquiryId = enquiryId;
         this.applicantNric = applicantNric;
         this.projectId = projectId;
-        this.content = content;
+        this.query = query;
+        this.response = null;
         this.enquiryStatus = EnquiryStatus.PENDING;
-        this.enquiryDate = LocalDate.now();
+        this.enquiryDate = LocalDateTime.now();
         this.respondedBy = null;
     }
 
@@ -28,23 +29,27 @@ public class Enquiry {
         return enquiryId;
     }
 
-    public Applicant getApplicantNric() {
+    public String getApplicantNric() {
         return applicantNric;
     }
 
-    public Project getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 
-    public String getContent() {
-        return content;
+    public String getQuery() {
+        return query;
+    }
+
+    public String getResponse() {
+        return response;
     }
 
     public EnquiryStatus getEnquiryStatus() {
         return enquiryStatus;
     }
 
-    public LocalDate getEnquiryDate() {
+    public LocalDateTime getEnquiryDate() {
         return enquiryDate;
     }
 
@@ -57,24 +62,29 @@ public class Enquiry {
         this.enquiryId = enquiryId;
     }
 
-    public void setApplicantNric(Applicant applicantNric) {
+    public void setApplicantNric(String applicantNric) {
         this.applicantNric = applicantNric;
     }
 
-    public void setProjectId(Project projectId) {
+    public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
-    public void markAsResponded(String responder) {
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public void setEnquiryDate(LocalDateTime enquiryDate) {
+        this.enquiryDate = enquiryDate;
+    }
+
+    public void markAsResponded(String responder, String response) {
+        this.response = response;
         this.enquiryStatus = EnquiryStatus.RESPONDED;
         this.respondedBy = responder;
-    }
-
-    public void setEnquiryDate(LocalDate enquiryDate) {
-        this.enquiryDate = enquiryDate;
     }
 }
