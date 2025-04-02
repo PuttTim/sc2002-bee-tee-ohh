@@ -1,42 +1,39 @@
 package models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import enums.ApplicationStatus;
 
 public class Application {
     private String applicationId;
-    private Applicant applicant;
-    private Project project;
-    private String selectedFlatType;
+    private String applicantNric;
+    private String projectId;
+    private FlatType selectedFlatType;
     private ApplicationStatus applicationStatus;
-    private Boolean withdrawalRequested;
-    private LocalDate applicationDate;
+    private Boolean isWithdrawalRequested;
+    private LocalDateTime applicationDate;
     private String approvedBy;
 
-
     // Minimal constructor
-    public Application(String applicationId, Applicant applicant, Project project, String selectedFlatType,
-    Boolean withdrawalRequested, String approvedBy) {
+    public Application(String applicationId, String applicantNric, String projectId, FlatType selectedFlatType) {
         this.applicationId = applicationId;
-        this.applicant = applicant;
-        this.project = project;
+        this.applicantNric = applicantNric;
+        this.projectId = projectId;
         this.selectedFlatType = selectedFlatType;
         this.applicationStatus = ApplicationStatus.PENDING;
-        this.withdrawalRequested = false;
-        this.applicationDate = LocalDate.now();
+        this.isWithdrawalRequested = false;
+        this.applicationDate = LocalDateTime.now();
         this.approvedBy = null;
     }
 
     // Full constructor
-    public Application(String applicationId, Applicant applicant, Project project, String selectedFlatType,
-    ApplicationStatus applicationStatus, Boolean withdrawalRequested, LocalDate applicationDate, String approvedBy) {
+    public Application(String applicationId, String applicantNric, String projectId, FlatType selectedFlatType, ApplicationStatus applicationStatus, Boolean isWithdrawalRequested, LocalDateTime applicationDate, String approvedBy) {
         this.applicationId = applicationId;
-        this.applicant = applicant;
-        this.project = project;
+        this.applicantNric = applicantNric;
+        this.projectId = projectId;
         this.selectedFlatType = selectedFlatType;
         this.applicationStatus = applicationStatus;
-        this.withdrawalRequested = withdrawalRequested;
+        this.isWithdrawalRequested = isWithdrawalRequested;
         this.applicationDate = applicationDate;
         this.approvedBy = approvedBy;
     }
@@ -46,15 +43,15 @@ public class Application {
         return applicationId;
     }
 
-    public Applicant getApplicant() {
-        return applicant; // Check this again 
+    public String getApplicantNric() {
+        return applicantNric;
     }
 
-    public Project getProject() {
-        return project;
+    public String getProjectId() {
+        return projectId;
     }
 
-    public String getSelectedFlatType() {
+    public FlatType getSelectedFlatType() {
         return selectedFlatType;
     }
 
@@ -63,10 +60,10 @@ public class Application {
     }
 
     public Boolean isWithdrawalRequested() {
-        return withdrawalRequested;
+        return isWithdrawalRequested;
     }
 
-    public LocalDate getApplicationDate() {
+    public LocalDateTime getApplicationDate() {
         return applicationDate;
     }
 
@@ -75,41 +72,41 @@ public class Application {
     }
 
     // Setters
-    public void setApplicant(Applicant applicant) {
-        this.applicant = applicant;
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setApplicantNric(String applicantNric) {
+        this.applicantNric = applicantNric;
     }
 
-    public void setSelectedFlatType(String selectedFlatType) {
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    public void setSelectedFlatType(FlatType selectedFlatType) {
         this.selectedFlatType = selectedFlatType;
     }
 
-    public void setApplicationStatus(ApplicationStatus applicationStatus) {
-        this.applicationStatus = applicationStatus;
-    }
-
-    public void setWithdrawalRequested(Boolean withdrawalRequested) {
-        this.withdrawalRequested = withdrawalRequested;
-    }
-
-    public void setApplicationDate(LocalDate applicationDate) {
+    public void setApplicationDate(LocalDateTime applicationDate) {
         this.applicationDate = applicationDate;
     }
 
-    public void setApprovedBy(String approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    // Others (Might need to move this)
-    public void withdrawApplication() {
-        this.withdrawalRequested = true;
-    }
-    
     public void approve(String manager) {
         this.applicationStatus = ApplicationStatus.SUCCESSFUL;
         this.approvedBy = manager;
+    }
+
+    public void reject(String manager) {
+        this.applicationStatus = ApplicationStatus.UNSUCCESSFUL;
+        this.approvedBy = manager;
+    }
+
+    public void book() {
+        this.applicationStatus = ApplicationStatus.BOOKED;
+    }
+
+    public void requestWithdrawal() {
+        this.isWithdrawalRequested = true;
     }
 }

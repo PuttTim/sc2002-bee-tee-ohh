@@ -1,29 +1,32 @@
 package models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Project {
     private String projectId;
-    private Manager manager;
+    private String managerNric;
     private String projectName;
     private String location;
-    private LocalDate applicationStart;
-    private LocalDate applicationEnd;
-    private int officerSlots;
-    private boolean visibility;
+    private LocalDateTime applicationStart;
+    private LocalDateTime applicationEnd;
+    private int availableOfficerSlots;
+    private boolean isVisible;
+    private List<String> applicants;
+    private List<String> officers;
 
-
-    // Might need to add minimal constructor
-    public Project (String projectId, Manager manager, String projectName, String location,
-    LocalDate applicationStart, LocalDate applicationEnd, int officerSlots, boolean visibility) {
+    public Project(String projectId, String managerNric, String projectName, String location, LocalDateTime applicationStart, LocalDateTime applicationEnd, int availableOfficerSlots, boolean isVisible) {
         this.projectId = projectId;
-        this.manager = manager;
+        this.managerNric = managerNric;
         this.projectName = projectName;
         this.location = location;
         this.applicationStart = applicationStart;
         this.applicationEnd = applicationEnd;
-        this.officerSlots = 10;
-        this.visibility = false; // Might need to add array of officers and applicants instead
+        this.availableOfficerSlots = availableOfficerSlots;
+        this.isVisible = isVisible;
+        this.applicants = new ArrayList<>();
+        this.officers = new ArrayList<>();
     }
 
     // Getters
@@ -31,8 +34,8 @@ public class Project {
         return projectId;
     }
 
-    public Manager getManager() {
-        return manager; // Check this again
+    public String getManagerNric() {
+        return managerNric;
     }
 
     public String getProjectName() {
@@ -43,29 +46,37 @@ public class Project {
         return location;
     }
 
-    public LocalDate getApplicationStart() {
+    public LocalDateTime getApplicationStart() {
         return applicationStart;
     }
 
-    public LocalDate getApplicationEnd() {
+    public LocalDateTime getApplicationEnd() {
         return applicationEnd;
     }
 
-    public int getOfficerSlots() {
-        return officerSlots;
+    public int getAvailableOfficerSlots() {
+        return availableOfficerSlots;
     }
 
     public boolean isVisible() {
-        return visibility;
+        return isVisible;
     }
-    
+
+    public List<String> getApplicants() {
+        return applicants;
+    }
+
+    public List<String> getOfficers() {
+        return officers;
+    }
+
     // Setters
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 
-    public void setManager(Manager manager) {
-        this.manager = manager;
+    public void setManagerNric(String managerNric) {
+        this.managerNric = managerNric;
     }
 
     public void setProjectName(String projectName) {
@@ -76,19 +87,27 @@ public class Project {
         this.location = location;
     }
 
-    public void setApplicationStart(LocalDate applicationStart) {
+    public void setApplicationStart(LocalDateTime applicationStart) {
         this.applicationStart = applicationStart;
     }
 
-    public void setApplicationEnd(LocalDate applicationEnd) {
+    public void setApplicationEnd(LocalDateTime applicationEnd) {
         this.applicationEnd = applicationEnd;
     }
 
-    public void setOfficerSlots(int officerSlots) {
-        this.officerSlots = officerSlots;
+    public void setAvailableOfficerSlots(int availableOfficerSlots) {
+        this.availableOfficerSlots = availableOfficerSlots;
     }
 
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
+    public void setVisibility(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    public void addApplicant(String applicantNric) {
+        this.applicants.add(applicantNric);
+    }
+
+    public void addOfficer(String officerNric) {
+        this.officers.add(officerNric);
     }
 }
