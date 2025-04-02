@@ -45,14 +45,6 @@ public abstract class User {
 		return role;
 	}
 
-    public MaritalStatus getMaritalStatus() {
-        return maritalStatus;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
     // Setters
     public void setName(String name) {
         this.name = name;
@@ -76,12 +68,4 @@ public abstract class User {
     public void setRole(Role role) {
 		this.role = role;
 	}
-
-    public void setMaritalStatus(MaritalStatus maritalStatus) {
-        this.maritalStatus = maritalStatus;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
 }
