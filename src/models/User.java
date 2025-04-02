@@ -12,7 +12,7 @@ public abstract class User {
     protected MaritalStatus maritalStatus;
     protected Role role;
 
-    public User(String nric, String name, String password, int age, MaritalStatus maritalStatus, Role role) {
+    public User(String nric, String name, String password, int age, Role role, MaritalStatus maritalStatus) {
         this.nric = nric;
         this.name = name;
         this.age = age;
