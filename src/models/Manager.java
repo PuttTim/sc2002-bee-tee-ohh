@@ -1,11 +1,12 @@
 package models;
 
+import enums.MaritalStatus;
 import enums.Role;
 
 public class Manager extends User {
     
-    public Manager(String nric, String name, String password) {
-        super(nric, name, password, Role.MANAGER);
+    public Manager(String name, String nric, int age, MaritalStatus maritalStatus, String password) {
+        super(name, nric, age, maritalStatus, password, Role.MANAGER);
     }
 
     // Getters

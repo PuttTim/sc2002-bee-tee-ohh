@@ -1,6 +1,7 @@
 package controllers;
 
 import models.*;
+import enums.MaritalStatus;
 import enums.Role;
 
 import java.time.LocalDate;
@@ -17,16 +18,35 @@ public class ManagerController {
         // get projectID
         System.out.println("Enter the ID of the Project:");
         String projectId = sc.nextLine();
-        // get project manager name
-        System.out.println("Enter the name of the Project manager:");
-        String managerName = sc.nextLine();
         // get project manager NRIC
         System.out.println("Enter the NRIC of the Project manager:");
         String nric = sc.nextLine();
+        // get project manager name
+        System.out.println("Enter the name of the Project manager:");
+        String managerName = sc.nextLine();
+        // get Project manager age
+        System.out.println("Enter the age of Project manager:");
+        int managerAge = sc.nextInt();
+        // get Project manager marital status
+        System.out.println("Enter Project manager marital status (0 = SINGLE / 1 = MARRIED):");
+        int inputMS = sc.nextInt();
+        MaritalStatus managerMS;
+        while (true){
+            if(inputMS != 0 && inputMS != 1){
+                System.out.println("Invalid input, enter (0 = SINGLE / 1 = MARRIED):");
+                continue;
+            }
+            else if(inputMS == 0){
+                managerMS = MaritalStatus.SINGLE;
+            }
+            else if(inputMS == 1){
+                managerMS = MaritalStatus.MARRIED;
+            }
+        }
         // get project manager password
         System.out.println("Enter the password of the Project manager:");
         String password = sc.nextLine();
-        Manager manager = new Manager(nric, managerName, password);
+        Manager manager = new Manager(nric, managerName, managerAge, managerMS, password);
         // get project name
         System.out.println("Enter the name of the Project:");
         String projectName = sc.nextLine();
@@ -142,11 +162,14 @@ public class ManagerController {
                 }
             }
         }
+        else{
+            System.out.println("Project not found!");
+        }
     }
 
     // view all projects, regardless of visibility setting
     public void viewAllProjects(){
-        
+        databaseViewAllProjects(Role.MANAGER);
     }
 
     // filter and view lists of projects created by a manager
