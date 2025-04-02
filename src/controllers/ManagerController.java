@@ -38,9 +38,11 @@ public class ManagerController {
             }
             else if(inputMS == 0){
                 managerMS = MaritalStatus.SINGLE;
+                break;
             }
             else if(inputMS == 1){
                 managerMS = MaritalStatus.MARRIED;
+                break;
             }
         }
         // get project manager password
