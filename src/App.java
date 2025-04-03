@@ -1,13 +1,6 @@
 import controllers.ProjectController;
-import models.Project;
 import repositories.ProjectRepository;
-import services.ProjectService;
-import views.ProjectView;
-
-import controllers.EnquiryController;
 import repositories.EnquiryRepository;
-import services.EnquiryService;
-import views.EnquiryView;
 
 // This is the main entrypoint of our application.
 public class App {
@@ -15,8 +8,8 @@ public class App {
     };
 
     public static void main(String[] args) {
+        App app = new App();
         try {
-            App app = new App();
             app.initRepositories();
 
             ProjectController projectController = new ProjectController();
@@ -26,6 +19,8 @@ public class App {
 
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
+
+            app.saveRepositories();
         }
     }
 
@@ -39,5 +34,6 @@ public class App {
         // Save repositories
 
         ProjectRepository.saveAll();  
+        EnquiryRepository.saveAll();
     }
 }

@@ -54,6 +54,8 @@ public class EnquiryRepository {
             }
 
             CsvWriter.write(new EnquiryCsvConfig(), records);
+
+            System.out.println("Enquiries saved successfully.");
         } catch (IOException e) {
             System.err.println("Error saving enquiries: " + e.getMessage());
         }

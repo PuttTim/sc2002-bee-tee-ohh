@@ -35,6 +35,9 @@ public class ProjectView {
             System.out.print("Select a project (1-" + maxChoice + "): ");
             try {
                 int choice = Integer.parseInt(scanner.nextLine().trim());
+                if (choice == 0) {
+                    return 0;
+                }
                 if (choice >= 1 && choice <= maxChoice) {
                     return choice;
                 }
@@ -48,17 +51,18 @@ public class ProjectView {
     public int getProjectMenuChoice() {
         System.out.println("\nProject Menu:");
         System.out.println("1. Display all enquiries");
-        System.out.println("2. Apply for unit");
+        System.out.println("2. Create new enquiry");
+        System.out.println("3. Apply for unit");
         System.out.println("0. Back to previous menu");
         
         while (true) {
             System.out.print("Enter your choice: ");
             try {
                 int choice = Integer.parseInt(scanner.nextLine().trim());
-                if (choice >= 0 && choice <= 2) {
+                if (choice >= 0 && choice <= 3) {
                     return choice;
                 }
-                System.out.println("Please enter a number between 0 and 2");
+                System.out.println("Please enter a number between 0 and 3");
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number");
             }

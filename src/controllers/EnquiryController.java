@@ -9,8 +9,8 @@ import java.util.List;
 public class EnquiryController {
     private final EnquiryView enquiryView;
 
-    public EnquiryController(EnquiryView enquiryView) {
-        this.enquiryView = enquiryView;
+    public EnquiryController() {
+        this.enquiryView = new EnquiryView();
     }
 
     public void listEnquiries(Project project) {
@@ -18,9 +18,11 @@ public class EnquiryController {
         enquiryView.displayEnquiries(enquiries);
     }
 
-    public void createEnquiry(Enquiry enquiry) {
+    public void createEnquiry(Project project, String applicantNric, String query) {
+        String enquiryId = "E" + (EnquiryRepository.getAll().size() + 1);
+        Enquiry enquiry = new Enquiry(enquiryId, applicantNric, project.getProjectId(), query, null);
         EnquiryRepository.add(enquiry);
-        // enquiryView.displayEnquiryCreatedMessage();
+        enquiryView.displayEnquiryCreatedMessage();
     }
 
     public void respondToEnquiry(Enquiry enquiry, String response, String responderNric) {

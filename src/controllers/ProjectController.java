@@ -9,10 +9,14 @@ import java.util.List;
 public class ProjectController {
     private final ProjectView projectView;
     private final EnquiryController enquiryController;
+    private final EnquiryView enquiryView;
 
     public ProjectController() {
         this.projectView = new ProjectView();
-        this.enquiryController = new EnquiryController(new EnquiryView());
+        this.enquiryView = new EnquiryView();
+        this.enquiryController = new EnquiryController();
+
+
     }
 
     public void showMainMenu() {
@@ -27,6 +31,11 @@ public class ProjectController {
             }
 
             int projectChoice = projectView.getProjectChoice(projects.size());
+            
+            if (projectChoice == 0) {
+                return;
+            }
+
             Project selectedProject = projects.get(projectChoice - 1);
             
             boolean continueProjectMenu = true;
@@ -41,6 +50,12 @@ public class ProjectController {
                         enquiryController.listEnquiries(selectedProject);
                         break;
                     case 2:
+                        String query = this.enquiryView.getEnquiryDetails();
+                        // TODO: Get actual logged in user's NRIC
+                        String tempNric = "S1234567A";
+                        enquiryController.createEnquiry(selectedProject, tempNric, query);
+                        break;
+                    default:
                         System.out.println("Application feature not implemented yet");
                         break;
                 }

@@ -31,4 +31,13 @@ public class EnquiryView {
             System.out.println("----------------------------------");
         }
     }
+
+    public String getEnquiryDetails() {
+        System.out.println("\nEnter your enquiry:");
+        return scanner.nextLine().trim();
+    }
+
+    public void displayEnquiryCreatedMessage() {
+        System.out.println("Enquiry has been created successfully.");
+    }
 }
