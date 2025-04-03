@@ -1,6 +1,6 @@
 package enums;
 
 public enum FlatType {
-    2_ROOM,
-    3_ROOM
+    _2ROOM,
+    _3ROOM
 }

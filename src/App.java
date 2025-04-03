@@ -20,8 +20,7 @@ public class App {
             app.initRepositories();
 
             ProjectController projectController = new ProjectController();
-
-            projectController.testingProjects();
+            projectController.showMainMenu();
 
             app.saveRepositories();
 
@@ -33,7 +32,7 @@ public class App {
     private void initRepositories() {
         // Initialize repositories
         ProjectRepository.load();
-        // EnquiryRepository.load();
+        EnquiryRepository.load();
     }
 
     private void saveRepositories() {

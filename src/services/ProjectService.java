@@ -1,23 +1,32 @@
 package services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import interfaces.IProjectService;
 import models.Officer;
 import models.Project;
+import repositories.ProjectRepository;
 
 public class ProjectService implements IProjectService {
-    //
-//    public boolean registerForOfficer(Officer officer, Project project) {
-//        if (project.getOfficerSlots() == 0) {
-//            return false;
-//        } else {
-//            project.setOfficerSlots(project.getOfficerSlots()-1);
-//            return true;
-//        }
-//    }
+    private final ProjectRepository projectRepository;
+
+    public ProjectService(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
+
+    public List<Project> getAllProjects() {
+        return projectRepository.getAll();
+    }
+
+    public List<Project> getVisibleProjects() {
+        return projectRepository.getAll().stream()
+                .filter(Project::isVisible)
+                .collect(Collectors.toList());
+    }
+
     public boolean hasOfficerSlots(Project project) {
-        return project.getOfficerSlots() >= 0;
+        return project.getAvailableOfficerSlots() >= 0;
     }
 
     @Override
@@ -25,5 +34,4 @@ public class ProjectService implements IProjectService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findHandledProjects'");
     }
-
 }
