@@ -2,13 +2,19 @@ package models;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import enums.FlatType;
+
 import java.util.ArrayList;
 
 public class Project {
     private String projectId;
     private String managerNric;
     private String projectName;
-    private String location;
+    private String neighbourhood;
+    private FlatType flatType;
+    private int availableUnits;
+    private int unitPrice; 
     private LocalDateTime applicationStart;
     private LocalDateTime applicationEnd;
     private int availableOfficerSlots;
@@ -16,11 +22,14 @@ public class Project {
     private List<String> applicants;
     private List<String> officers;
 
-    public Project(String projectId, String managerNric, String projectName, String location, LocalDateTime applicationStart, LocalDateTime applicationEnd, int availableOfficerSlots, boolean isVisible) {
+    public Project(String projectId, String managerNric, String projectName, String neighbourhood, FlatType flatType, int availableUnits, int unitPrice, LocalDateTime applicationStart, LocalDateTime applicationEnd, int availableOfficerSlots, boolean isVisible) {
         this.projectId = projectId;
         this.managerNric = managerNric;
         this.projectName = projectName;
-        this.location = location;
+        this.neighbourhood = neighbourhood;
+        this.flatType = flatType;
+        this.availableUnits = availableUnits;
+        this.unitPrice = unitPrice;
         this.applicationStart = applicationStart;
         this.applicationEnd = applicationEnd;
         this.availableOfficerSlots = availableOfficerSlots;
@@ -40,10 +49,6 @@ public class Project {
 
     public String getProjectName() {
         return projectName;
-    }
-
-    public String getLocation() {
-        return location;
     }
 
     public LocalDateTime getApplicationStart() {
@@ -83,10 +88,6 @@ public class Project {
         this.projectName = projectName;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public void setApplicationStart(LocalDateTime applicationStart) {
         this.applicationStart = applicationStart;
     }
@@ -109,5 +110,49 @@ public class Project {
 
     public void addOfficer(String officerNric) {
         this.officers.add(officerNric);
+    }
+
+    public String getNeighbourhood() {
+        return neighbourhood;
+    }
+
+    public void setNeighbourhood(String neighbourhood) {
+        this.neighbourhood = neighbourhood;
+    }
+
+    public FlatType getFlatType() {
+        return flatType;
+    }
+
+    public void setFlatType(FlatType flatType) {
+        this.flatType = flatType;
+    }
+
+    public int getAvailableUnits() {
+        return availableUnits;
+    }
+
+    public void setAvailableUnits(int availableUnits) {
+        this.availableUnits = availableUnits;
+    }
+
+    public int getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(int unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    public void setApplicants(List<String> applicants) {
+        this.applicants = applicants;
+    }
+
+    public void setOfficers(List<String> officers) {
+        this.officers = officers;
     }
 }
