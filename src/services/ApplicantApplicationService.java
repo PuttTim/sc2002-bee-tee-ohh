@@ -8,6 +8,7 @@ import java.util.List;
 
 public class ApplicantApplicationService {
     private static int applicationIdCount = 1; //for generating application id???
+    private List<Application> applications = new ArrayList<>(); //to store all applications
 
     private String generateApplicationId() {
         return "A" + applicationIdCount++; //A1, A2, A3, etc
@@ -47,10 +48,21 @@ public class ApplicantApplicationService {
         }
     }
 
-    //applicant views their application status
+    //get applications by applicant
+    public Application getApplicationByApplicant(Applicant applicant) {
+        for (Application app : applications) {
+            if (app.getApplicant().equals(applicant)) {
+                return app;
+            }
+        }
+        return null;
+    }
+
+    //view status
     public ApplicationStatus viewApplicationStatus(Application application) {
         return application.getApplicationStatus();
     }
+
 
     //withdraw application
     public void withdrawApplication(Application application) {
