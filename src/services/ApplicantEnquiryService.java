@@ -7,15 +7,26 @@ import java.util.List;
 
 public class ApplicantEnquiryService {
     private static int enquiryIdCount = 1; //for generating enquiry id????
+    private List<Enquiry> enquiries = new ArrayList<>(); //list of all enquiries
 
     private String generateEnquiryId() {
         return "E" + enquiryIdCount++; //E1, E2, E3, etc
     }
 
-    //store all enquiries
-    private List<Enquiry> enquiries = new ArrayList<>();
-
     //enquiries section
+    //view the enquiries by applicant
+    public List<Enquiry> viewEnquiriesByApplicant(Applicant applicant) {
+        List<Enquiry> applicantEnquiries = new ArrayList<>();
+
+        //loop through list, filter by nric
+        for (Enquiry enquiry : enquiries) {
+            if (enquiry.getApplicant().getNric().equals(applicant.getNric())) { //if equal
+                applicantEnquiries.add(enquiry); //add enquiry to display
+            }
+        }
+        return applicantEnquiries;
+    }
+
     //submit enquiries
     public void submitEnquiry(Applicant applicant, Project project, String enquiryContent) {
         String enquiryId = generateEnquiryId();
