@@ -1,0 +1,3 @@
+﻿projectId,projectName,neighbourhood,flatType,availableUnits,unitPrice,applicationStart,applicationEnd,managerNric,availableOfficerSlots,officers
+P-1,Acacia Breeze,Yishun,2ROOM,2,350000,15/02/2025,20/03/2025,Jessica,3,"T2109876H,S6543210I"
+P-2,Acacia Breeze,Yishun,3ROOM,3,450000,15/02/2025,20/03/2025,Jessica,3,"T2109876H,S6543210I"

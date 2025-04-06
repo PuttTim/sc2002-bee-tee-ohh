@@ -1,29 +1,41 @@
 package models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import enums.FlatType;
+
+import java.util.ArrayList;
 
 public class Project {
     private String projectId;
-    private Manager manager;
+    private String managerNric;
     private String projectName;
-    private String location;
-    private LocalDate applicationStart;
-    private LocalDate applicationEnd;
-    private int officerSlots;
-    private boolean visibility;
+    private String neighbourhood;
+    private FlatType flatType;
+    private int availableUnits;
+    private int unitPrice; 
+    private LocalDateTime applicationStart;
+    private LocalDateTime applicationEnd;
+    private int availableOfficerSlots;
+    private boolean isVisible;
+    private List<String> applicants;
+    private List<String> officers;
 
-
-    // Might need to add minimal constructor
-    public Project (String projectId, Manager manager, String projectName, String location,
-    LocalDate applicationStart, LocalDate applicationEnd, int officerSlots, boolean visibility) {
+    public Project(String projectId, String managerNric, String projectName, String neighbourhood, FlatType flatType, int availableUnits, int unitPrice, LocalDateTime applicationStart, LocalDateTime applicationEnd, int availableOfficerSlots, boolean isVisible) {
         this.projectId = projectId;
-        this.manager = manager;
+        this.managerNric = managerNric;
         this.projectName = projectName;
-        this.location = location;
+        this.neighbourhood = neighbourhood;
+        this.flatType = flatType;
+        this.availableUnits = availableUnits;
+        this.unitPrice = unitPrice;
         this.applicationStart = applicationStart;
         this.applicationEnd = applicationEnd;
-        this.officerSlots = 10;
-        this.visibility = false; // Might need to add array of officers and applicants instead
+        this.availableOfficerSlots = availableOfficerSlots;
+        this.isVisible = isVisible;
+        this.applicants = applicants != null ? applicants : new ArrayList<>();
+        this.officers = officers != null ? officers : new ArrayList<>();
     }
 
     // Getters
@@ -31,64 +43,121 @@ public class Project {
         return projectId;
     }
 
-    public Manager getManager() {
-        return manager; // Check this again
+    public String getManagerNric() {
+        return managerNric;
     }
 
     public String getProjectName() {
         return projectName;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public LocalDate getApplicationStart() {
+    public LocalDateTime getApplicationStart() {
         return applicationStart;
     }
 
-    public LocalDate getApplicationEnd() {
+    public LocalDateTime getApplicationEnd() {
         return applicationEnd;
     }
 
-    public int getOfficerSlots() {
-        return officerSlots;
+    public int getAvailableOfficerSlots() {
+        return availableOfficerSlots;
     }
 
     public boolean isVisible() {
-        return visibility;
+        return isVisible;
     }
-    
+
+    public List<String> getApplicants() {
+        return applicants;
+    }
+
+    public List<String> getOfficers() {
+        return officers;
+    }
+
     // Setters
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 
-    public void setManager(Manager manager) {
-        this.manager = manager;
+    public void setManagerNric(String managerNric) {
+        this.managerNric = managerNric;
     }
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setApplicationStart(LocalDate applicationStart) {
+    public void setApplicationStart(LocalDateTime applicationStart) {
         this.applicationStart = applicationStart;
     }
 
-    public void setApplicationEnd(LocalDate applicationEnd) {
+    public void setApplicationEnd(LocalDateTime applicationEnd) {
         this.applicationEnd = applicationEnd;
     }
 
-    public void setOfficerSlots(int officerSlots) {
-        this.officerSlots = officerSlots;
+    public void setAvailableOfficerSlots(int availableOfficerSlots) {
+        this.availableOfficerSlots = availableOfficerSlots;
     }
 
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
+    public void setVisibility(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    // Helpers
+    public void addApplicant(String applicantNric) {
+        if (!applicants.contains(applicantNric)) {
+            applicants.add(applicantNric);
+        }
+    }
+
+    public void addOfficer(String officerNric) {
+        if (!officers.contains(officerNric)) {
+            officers.add(officerNric);
+        }
+    }
+
+    public String getNeighbourhood() {
+        return neighbourhood;
+    }
+
+    public void setNeighbourhood(String neighbourhood) {
+        this.neighbourhood = neighbourhood;
+    }
+
+    public FlatType getFlatType() {
+        return flatType;
+    }
+
+    public void setFlatType(FlatType flatType) {
+        this.flatType = flatType;
+    }
+
+    public int getAvailableUnits() {
+        return availableUnits;
+    }
+
+    public void setAvailableUnits(int availableUnits) {
+        this.availableUnits = availableUnits;
+    }
+
+    public int getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(int unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    public void setApplicants(List<String> applicants) {
+        this.applicants = applicants;
+    }
+
+    public void setOfficers(List<String> officers) {
+        this.officers = officers;
     }
 }
