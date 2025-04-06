@@ -15,4 +15,7 @@ public class CliUtils {
             }
         }
     }
+    public static boolean promptYesNo(String message) {
+        return true;
+    }
 }

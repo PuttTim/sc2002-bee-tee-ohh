@@ -2,12 +2,14 @@ package controllers;
 
 import enums.RegistrationStatus;
 import interfaces.*;
+import models.Enquiry;
 import models.Officer;
 import models.OfficerRegistration;
 import models.Project;
 import utils.CliUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public class OfficerController {
@@ -18,6 +20,8 @@ public class OfficerController {
     private final IOfficerRegistrationView officerRegistrationView;
     private final IProjectView projectView;
     private final ICommonView commonView;
+    private final IEnquiryView enquiryView;
+    private final IEnquiryService enquiryService;
 
     public OfficerController(
             ApplicantController applicantController,
@@ -26,7 +30,9 @@ public class OfficerController {
             IOfficerRegistrationService officerRegistrationService,
             IOfficerRegistrationView officerRegistrationView,
             IProjectView projectView,
-            ICommonView commonView
+            ICommonView commonView,
+            IEnquiryView enquiryView,
+            IEnquiryService enquiryService
     ) {
         this.applicantController = applicantController;
         this.officerService = officerService;
@@ -35,6 +41,8 @@ public class OfficerController {
         this.officerRegistrationView = officerRegistrationView;
         this.projectView = projectView;
         this.commonView = commonView;
+        this.enquiryView = enquiryView;
+        this.enquiryService = enquiryService;
     }
 
     //register to join project as officer
@@ -58,35 +66,72 @@ public class OfficerController {
     }
     //check status of registration as officer
     public void checkHandlerRegistration(Officer officer) {
-        RegistrationStatus registrationStatus = officerRegistrationService.checkRegistrationStatus(officer);
+        RegistrationStatus registrationStatus = officerRegistrationService.getRegistrationStatus(officer);
         officerRegistrationView.displayRegistrationStatus(registrationStatus);
     }
-    //view details of project
-    public void viewHandledProjectDetails(Officer officer) {
-        List<Project> projects = projectService.findHandledProjects(officer);
+    private Optional<Project> getProjectSelection(Officer officer) {
+        List<Project> projects = projectService.getHandledProjects(officer);
         if (projects.isEmpty()) {
             projectView.displayEmptyMessage();
-            return;
+            return Optional.empty();
         }
         projectView.showProjectList(projects);
         int choice = CliUtils.promptInt("Enter the number of the project to view details (or 0 to cancel):");
 
         if (choice == 0) {
-            commonView.displayMessage("Cacncelled");
-            return;
+            commonView.displayMessage("Cancelled.");
+            return Optional.empty();
         }
 
         if (choice < 1 || choice > projects.size()) {
             commonView.displayMessage("Invalid project number selected.");
+            return Optional.empty();
+        }
+        Project selectedProject = projects.get(choice-1);
+        return Optional.of(selectedProject);
+    }
+    //view details of project
+    public void viewHandledProjectDetails(Officer officer) {
+        Optional<Project> selectedProjectOptional = getProjectSelection(officer);
+        if (selectedProjectOptional.isPresent()) {
+            Project selectedProject = selectedProjectOptional.get();
+            projectView.displayProjectDetails(selectedProject);
+        }
+    }
+    //view and reply to enquiries
+    public void manageProjectEnquiries(Officer officer) {
+        //TODO
+        Optional<Project> selectedProjectOptional = getProjectSelection(officer);
+        if (selectedProjectOptional.isEmpty()) {
+            return;
+        }
+        Project selectedProject = selectedProjectOptional.get();
+        List<Enquiry> enquiries = enquiryService.getProjectEnquiries(selectedProject);
+        if (enquiries.isEmpty()) {
+            enquiryView.displayEmptyMessage();
+            return;
+        }
+        enquiryView.showEnquiryList(enquiries);
+        int choice = CliUtils.promptInt("Enter the number of the enquiry to view details/reply (or 0 to cancel):");
+
+        if (choice == 0) {
+            commonView.displayMessage("Cancelled.");
             return;
         }
 
-        Project selectedProject = projects.get(choice-1);
-        projectView.displayProjectDetails(selectedProject);
-    }
-    //view and reply to enquiries
-    public void viewProjectEnquiries() {
-        //TODO
+        if (choice < 1 || choice > enquiries.size()) {
+            commonView.displayMessage("Invalid project number selected.");
+            return;
+        }
+        Enquiry selectedEnquiry = enquiries.get(choice-1);
+
+        enquiryView.displayEnquiry(selectedEnquiry);
+
+        if (CliUtils.promptYesNo("Do you want to reply to this enquiry?")) {
+            enquiryService.replyToEnquiry(selectedEnquiry);
+        } else {
+            commonView.displayMessage("Exiting...");
+        }
 
     }
     //help select flat
