@@ -1,5 +1,8 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import enums.MaritalStatus;
 import enums.Role;
 

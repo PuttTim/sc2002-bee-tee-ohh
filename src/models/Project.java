@@ -34,8 +34,8 @@ public class Project {
         this.applicationEnd = applicationEnd;
         this.availableOfficerSlots = availableOfficerSlots;
         this.isVisible = isVisible;
-        this.applicants = new ArrayList<>();
-        this.officers = new ArrayList<>();
+        this.applicants = applicants != null ? applicants : new ArrayList<>();
+        this.officers = officers != null ? officers : new ArrayList<>();
     }
 
     // Getters
@@ -104,12 +104,17 @@ public class Project {
         this.isVisible = isVisible;
     }
 
+    // Helpers
     public void addApplicant(String applicantNric) {
-        this.applicants.add(applicantNric);
+        if (!applicants.contains(applicantNric)) {
+            applicants.add(applicantNric);
+        }
     }
 
     public void addOfficer(String officerNric) {
-        this.officers.add(officerNric);
+        if (!officers.contains(officerNric)) {
+            officers.add(officerNric);
+        }
     }
 
     public String getNeighbourhood() {
