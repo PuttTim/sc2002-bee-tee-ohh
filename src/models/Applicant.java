@@ -6,26 +6,27 @@ import java.util.List;
 import enums.MaritalStatus;
 import enums.Role;
 
-public class Applicant extends User {
+public class Applicant extends Officer {
     private List<String> appliedProjectIds;
 
     public Applicant(String applicantNric, String name, String password, int age, List<String> appliedProjectIds) {
-        super(applicantNric, name, password, age, MaritalStatus.SINGLE, Role.APPLICANT);
+        super(applicantNric, name, password, age);
+        super.setMaritalStatus(MaritalStatus.SINGLE);
+        super.setRole(Role.APPLICANT);
         this.appliedProjectIds = appliedProjectIds != null ? appliedProjectIds : new ArrayList<>();
     }
 
-
-    // Getters
+    // Getter
     public List<String> getAppliedProjectIds() {
         return appliedProjectIds;
     }
 
-    // Setters
-    public void setAppliedProjectIds(List<String> appliedProjectIds) {
-        this.appliedProjectIds = appliedProjectIds != null ? appliedProjectIds : new ArrayList<>();
+    // Setter
+    public void setAppliedProjectIds(List<String> projectIds) {
+        this.appliedProjectIds = projectIds != null ? projectIds : new ArrayList<>();
     }
 
-    // Helpers
+    // Helper
     public void addAppliedProject(String projectId) {
         if (!appliedProjectIds.contains(projectId)) {
             appliedProjectIds.add(projectId);

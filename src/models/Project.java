@@ -1,35 +1,73 @@
 package models;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import enums.FlatType;
 
 public class Project {
+    private static int lastProjectId = 0;
+
     private String projectId;
     private String managerNric;
     private String projectName;
     private String location;
+    private FlatType flatType;
+    private int numberOfFlats;
     private LocalDateTime applicationStart;
     private LocalDateTime applicationEnd;
     private int availableOfficerSlots;
     private boolean isVisible;
-    private List<String> applicants;
-    private List<String> officers;
+    private List<String> applicantNrics;
+    private List<String> officerNrics;
 
-    public Project(String projectId, String managerNric, String projectName, String location,
+    public Project(String managerNric, String projectName, String location,
+                   FlatType flatType, int numberOfFlats,
                    LocalDateTime applicationStart, LocalDateTime applicationEnd,
                    int availableOfficerSlots, boolean isVisible,
-                   List<String> applicants, List<String> officers) {
-        this.projectId = projectId;
+                   List<String> applicantNrics, List<String> officerNrics) {
+
+        this.projectId = "P" + (++Project.lastProjectId);
         this.managerNric = managerNric;
         this.projectName = projectName;
         this.location = location;
+        this.flatType = flatType;
+        this.numberOfFlats = numberOfFlats;
         this.applicationStart = applicationStart;
         this.applicationEnd = applicationEnd;
         this.availableOfficerSlots = availableOfficerSlots;
         this.isVisible = isVisible;
-        this.applicants = applicants != null ? applicants : new ArrayList<>();
-        this.officers = officers != null ? officers : new ArrayList<>();
+        this.applicantNrics = applicantNrics != null ? applicantNrics : new ArrayList<>();
+        this.officerNrics = officerNrics != null ? officerNrics : new ArrayList<>();
+    }
+
+    public Project(String projectId, String managerNric, String projectName, String location,
+                   FlatType flatType, int numberOfFlats,
+                   LocalDateTime applicationStart, LocalDateTime applicationEnd,
+                   int availableOfficerSlots, boolean isVisible,
+                   List<String> applicantNrics, List<String> officerNrics) {
+
+        this.projectId = projectId;
+        this.managerNric = managerNric;
+        this.projectName = projectName;
+        this.location = location;
+        this.flatType = flatType;
+        this.numberOfFlats = numberOfFlats;
+        this.applicationStart = applicationStart;
+        this.applicationEnd = applicationEnd;
+        this.availableOfficerSlots = availableOfficerSlots;
+        this.isVisible = isVisible;
+        this.applicantNrics = applicantNrics != null ? applicantNrics : new ArrayList<>();
+        this.officerNrics = officerNrics != null ? officerNrics : new ArrayList<>();
+
+        try {
+            int numericId = Integer.parseInt(projectId.replaceAll("\\D+", ""));
+            if (numericId > Project.lastProjectId) {
+                Project.lastProjectId = numericId;
+            }
+        } catch (NumberFormatException e) {
+        }
     }
 
     // Getters
@@ -49,6 +87,14 @@ public class Project {
         return location;
     }
 
+    public FlatType getFlatType() {
+        return flatType;
+    }
+
+    public int getNumberOfFlats() {
+        return numberOfFlats;
+    }
+
     public LocalDateTime getApplicationStart() {
         return applicationStart;
     }
@@ -65,27 +111,15 @@ public class Project {
         return isVisible;
     }
 
-    public List<String> getApplicants() {
-        return applicants;
+    public List<String> getApplicantNrics() {
+        return applicantNrics;
     }
 
-    public List<String> getOfficers() {
-        return officers;
+    public List<String> getOfficerNrics() {
+        return officerNrics;
     }
 
     // Setters
-    public void setApplicants(List<String> applicants) {
-        this.applicants = applicants != null ? applicants : new ArrayList<>();
-    }
-
-    public void setOfficers(List<String> officers) {
-        this.officers = officers != null ? officers : new ArrayList<>();
-    }
-
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
     public void setManagerNric(String managerNric) {
         this.managerNric = managerNric;
     }
@@ -96,6 +130,14 @@ public class Project {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public void setFlatType(FlatType flatType) {
+        this.flatType = flatType;
+    }
+
+    public void setNumberOfFlats(int numberOfFlats) {
+        this.numberOfFlats = numberOfFlats;
     }
 
     public void setApplicationStart(LocalDateTime applicationStart) {
@@ -114,16 +156,40 @@ public class Project {
         this.isVisible = isVisible;
     }
 
+    public void setApplicantNrics(List<String> applicantNrics) {
+        this.applicantNrics = applicantNrics != null ? applicantNrics : new ArrayList<>();
+    }
+
+    public void setOfficerNrics(List<String> officerNrics) {
+        this.officerNrics = officerNrics != null ? officerNrics : new ArrayList<>();
+    }
+
     // Helpers
+    public boolean isApplicationOpen(LocalDateTime now) {
+        return now.isAfter(applicationStart) && now.isBefore(applicationEnd);
+    }
+
     public void addApplicant(String applicantNric) {
-        if (!applicants.contains(applicantNric)) {
-            applicants.add(applicantNric);
+        if (!applicantNrics.contains(applicantNric)) {
+            applicantNrics.add(applicantNric);
         }
     }
 
     public void addOfficer(String officerNric) {
-        if (!officers.contains(officerNric)) {
-            officers.add(officerNric);
+        if (!officerNrics.contains(officerNric)) {
+            officerNrics.add(officerNric);
+        }
+    }
+
+    public void reduceOfficerSlot() {
+        if (availableOfficerSlots > 0) {
+            availableOfficerSlots--;
+        }
+    }
+
+    public void reduceFlatCount() {
+        if (numberOfFlats > 0) {
+            numberOfFlats--;
         }
     }
 }
