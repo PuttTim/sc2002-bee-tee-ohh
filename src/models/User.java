@@ -4,23 +4,23 @@ import enums.MaritalStatus;
 import enums.Role;
 
 public class User {
-    protected String userNric;
+    protected String userNRIC;
     protected String name;
     protected String password;
     protected int age;
     protected MaritalStatus maritalStatus;
     protected Role role;
 
-    public User(String userNric, String name, String password, int age) {
-        this.userNric = userNric;
+    public User(String userNRIC, String name, String password, int age) {
+        this.userNRIC = userNRIC;
         this.name = name;
         this.password = password;
         this.age = age;
     }
 
     // Getters
-    public String getUserNric() {
-        return userNric;
+    public String getUserNRIC() {
+        return userNRIC;
     }
 
     public String getName() {

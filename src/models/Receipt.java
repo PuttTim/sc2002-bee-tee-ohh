@@ -6,33 +6,37 @@ import enums.FlatType;
 import enums.MaritalStatus;
 
 public class Receipt {
-    private static int lastReceiptId = 0;
+    private static int lastReceiptID = 0;
 
-    private String receiptId;
+    private String receiptID;
     private String applicantName;
-    private String applicantNric;
+    private String applicantNRIC;
     private int applicantAge;
     private MaritalStatus maritalStatus;
     private FlatType flatType;
-    private String projectId;
+    private int flatPrice;
+    private String flatUnitNumber;
+    private String projectID;
     private String projectName;
     private String projectLocation;
     private LocalDateTime receiptDate;
 
-    public Receipt(Applicant applicant, FlatType flatType, Project project) {
-        this.receiptId = "RCPT" + (++lastReceiptId);
+    public Receipt(Applicant applicant, FlatType flatType, int flatPrice, String flatUnitNumber, Project project) {
+        this.receiptID = "RCPT" + (++lastReceiptID);
 
         // Applicant Info
         this.applicantName = applicant.getName();
-        this.applicantNric = applicant.getUserNric();
+        this.applicantNRIC = applicant.getUserNRIC();
         this.applicantAge = applicant.getAge();
         this.maritalStatus = applicant.getMaritalStatus();
 
         // Flat Info
         this.flatType = flatType;
+        this.flatPrice = flatPrice;
+        this.flatUnitNumber = flatUnitNumber;
 
         // Project Info
-        this.projectId = project.getProjectId();
+        this.projectID = project.getProjectID();
         this.projectName = project.getProjectName();
         this.projectLocation = project.getLocation();
 
@@ -41,16 +45,16 @@ public class Receipt {
     }
 
     // Getters
-    public String getReceiptId() {
-        return receiptId;
+    public String getReceiptID() {
+        return receiptID;
     }
 
     public String getApplicantName() {
         return applicantName;
     }
 
-    public String getApplicantNric() {
-        return applicantNric;
+    public String getApplicantNRIC() {
+        return applicantNRIC;
     }
 
     public int getApplicantAge() {
@@ -65,8 +69,16 @@ public class Receipt {
         return flatType;
     }
 
-    public String getProjectId() {
-        return projectId;
+    public int getFlatPrice() {
+        return flatPrice;
+    }
+
+    public String getFlatUnitNumber() {
+        return flatUnitNumber;
+    }
+
+    public String getProjectID() {
+        return projectID;
     }
 
     public String getProjectName() {

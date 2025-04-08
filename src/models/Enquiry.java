@@ -1,15 +1,14 @@
 package models;
 
 import java.time.LocalDateTime;
-
 import enums.EnquiryStatus;
 
 public class Enquiry {
-    private static int lastEnquiryId = 0;
+    private static int lastEnquiryID = 0;
 
-    private String enquiryId;
-    private String applicantNric;
-    private String projectId;
+    private String enquiryID;
+    private String applicantNRIC;
+    private String projectID;
     private String query;
     private String response;
     private EnquiryStatus enquiryStatus;
@@ -17,10 +16,10 @@ public class Enquiry {
     private LocalDateTime lastUpdated;
     private String respondedBy;
 
-    public Enquiry(String applicantNric, String projectId, String query) {
-        this.enquiryId = "E" + (++Enquiry.lastEnquiryId);
-        this.applicantNric = applicantNric;
-        this.projectId = projectId;
+    public Enquiry(String applicantNRIC, String projectID, String query) {
+        this.enquiryID = "E" + (++Enquiry.lastEnquiryID);
+        this.applicantNRIC = applicantNRIC;
+        this.projectID = projectID;
         this.query = query;
         this.response = null;
         this.enquiryStatus = EnquiryStatus.PENDING;
@@ -29,12 +28,12 @@ public class Enquiry {
         this.respondedBy = null;
     }
 
-    public Enquiry(String enquiryId, String applicantNric, String projectId, String query, String response,
+    public Enquiry(String enquiryID, String applicantNRIC, String projectID, String query, String response,
                    EnquiryStatus enquiryStatus, LocalDateTime enquiryDate,
                    LocalDateTime lastUpdated, String respondedBy) {
-        this.enquiryId = enquiryId;
-        this.applicantNric = applicantNric;
-        this.projectId = projectId;
+        this.enquiryID = enquiryID;
+        this.applicantNRIC = applicantNRIC;
+        this.projectID = projectID;
         this.query = query;
         this.response = response;
         this.enquiryStatus = enquiryStatus;
@@ -43,25 +42,25 @@ public class Enquiry {
         this.respondedBy = respondedBy;
 
         try {
-            int numericId = Integer.parseInt(enquiryId.replaceAll("\\D+", ""));
-            if (numericId > Enquiry.lastEnquiryId) {
-                Enquiry.lastEnquiryId = numericId;
+            int numericId = Integer.parseInt(enquiryID.replaceAll("\\D+", ""));
+            if (numericId > Enquiry.lastEnquiryID) {
+                Enquiry.lastEnquiryID = numericId;
             }
         } catch (NumberFormatException ignored) {
         }
     }
 
     // Getters
-    public String getEnquiryId() {
-        return enquiryId;
+    public String getEnquiryID() {
+        return enquiryID;
     }
 
-    public String getApplicantNric() {
-        return applicantNric;
+    public String getApplicantNRIC() {
+        return applicantNRIC;
     }
 
-    public String getProjectId() {
-        return projectId;
+    public String getProjectID() {
+        return projectID;
     }
 
     public String getQuery() {
@@ -89,16 +88,16 @@ public class Enquiry {
     }
 
     // Setters
-    public void setEnquiryId(String enquiryId) {
-        this.enquiryId = enquiryId;
+    public void setEnquiryID(String enquiryID) {
+        this.enquiryID = enquiryID;
     }
 
-    public void setApplicantNric(String applicantNric) {
-        this.applicantNric = applicantNric;
+    public void setApplicantNRIC(String applicantNRIC) {
+        this.applicantNRIC = applicantNRIC;
     }
 
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
+    public void setProjectID(String projectID) {
+        this.projectID = projectID;
     }
 
     public void setQuery(String query) {

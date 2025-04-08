@@ -4,22 +4,22 @@ import enums.MaritalStatus;
 import enums.Role;
 
 public class Officer extends User {
-    private String currentProjectId;
+    private String currentProjectID;
 
-    public Officer(String officerNric, String name, String password, int age) {
-        super(officerNric, name, password, age);
+    public Officer(String officerNRIC, String name, String password, int age) {
+        super(officerNRIC, name, password, age);
         super.setMaritalStatus(MaritalStatus.SINGLE);
         super.setRole(Role.OFFICER);
-        this.currentProjectId = null;
+        this.currentProjectID = null;
     }
 
     // Getter
-    public String getCurrentProjectId() {
-        return currentProjectId;
+    public String getCurrentProjectID() {
+        return currentProjectID;
     }
 
     // Setter
-    public void setCurrentProjectId(String currentProjectId) {
-        this.currentProjectId = currentProjectId;
+    public void setCurrentProjectID(String currentProjectID) {
+        this.currentProjectID = currentProjectID;
     }
 }

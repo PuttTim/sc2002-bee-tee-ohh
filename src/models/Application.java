@@ -8,10 +8,10 @@ import enums.FlatType;
 import enums.ApplicationStatus;
 
 public class Application {
-    private static int lastApplicationId = 0;
+    private static int lastApplicationID = 0;
 
-    private String applicationId;
-    private String applicantNric;
+    private String applicationID;
+    private String applicantNRIC;
     private String projectId;
     private FlatType selectedFlatType;
     private ApplicationStatus applicationStatus;
@@ -20,9 +20,9 @@ public class Application {
     private String approvedBy;
     private Map<ApplicationStatus, LocalDateTime> applicationStatusHistory;
 
-    public Application(String applicantNric, String projectId, FlatType selectedFlatType) {
-        this.applicationId = "A" + (++Application.lastApplicationId);
-        this.applicantNric = applicantNric;
+    public Application(String applicantNRIC, String projectId, FlatType selectedFlatType) {
+        this.applicationID = "A" + (++Application.lastApplicationID);
+        this.applicantNRIC = applicantNRIC;
         this.projectId = projectId;
         this.selectedFlatType = selectedFlatType;
         this.applicationStatus = ApplicationStatus.PENDING;
@@ -33,37 +33,36 @@ public class Application {
         recordStatusChange(ApplicationStatus.PENDING);
     }
 
-    public Application(String applicationId, String applicantNric, String projectId,
+    public Application(String applicationID, String applicantNRIC, String projectId,
                        FlatType selectedFlatType, ApplicationStatus applicationStatus,
                        boolean isWithdrawalRequested, LocalDateTime applicationDate,
                        String approvedBy, Map<ApplicationStatus, LocalDateTime> statusHistory) {
-        this.applicationId = applicationId;
-        this.applicantNric = applicantNric;
+        this.applicationID = applicationID;
+        this.applicantNRIC = applicantNRIC;
         this.projectId = projectId;
         this.selectedFlatType = selectedFlatType;
         this.applicationStatus = applicationStatus;
         this.isWithdrawalRequested = isWithdrawalRequested;
         this.applicationDate = applicationDate;
         this.approvedBy = approvedBy;
-        this.applicationStatusHistory = statusHistory != null ? applicationStatusHistory : new HashMap<>();
+        this.applicationStatusHistory = statusHistory != null ? statusHistory : new HashMap<>();
 
-        // Update the static ID counter to prevent duplicates
         try {
-            int numericId = Integer.parseInt(applicationId.replaceAll("\\D+", ""));
-            if (numericId > Application.lastApplicationId) {
-                Application.lastApplicationId = numericId;
+            int numericId = Integer.parseInt(applicationID.replaceAll("\\D+", ""));
+            if (numericId > Application.lastApplicationID) {
+                Application.lastApplicationID = numericId;
             }
         } catch (NumberFormatException ignored) {
         }
     }
 
     // Getters
-    public String getApplicationId() {
-        return applicationId;
+    public String getApplicationID() {
+        return applicationID;
     }
 
-    public String getApplicantNric() {
-        return applicantNric;
+    public String getApplicantNRIC() {
+        return applicantNRIC;
     }
 
     public String getProjectId() {
@@ -99,8 +98,12 @@ public class Application {
     }
 
     // Setters
-    public void setApplicantNric(String applicantNric) {
-        this.applicantNric = applicantNric;
+    public void setApplicationID(String applicationID) {
+        this.applicationID = applicationID;
+    }
+
+    public void setApplicantNRIC(String applicantNRIC) {
+        this.applicantNRIC = applicantNRIC;
     }
 
     public void setProjectId(String projectId) {

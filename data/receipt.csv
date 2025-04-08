@@ -1,0 +1,3 @@
+ReceiptID,Applicant Name,ApplicantNRIC,Applicant Age,Marital Status,Flat Type,Flat Price,Flat Unit Number,ProjectID,Project Name,Project Location,Receipt Date
+RCPT1,Alice Tan,S1234567A,30,SINGLE,THREE_ROOM,550000,B123,P2,Tampines GreenView,Tampines,2025-04-09T10:00:00
+RCPT2,Rachel Sim,S3456789E,25,SINGLE,TWO_ROOM,450000,A212,P1,Acacia Breeze,Yishun,2025-02-19T14:00:00
