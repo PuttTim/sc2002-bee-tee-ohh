@@ -1,0 +1,5 @@
+projectId,projectName,neighbourhood,flatType,availableUnits,unitPrice,applicationStart,applicationEnd,managerNric,availableOfficerSlots,officer1,officer2,officer3
+P-1,Acacia Breeze,Yishun,2ROOM,2,350000,15/02/2025,20/03/2025,T1234567P,3,T2109876H,S6543210I,-
+P-2,Jessica,Woodleigh,3ROOM,3,450000,15/02/2025,20/03/2025,T1234567P,3,T2109876H,S6543210I,T1234567P
+P-3,Jonathan,Queenstown,3ROOM,3,450000,15/02/2025,20/03/2025,T1234567P,1,T2109876H,-,-
+P-4,Kennedy,Jurong,3ROOM,3,450000,15/02/2025,20/03/2025,T1234567P,2,T2109876H,S6543210I,-
