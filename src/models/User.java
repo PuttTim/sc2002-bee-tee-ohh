@@ -4,32 +4,34 @@ import enums.MaritalStatus;
 import enums.Role;
 import enums.MaritalStatus;
 
-public abstract class User {
-    protected String nric;
+public class User {
+    protected String userNRIC;
     protected String name;
     protected String password;
     protected int age;
     protected MaritalStatus maritalStatus;
     protected Role role;
 
-    public User(String nric, String name, String password, int age, Role role, MaritalStatus maritalStatus) {
-        this.nric = nric;
+    public User(String userNRIC, String name, String password, int age) {
+        this.userNRIC = userNRIC;
         this.name = name;
         this.age = age;
         this.maritalStatus = maritalStatus;
         this.password = password;
         this.age = age;
-        this.maritalStatus = maritalStatus;
-        this.role = role;
     }
 
     // Getters
+    public String getUserNRIC() {
+        return userNRIC;
+    }
+
     public String getName() {
         return name;
     }
 
-    public String getNric() {
-        return nric;
+    public String getPassword() {
+        return password;
     }
 
     public int getAge() {
@@ -45,20 +47,13 @@ public abstract class User {
     }
 
     public Role getRole() {
-		return role;
-	}
-
-    // Setters
-    public void setName(String name) {
-        this.name = name;
+        return role;
     }
 
-    public void setNric(String nric) {
-		this.nric = nric;
-	}
-
+    // Setters
     public void setPassword(String password) {
-        this.password = password;   // Hash password here
+        // TODO: Hash the password
+        this.password = password;
     }
 
     public void setAge(int age) {
@@ -70,6 +65,6 @@ public abstract class User {
     }
 
     public void setRole(Role role) {
-		this.role = role;
-	}
+        this.role = role;
+    }
 }

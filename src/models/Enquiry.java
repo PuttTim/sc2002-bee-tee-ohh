@@ -4,37 +4,63 @@ import java.time.LocalDateTime;
 import enums.EnquiryStatus;
 
 public class Enquiry {
-    private String enquiryId;
-    private String applicantNric;
-    private String projectId;
+    private static int lastEnquiryID = 0;
+
+    private String enquiryID;
+    private String applicantNRIC;
+    private String projectID;
     private String query;
     private String response;
     private EnquiryStatus enquiryStatus;
     private LocalDateTime enquiryDate;
+    private LocalDateTime lastUpdated;
     private String respondedBy;
 
-    public Enquiry(String enquiryId, String applicantNric, String projectId, String query, String respondedBy) {
-        this.enquiryId = enquiryId;
-        this.applicantNric = applicantNric;
-        this.projectId = projectId;
+    public Enquiry(String applicantNRIC, String projectID, String query) {
+        this.enquiryID = "E" + (++Enquiry.lastEnquiryID);
+        this.applicantNRIC = applicantNRIC;
+        this.projectID = projectID;
         this.query = query;
         this.response = null;
         this.enquiryStatus = EnquiryStatus.PENDING;
         this.enquiryDate = LocalDateTime.now();
+        this.lastUpdated = this.enquiryDate;
         this.respondedBy = null;
     }
 
+    public Enquiry(String enquiryID, String applicantNRIC, String projectID, String query, String response,
+                   EnquiryStatus enquiryStatus, LocalDateTime enquiryDate,
+                   LocalDateTime lastUpdated, String respondedBy) {
+        this.enquiryID = enquiryID;
+        this.applicantNRIC = applicantNRIC;
+        this.projectID = projectID;
+        this.query = query;
+        this.response = response;
+        this.enquiryStatus = enquiryStatus;
+        this.enquiryDate = enquiryDate;
+        this.lastUpdated = lastUpdated;
+        this.respondedBy = respondedBy;
+
+        try {
+            int numericId = Integer.parseInt(enquiryID.replaceAll("\\D+", ""));
+            if (numericId > Enquiry.lastEnquiryID) {
+                Enquiry.lastEnquiryID = numericId;
+            }
+        } catch (NumberFormatException ignored) {
+        }
+    }
+
     // Getters
-    public String getEnquiryId() {
-        return enquiryId;
+    public String getEnquiryID() {
+        return enquiryID;
     }
 
-    public String getApplicantNric() {
-        return applicantNric;
+    public String getApplicantNRIC() {
+        return applicantNRIC;
     }
 
-    public String getProjectId() {
-        return projectId;
+    public String getProjectID() {
+        return projectID;
     }
 
     public String getQuery() {
@@ -53,21 +79,25 @@ public class Enquiry {
         return enquiryDate;
     }
 
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
     public String getRespondedBy() {
         return respondedBy;
     }
 
     // Setters
-    public void setEnquiryId(String enquiryId) {
-        this.enquiryId = enquiryId;
+    public void setEnquiryID(String enquiryID) {
+        this.enquiryID = enquiryID;
     }
 
-    public void setApplicantNric(String applicantNric) {
-        this.applicantNric = applicantNric;
+    public void setApplicantNRIC(String applicantNRIC) {
+        this.applicantNRIC = applicantNRIC;
     }
 
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
+    public void setProjectID(String projectID) {
+        this.projectID = projectID;
     }
 
     public void setQuery(String query) {
@@ -82,9 +112,19 @@ public class Enquiry {
         this.enquiryDate = enquiryDate;
     }
 
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public void setRespondedBy(String respondedBy) {
+        this.respondedBy = respondedBy;
+    }
+
+    // Status Update Method
     public void markAsResponded(String responder, String response) {
         this.response = response;
         this.enquiryStatus = EnquiryStatus.RESPONDED;
         this.respondedBy = responder;
+        this.lastUpdated = LocalDateTime.now();
     }
 }
