@@ -1,11 +1,11 @@
 package controllers;
 
-import enums.RegistrationStatus;
 import interfaces.*;
 import models.Enquiry;
 import models.Officer;
 import models.OfficerRegistration;
 import models.Project;
+import models.enums.RegistrationStatus;
 import utils.CliUtils;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package services;
 
 import models.*;
-import enums.ApplicationStatus;
+import models.enums.ApplicationStatus;
 
 import java.util.ArrayList;
 import java.util.List;

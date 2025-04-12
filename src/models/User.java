@@ -1,8 +1,7 @@
 package models;
 
-import enums.MaritalStatus;
-import enums.Role;
-import enums.MaritalStatus;
+import models.enums.MaritalStatus;
+import models.enums.Role;
 
 public class User {
     protected String userNRIC;
@@ -36,10 +35,6 @@ public class User {
 
     public int getAge() {
         return age;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public MaritalStatus getMaritalStatus() {

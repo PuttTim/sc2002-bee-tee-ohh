@@ -3,8 +3,8 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-import enums.MaritalStatus;
-import enums.Role;
+import models.enums.MaritalStatus;
+import models.enums.Role;
 
 public class Applicant extends Officer {
     private List<String> appliedProjects;

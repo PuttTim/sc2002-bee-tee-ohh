@@ -1,6 +1,6 @@
 package models;
 
-import enums.RegistrationStatus;
+import models.enums.RegistrationStatus;
 
 public class OfficerRegistration {
     private final String applicantNric;

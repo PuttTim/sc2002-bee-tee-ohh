@@ -2,8 +2,8 @@ package models;
 
 import java.time.LocalDateTime;
 
-import enums.FlatType;
-import enums.MaritalStatus;
+import models.enums.FlatType;
+import models.enums.MaritalStatus;
 
 public class Receipt {
     private static int lastReceiptID = 0;

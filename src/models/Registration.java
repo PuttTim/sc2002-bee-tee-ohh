@@ -1,7 +1,8 @@
 package models;
 
 import java.time.LocalDateTime;
-import enums.RegistrationStatus;
+
+import models.enums.RegistrationStatus;
 
 public class Registration {
     private static int lastRegistrationID = 0;

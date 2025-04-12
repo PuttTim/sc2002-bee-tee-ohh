@@ -1,7 +1,8 @@
 package models;
 
 import java.time.LocalDateTime;
-import enums.EnquiryStatus;
+
+import models.enums.EnquiryStatus;
 
 public class Enquiry {
     private static int lastEnquiryID = 0;

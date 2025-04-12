@@ -1,7 +1,7 @@
 package models;
 
-import enums.MaritalStatus;
-import enums.Role;
+import models.enums.MaritalStatus;
+import models.enums.Role;
 
 public class Officer extends User {
     private String currentProjectID;

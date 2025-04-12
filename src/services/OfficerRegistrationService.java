@@ -1,10 +1,10 @@
 package services;
 
-import enums.RegistrationStatus;
 import interfaces.IOfficerRegistrationService;
 import models.Officer;
 import models.OfficerRegistration;
 import models.Project;
+import models.enums.RegistrationStatus;
 
 public class OfficerRegistrationService implements IOfficerRegistrationService {
     public OfficerRegistration createApplication(Officer officer, Project project) {

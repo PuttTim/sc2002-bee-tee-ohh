@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import enums.FlatType;
-import enums.ApplicationStatus;
+import models.enums.ApplicationStatus;
+import models.enums.FlatType;
 
 public class Application {
     private static int lastApplicationID = 0;

@@ -1,6 +1,6 @@
 package interfaces;
 
-import enums.RegistrationStatus;
+import models.enums.RegistrationStatus;
 
 public interface IOfficerRegistrationView {
     public void displayRegistrationSuccess();

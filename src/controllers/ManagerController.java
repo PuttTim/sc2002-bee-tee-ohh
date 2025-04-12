@@ -1,8 +1,8 @@
 package controllers;
 
 import models.*;
-import enums.MaritalStatus;
-import enums.Role;
+import models.enums.MaritalStatus;
+import models.enums.Role;
 import stores.Database;
 
 import java.time.LocalDate;

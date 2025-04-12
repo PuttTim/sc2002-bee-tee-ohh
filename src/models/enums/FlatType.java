@@ -1,4 +1,4 @@
-package enums;
+package models.enums;
 
 public enum FlatType {
     TWO_ROOM,
