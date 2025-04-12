@@ -1,13 +1,13 @@
 package repositories;
 
 import models.Enquiry;
+import models.enums.EnquiryStatus;
 import utils.CsvReader;
 import utils.CsvWriter;
-import enums.EnquiryStatus;
+import utils.DateTimeUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,14 +21,14 @@ public class EnquiryRepository {
         @Override
         public String[] getHeaders() {
             return new String[] {
-                "enquiryId", "applicantNric", "projectId", "query", 
-                "response", "enquiryStatus", "enquiryDate", "respondedBy"
+                "EnquiryID", "ApplicantNRIC", "ProjectID", "Query", 
+                "Response", "Enquiry Status", "Enquiry Date", "Last Updated", "Responded By"
             };
         }
 
         @Override
         public String getFilePath() {
-            return "data/sample/EnquiryList.csv";
+            return "data/enquiry.csv";
         }
     }
 
@@ -42,20 +42,19 @@ public class EnquiryRepository {
 
             for (Enquiry enquiry : enquiries) {
                 Map<String, String> record = new HashMap<>();
-                record.put("enquiryId", enquiry.getEnquiryId());
-                record.put("applicantNric", enquiry.getApplicantNric());
-                record.put("projectId", enquiry.getProjectId());
-                record.put("query", enquiry.getQuery());
-                record.put("response", enquiry.getResponse() != null ? enquiry.getResponse() : "");
-                record.put("enquiryStatus", enquiry.getEnquiryStatus().toString());
-                record.put("enquiryDate", enquiry.getEnquiryDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                record.put("respondedBy", enquiry.getRespondedBy() != null ? enquiry.getRespondedBy() : "");
+                record.put("EnquiryID", enquiry.getEnquiryID());
+                record.put("ApplicantNRIC", enquiry.getApplicantNRIC());
+                record.put("ProjectID", enquiry.getProjectID());
+                record.put("Query", enquiry.getQuery());
+                record.put("Response", enquiry.getResponse() != null ? enquiry.getResponse() : "");
+                record.put("Enquiry Status", enquiry.getEnquiryStatus().toString());
+                record.put("Enquiry Date", DateTimeUtils.formatDateTime(enquiry.getEnquiryDate()));
+                record.put("Last Updated", DateTimeUtils.formatDateTime(enquiry.getLastUpdated()));
+                record.put("Responded By", enquiry.getRespondedBy() != null ? enquiry.getRespondedBy() : "");
                 records.add(record);
             }
 
             CsvWriter.write(new EnquiryCsvConfig(), records);
-
-            System.out.println("Enquiries saved successfully.");
         } catch (IOException e) {
             System.err.println("Error saving enquiries: " + e.getMessage());
         }
@@ -67,19 +66,24 @@ public class EnquiryRepository {
             enquiries = new ArrayList<>();
 
             for (Map<String, String> record : records) {
+                LocalDateTime enquiryDate = DateTimeUtils.parseDateTime(record.get("Enquiry Date"));
+                LocalDateTime lastUpdated = DateTimeUtils.parseDateTime(record.get("Last Updated"));
+                String response = record.get("Response").trim();
+                EnquiryStatus status = EnquiryStatus.valueOf(record.get("Enquiry Status"));
+                String respondedBy = record.get("Responded By").trim();
+
                 Enquiry enquiry = new Enquiry(
-                    record.get("enquiryId"),
-                    record.get("applicantNric"),
-                    record.get("projectId"),
-                    record.get("query"),
-                    record.get("respondedBy")
+                    record.get("EnquiryID"),
+                    record.get("ApplicantNRIC"),
+                    record.get("ProjectID"),
+                    record.get("Query"),
+                    response,
+                    status,
+                    enquiryDate,
+                    lastUpdated,
+                    respondedBy
                 );
 
-                if (!record.get("response").isEmpty()) {
-                    enquiry.markAsResponded(record.get("respondedBy"), record.get("response"));
-                }
-
-                enquiry.setEnquiryDate(LocalDateTime.parse(record.get("enquiryDate")));
                 enquiries.add(enquiry);
             }
         } catch (IOException e) {
@@ -93,7 +97,7 @@ public class EnquiryRepository {
 
     public static List<Enquiry> getEnquiriesByProject(String projectId) {
         return enquiries.stream()
-            .filter(enquiry -> enquiry.getProjectId().equals(projectId))
+            .filter(enquiry -> enquiry.getProjectID().equals(projectId))
             .collect(Collectors.toList());
     }
 

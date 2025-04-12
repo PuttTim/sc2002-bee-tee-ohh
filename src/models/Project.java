@@ -1,10 +1,10 @@
 package models;
 
-import enums.FlatType;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import models.enums.FlatType;
 
 public class Project {
     private static int lastProjectID = 0;
@@ -14,13 +14,9 @@ public class Project {
     private String projectName;
     private String location;
 
-    private FlatType flatType1;
-    private int flatType1Units;
-    private int flatType1SellingPrice;
-
-    private FlatType flatType2;
-    private int flatType2Units;
-    private int flatType2SellingPrice;
+    private List<FlatType> flatTypes;
+    private List<Integer> flatTypeUnits;
+    private List<Integer> flatTypeSellingPrice; 
 
     private LocalDateTime applicationOpenDate;
     private LocalDateTime applicationCloseDate;
@@ -32,8 +28,7 @@ public class Project {
     private List<String> officers;
 
     public Project(String managerNRIC, String projectName, String location,
-                   FlatType flatType1, int flatType1Units, int flatType1SellingPrice,
-                   FlatType flatType2, int flatType2Units, int flatType2SellingPrice,
+                    List<FlatType> flatTypes, List<Integer> flatTypeUnits, List<Integer> flatTypeSellingPrice,
                    LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
                    int officerSlots, boolean isVisible,
                    List<String> applicants, List<String> officers) {
@@ -42,12 +37,9 @@ public class Project {
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
         this.location = location;
-        this.flatType1 = flatType1;
-        this.flatType1Units = flatType1Units;
-        this.flatType1SellingPrice = flatType1SellingPrice;
-        this.flatType2 = flatType2;
-        this.flatType2Units = flatType2Units;
-        this.flatType2SellingPrice = flatType2SellingPrice;
+        this.flatTypes = flatTypes;
+        this.flatTypeUnits = flatTypeUnits;
+        this.flatTypeSellingPrice = flatTypeSellingPrice;
         this.applicationOpenDate = applicationOpenDate;
         this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
@@ -57,8 +49,7 @@ public class Project {
     }
 
     public Project(String projectID, String managerNRIC, String projectName, String location,
-                   FlatType flatType1, int flatType1Units, int flatType1SellingPrice,
-                   FlatType flatType2, int flatType2Units, int flatType2SellingPrice,
+                    List<FlatType> flatTypes, List<Integer> flatTypeUnits, List<Integer> flatTypeSellingPrice,
                    LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
                    int officerSlots, boolean isVisible,
                    List<String> applicants, List<String> officers) {
@@ -67,12 +58,9 @@ public class Project {
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
         this.location = location;
-        this.flatType1 = flatType1;
-        this.flatType1Units = flatType1Units;
-        this.flatType1SellingPrice = flatType1SellingPrice;
-        this.flatType2 = flatType2;
-        this.flatType2Units = flatType2Units;
-        this.flatType2SellingPrice = flatType2SellingPrice;
+        this.flatTypes = flatTypes;
+        this.flatTypeUnits = flatTypeUnits;
+        this.flatTypeSellingPrice = flatTypeSellingPrice;
         this.applicationOpenDate = applicationOpenDate;
         this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
@@ -106,28 +94,16 @@ public class Project {
         return location;
     }
 
-    public FlatType getFlatType1() {
-        return flatType1;
+    public List<FlatType> getFlatTypes() {
+        return flatTypes;
     }
 
-    public int getFlatType1Units() {
-        return flatType1Units;
+    public List<Integer> getFlatTypeUnits() {
+        return flatTypeUnits;
     }
 
-    public int getFlatType1SellingPrice() {
-        return flatType1SellingPrice;
-    }
-
-    public FlatType getFlatType2() {
-        return flatType2;
-    }
-
-    public int getFlatType2Units() {
-        return flatType2Units;
-    }
-
-    public int getFlatType2SellingPrice() {
-        return flatType2SellingPrice;
+    public List<Integer> getFlatTypeSellingPrice() {
+        return flatTypeSellingPrice;
     }
 
     public LocalDateTime getApplicationOpenDate() {
@@ -167,28 +143,16 @@ public class Project {
         this.location = location;
     }
 
-    public void setFlatType1(FlatType flatType1) {
-        this.flatType1 = flatType1;
+    public void setFlatTypes(List<FlatType> flatTypes) {
+        this.flatTypes = flatTypes;
     }
 
-    public void setFlatType1Units(int flatType1Units) {
-        this.flatType1Units = flatType1Units;
+    public void setFlatTypeUnits(List<Integer> flatTypeUnits) {
+        this.flatTypeUnits = flatTypeUnits;
     }
 
-    public void setFlatType1SellingPrice(int flatType1SellingPrice) {
-        this.flatType1SellingPrice = flatType1SellingPrice;
-    }
-
-    public void setFlatType2(FlatType flatType2) {
-        this.flatType2 = flatType2;
-    }
-
-    public void setFlatType2Units(int flatType2Units) {
-        this.flatType2Units = flatType2Units;
-    }
-
-    public void setFlatType2SellingPrice(int flatType2SellingPrice) {
-        this.flatType2SellingPrice = flatType2SellingPrice;
+    public void setFlatTypeSellingPrice(List<Integer> flatTypeSellingPrice) {
+        this.flatTypeSellingPrice = flatTypeSellingPrice;
     }
 
     public void setApplicationOpenDate(LocalDateTime applicationOpenDate) {
@@ -201,18 +165,6 @@ public class Project {
 
     public void setOfficerSlots(int officerSlots) {
         this.officerSlots = officerSlots;
-    }
-
-    public void setVisible(boolean visible) {
-        isVisible = visible;
-    }
-
-    public void setApplicants(List<String> applicants) {
-        this.applicants = applicants != null ? applicants : new ArrayList<>();
-    }
-
-    public void setOfficers(List<String> officers) {
-        this.officers = officers != null ? officers : new ArrayList<>();
     }
 
     // Helpers
@@ -239,43 +191,10 @@ public class Project {
     }
 
     public void reduceFlatCount(FlatType type) {
-        if (type == flatType1 && flatType1Units > 0) {
-            flatType1Units--;
-        } else if (type == flatType2 && flatType2Units > 0) {
-            flatType2Units--;
+        int index = flatTypes.indexOf(type);
+        if (index != -1 && flatTypeUnits.get(index) > 0) {
+            flatTypeUnits.set(index, flatTypeUnits.get(index) - 1);
         }
-    }
-
-    public String getNeighbourhood() {
-        return neighbourhood;
-    }
-
-    public void setNeighbourhood(String neighbourhood) {
-        this.neighbourhood = neighbourhood;
-    }
-
-    public FlatType getFlatType() {
-        return flatType;
-    }
-
-    public void setFlatType(FlatType flatType) {
-        this.flatType = flatType;
-    }
-
-    public int getAvailableUnits() {
-        return availableUnits;
-    }
-
-    public void setAvailableUnits(int availableUnits) {
-        this.availableUnits = availableUnits;
-    }
-
-    public int getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(int unitPrice) {
-        this.unitPrice = unitPrice;
     }
 
     public void setVisible(boolean isVisible) {
