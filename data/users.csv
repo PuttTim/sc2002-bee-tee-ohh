@@ -1,4 +1,4 @@
-UserNRIC,Name,Password,Age,Marital Status,Role
+UserNRIC,Name,Password,Age,MaritalStatus,Role
 S1234567A,Alice Tan,password,30,SINGLE,APPLICANT
 S4567890D,David Ong,password,29,SINGLE,APPLICANT
 S7891234A,John Leong,password,35,DIVORCED,APPLICANT
