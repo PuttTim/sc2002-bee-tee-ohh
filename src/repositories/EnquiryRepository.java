@@ -74,8 +74,8 @@ public class EnquiryRepository {
 
                 Enquiry enquiry = new Enquiry(
                     record.get("EnquiryID"),
-                    record.get("ProjectID"),
                     record.get("ApplicantNRIC"),
+                    record.get("ProjectID"),
                     record.get("Query"),
                     response,
                     EnquiryStatus.valueOf(record.get("EnquiryStatus")),

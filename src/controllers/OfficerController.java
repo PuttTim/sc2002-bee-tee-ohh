@@ -84,31 +84,7 @@ public class OfficerController {
             return;
         }
         Project selectedProject = selectedProjectOptional.get();
-        List<Enquiry> enquiries = EnquiryService.getEnquiriesByProject(selectedProject);
-        if (enquiries.isEmpty()) {
-            CommonView.displayMessage("No enquiries found.");
-            return;
-        }
-        EnquiryView.showEnquiryList(enquiries);
-        int choice = CommonView.promptInt("Enter the number of the enquiry to view details/reply (or 0 to cancel): ");
-
-        if (choice == 0) {
-            CommonView.displayMessage("Cancelled.");
-            return;
-        }
-
-        if (choice < 1 || choice > enquiries.size()) {
-            CommonView.displayError("Invalid enquiry number selected.");
-            return;
-        }
-        Enquiry selectedEnquiry = enquiries.get(choice-1);
-
-        EnquiryView.displayEnquiry(selectedEnquiry);
-        if (CommonView.promptYesNo("Do you want to reply to this enquiry?")) {
-            String reply = CommonView.prompt("Enter your reply: ");
-            EnquiryService.replyToEnquiry(selectedEnquiry, reply, officer.getUserNRIC());
-            CommonView.displaySuccess("Reply submitted successfully.");
-        }
+        EnquiryController.manageProjectEnquiries(Optional.of(officer), Optional.empty(), selectedProject);
     }
 
     //help select flat

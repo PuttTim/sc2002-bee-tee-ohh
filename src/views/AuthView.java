@@ -33,7 +33,7 @@ public class AuthView {
             "View Available Projects",
             "Submit Project Application",
             "View My Applications",
-            "Submit Project Enquiry",
+            "Create New Enquiry",
             "View My Enquiries",
             "Change Password",
             "Logout"

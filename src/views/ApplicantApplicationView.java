@@ -30,7 +30,7 @@ public class ApplicantApplicationView {
         }
     }
 
-    private static void displayEligibleProjects(Applicant applicant, List<Project> allProjects) {
+    public static void displayEligibleProjects(Applicant applicant, List<Project> allProjects) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
         if (eligibleProjects.isEmpty()) {
             CommonView.displayMessage("No eligible projects found.");
@@ -92,16 +92,6 @@ public class ApplicantApplicationView {
         }
     }
 
-    private static String getStatusDisplay(ApplicationStatus status) {
-        return switch (status) {
-            case PENDING -> "Pending Review";
-            case SUCCESSFUL -> "Approved";
-            case UNSUCCESSFUL -> "Rejected";
-            case WITHDRAWN -> "Withdrawn";
-            default -> status.toString();
-        };
-    }
-
     public static void handleWithdraw(Applicant applicant) {
         List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
         if (applications.isEmpty()) {
@@ -127,20 +117,22 @@ public class ApplicantApplicationView {
             return;
         }
 
-        int choice = CommonView.promptInt("\nSelect application number to withdraw (or 0 to cancel): ", 0, applications.size());
-        if (choice == 0) return;
-
-        Application selectedApp = applications.get(choice - 1);
-        if (selectedApp.getApplicationStatus() != ApplicationStatus.PENDING) {
-            CommonView.displayError("Can only withdraw pending applications.");
-            return;
-        }
-
-        if (CommonView.promptYesNo("Are you sure you want to withdraw this application?")) {
+        int choice = CommonView.promptInt("Select application to withdraw (or 0 to cancel): ", 0, applications.size());
+        if (choice > 0) {
+            Application selectedApp = applications.get(choice - 1);
             ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
-            CommonView.displaySuccess("Application withdrawn successfully.");
-        } else {
-            CommonView.displayMessage("Withdrawal cancelled.");
+            CommonView.displaySuccess("Application withdrawal requested successfully.");
         }
+    }
+
+    private static String getStatusDisplay(ApplicationStatus status) {
+        return switch (status) {
+            case PENDING -> "Pending";
+            case SUCCESSFUL -> "Approved";
+            case UNSUCCESSFUL -> "Rejected";
+            case WITHDRAWN -> "Withdrawn";
+            case BOOKED -> "Booked";
+            default -> status.toString();
+        };
     }
 }

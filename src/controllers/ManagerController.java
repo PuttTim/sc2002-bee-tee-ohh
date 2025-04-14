@@ -4,6 +4,7 @@ import models.*;
 import models.enums.MaritalStatus;
 import models.enums.Role;
 import repositories.*;
+import views.EnquiryView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -191,58 +192,7 @@ public class ManagerController {
     }
 
     public static void viewProjectEnquiries(Project project) {
-        List<Enquiry> enquiries = EnquiryRepository.getEnquiriesByProject(project.getProjectID());
-        
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries found for project: " + project.getProjectName());
-            return;
-        }
-
-        System.out.println("\nEnquiries for project: " + project.getProjectName());
-        System.out.println("----------------------------------------");
-        
-        for (Enquiry enquiry : enquiries) {
-            System.out.println("Enquiry ID: " + enquiry.getEnquiryID());
-            System.out.println("From: " + enquiry.getApplicantNRIC());
-            System.out.println("Query: " + enquiry.getQuery());
-            System.out.println("Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
-            if (enquiry.isResponse()) {
-                System.out.println("Response: " + enquiry.getResponse());
-                System.out.println("Responded by: " + enquiry.getResponder());
-            }
-            System.out.println("----------------------------------------");
-        }
-
-        System.out.print("\nWould you like to respond to an enquiry? (yes/no): ");
-        String response = scanner.nextLine().trim().toLowerCase();
-        
-        if (response.equals("yes")) {
-            System.out.print("Enter enquiry ID to respond to: ");
-            String enquiryId = scanner.nextLine().trim();
-            
-            Enquiry selectedEnquiry = enquiries.stream()
-                .filter(e -> e.getEnquiryID().equals(enquiryId))
-                .findFirst()
-                .orElse(null);
-                
-            if (selectedEnquiry == null) {
-                System.out.println("Invalid enquiry ID.");
-                return;
-            }
-            
-            if (selectedEnquiry.isResponse()) {
-                System.out.println("This enquiry has already been responded to.");
-                return;
-            }
-            
-            System.out.print("Enter your response: ");
-            String enquiryResponse = scanner.nextLine().trim();
-            
-            selectedEnquiry.setResponse(enquiryResponse);
-            selectedEnquiry.setResponder("MANAGER");
-            EnquiryRepository.saveAll();
-            System.out.println("Response recorded successfully.");
-        }
+        // EnquiryController.manageProjectEnquiries();
     }
 
     public static void viewOfficerRegistrations() {

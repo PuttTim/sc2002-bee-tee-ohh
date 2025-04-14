@@ -4,7 +4,6 @@ import models.Project;
 import models.enums.FlatType;
 import java.util.List;
 import java.time.format.DateTimeFormatter;
-import interfaces.IProjectView;
 
 public class ProjectView {
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -41,10 +40,6 @@ public class ProjectView {
         }
     }
 
-    public static void displayEmptyMessage() {
-        CommonView.displayMessage("No projects available.");
-    }
-
     public static void displayProjectDetails(Project project) {
         CommonView.displayHeader("Project Details");
         CommonView.displayMessage("ID: " + project.getProjectID());
@@ -77,17 +72,22 @@ public class ProjectView {
         CommonView.displaySeparator();
     }
 
+    public static void displayEmptyMessage() {
+        CommonView.displayMessage("No projects available.");
+    }
+
     public static int getProjectChoice(int maxChoice) {
-        return CommonView.promptInt("\nSelect a project (1-" + maxChoice + ") or 0 to exit: ", 0, maxChoice);
+        return CommonView.promptInt("\nSelect a project number (or 0 to cancel): ", 0, maxChoice);
     }
 
     public static int getProjectMenuChoice() {
         List<String> options = List.of(
-            "View Enquiries",
-            "Submit Enquiry",
-            "Back"
+            "Back",
+            "View Project Enquiries",
+            "Submit New Enquiry",
+            "Apply for Project"
         );
-        int choice = CommonView.displayMenu("Project Menu", options);
-        return choice == 3 ? 0 : choice; // Map the "Back" option (3) to 0
+        
+        return CommonView.displayMenu("Project Actions", options) - 1;
     }
 }

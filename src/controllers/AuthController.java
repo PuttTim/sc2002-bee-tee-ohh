@@ -107,10 +107,10 @@ public class AuthController {
                         ApplicantController.viewMyApplications(applicant);
                         break;
                     case 4:
-                        ApplicantController.submitEnquiry(applicant);
+                        EnquiryController.createNewEnquiry(applicant);
                         break;
                     case 5:
-                        ApplicantController.viewMyEnquiries(applicant);
+                        EnquiryController.viewApplicantEnquiries(applicant);
                         break;
                     case 6:
                         handleChangePassword(applicant);

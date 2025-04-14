@@ -1,19 +1,41 @@
 package views;
 
 import models.Enquiry;
-import interfaces.IEnquiryView;
+import models.Project;
 import java.util.List;
 
 public class EnquiryView {
-    public static void displayEnquiries(List<Enquiry> enquiries) {
+    public static void displayMenu() {
+        List<String> options = List.of(
+            "View My Enquiries",
+            "Create New Enquiry",
+            "Edit Enquiry",
+            "Delete Enquiry",
+            "Back to Main Menu"
+        );
+        CommonView.displayMenu("Enquiry Management", options);
+    }
+
+    public static void displayEnquiryList(List<Enquiry> enquiries) {
         if (enquiries.isEmpty()) {
-            CommonView.displayMessage("No enquiries found.");
+            displayEmptyMessage();
             return;
         }
 
-        for (Enquiry enquiry : enquiries) {
-            displayEnquiry(enquiry);
-            CommonView.displaySeparator();
+        CommonView.displayHeader("Enquiries");
+        for (int i = 0; i < enquiries.size(); i++) {
+            Enquiry enquiry = enquiries.get(i);
+            CommonView.displayMessage(String.format("%d. From: %s", i + 1, enquiry.getApplicantNRIC()));
+            CommonView.displayMessage("   Query: " + enquiry.getQuery());
+            CommonView.displayMessage("   Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
+            if (enquiry.isResponse()) {
+                CommonView.displayMessage("   Response: " + enquiry.getResponse());
+                CommonView.displayMessage("   Responded by: " + enquiry.getResponder());
+            }
+            
+
+            System.out.println("-----------------------------------");
+            System.out.println();
         }
     }
 
@@ -31,31 +53,56 @@ public class EnquiryView {
         }
     }
 
-    public static String getEnquiryDetails() {
-        return CommonView.prompt("\nEnter your enquiry: ");
+    public static Enquiry getEnquiryInput(String applicantNric, List<Project> projects) {
+        if (projects.isEmpty()) {
+            CommonView.displayMessage("No projects available for enquiry.");
+            return null;
+        }
+
+        CommonView.displayHeader("Select a Project for Enquiry");
+        for (int i = 0; i < projects.size(); i++) {
+            CommonView.displayMessage(String.format("%d. %s", i + 1, projects.get(i).getProjectName()));
+        }
+
+        int projectChoice = CommonView.promptInt("\nSelect a project number (or 0 to cancel): ", 0, projects.size());
+        if (projectChoice == 0) return null;
+
+        Project selectedProject = projects.get(projectChoice - 1);
+        String query = CommonView.prompt("\nEnter your enquiry: ");
+
+        if (query.isEmpty()) {
+            displayError("Enquiry cannot be empty.");
+            return null;
+        }
+
+        return new Enquiry(applicantNric, selectedProject.getProjectID(), query);
     }
 
-    public static void displayEnquiryCreatedMessage() {
-        CommonView.displaySuccess("Enquiry created successfully.");
+    public static int getEnquiryToEditOrDelete(String action, int size) {
+        int choice = CommonView.promptInt(
+            String.format("Enter the number of the enquiry to %s (1-%d) or 0 to cancel: ", action, size),
+            0, size);
+        return choice - 1;
+    }
+
+    public static String getUpdatedContents() {
+        String content = CommonView.prompt("Enter your updated enquiry (or press Enter to cancel): ");
+        return content.isEmpty() ? null : content;
     }
 
     public static void displayEmptyMessage() {
         CommonView.displayMessage("No enquiries available.");
     }
 
-    public static void showEnquiryList(List<Enquiry> enquiries) {
-        if (enquiries.isEmpty()) {
-            displayEmptyMessage();
-            return;
-        }
+    public static void displayEnquiryCreatedMessage() {
+        displaySuccess("Enquiry created successfully.");
+    }
 
-        CommonView.displayHeader("Enquiries");
-        for (int i = 0; i < enquiries.size(); i++) {
-            Enquiry enquiry = enquiries.get(i);
-            CommonView.displayMessage(String.format("%d. From: %s", i + 1, enquiry.getApplicantNRIC()));
-            CommonView.displayMessage("   Query: " + enquiry.getQuery());
-            CommonView.displayMessage("   Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
-            CommonView.displaySeparator();
-        }
+    public static void displaySuccess(String message) {
+        CommonView.displaySuccess(message);
+    }
+
+    public static void displayError(String message) {
+        CommonView.displayError(message);
     }
 }
