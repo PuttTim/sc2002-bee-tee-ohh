@@ -21,14 +21,14 @@ public class CsvReader {
             }
 
             String line;
-            String[] headers = config.getHeaders();
+            List<String> headers = config.getHeaders();
             
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 Map<String, String> record = new HashMap<>();
                 
-                for (int i = 0; i < headers.length && i < values.length; i++) {
-                    record.put(headers[i], values[i]);
+                for (int i = 0; i < headers.size() && i < values.length; i++) {
+                    record.put(headers.get(i), values[i]);
                 }
                 
                 records.add(record);

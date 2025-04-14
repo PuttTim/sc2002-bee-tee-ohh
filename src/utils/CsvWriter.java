@@ -15,9 +15,9 @@ public class CsvWriter {
             
             // Write records
             for (Map<String, String> record : records) {
-                String[] values = new String[config.getHeaders().length];
-                for (int i = 0; i < config.getHeaders().length; i++) {
-                    String value = record.get(config.getHeaders()[i]);
+                String[] values = new String[config.getHeaders().size()];
+                for (int i = 0; i < config.getHeaders().size(); i++) {
+                    String value = record.get(config.getHeaders().get(i));
                     values[i] = value != null ? value : "";
                 }
                 writer.write(String.join(",", values) + "\n");

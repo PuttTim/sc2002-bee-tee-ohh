@@ -14,13 +14,12 @@ public class EnquiryController {
     }
 
     public void listEnquiries(Project project) {
-        List<Enquiry> enquiries = EnquiryRepository.getEnquiriesByProject(project.getProjectId());
+        List<Enquiry> enquiries = EnquiryRepository.getEnquiriesByProject(project.getProjectID());
         enquiryView.displayEnquiries(enquiries);
     }
 
     public void createEnquiry(Project project, String applicantNric, String query) {
-        String enquiryId = "E" + (EnquiryRepository.getAll().size() + 1);
-        Enquiry enquiry = new Enquiry(enquiryId, applicantNric, project.getProjectId(), query, null);
+        Enquiry enquiry = new Enquiry(applicantNric, project.getProjectID(), query);
         EnquiryRepository.add(enquiry);
         enquiryView.displayEnquiryCreatedMessage();
     }

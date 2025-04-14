@@ -19,11 +19,11 @@ import interfaces.ICsvConfig;
 public class EnquiryRepository {
     private static class EnquiryCsvConfig implements ICsvConfig {
         @Override
-        public String[] getHeaders() {
-            return new String[] {
-                "EnquiryID", "ApplicantNRIC", "ProjectID", "Query", 
-                "Response", "Enquiry Status", "Enquiry Date", "Last Updated", "Responded By"
-            };
+        public List<String> getHeaders() {
+            return List.of(
+                "EnquiryID", "ProjectID", "ApplicantNRIC", "Content",
+                "Status", "Reply", "CreatedAt", "LastUpdated"
+            );
         }
 
         @Override

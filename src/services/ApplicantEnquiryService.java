@@ -20,7 +20,7 @@ public class ApplicantEnquiryService {
 
         //loop through list, filter by nric
         for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicant().getNric().equals(applicant.getNric())) { //if equal
+            if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) { //if equal
                 applicantEnquiries.add(enquiry); //add enquiry to display
             }
         }
@@ -30,7 +30,7 @@ public class ApplicantEnquiryService {
     //submit enquiries
     public void submitEnquiry(Applicant applicant, Project project, String enquiryContent) {
         String enquiryId = generateEnquiryId();
-        Enquiry enquiry = new Enquiry(enquiryId, applicant, project, enquiryContent);
+        Enquiry enquiry = new Enquiry(applicant.getUserNRIC(), project.getProjectID(), enquiryContent);
         enquiries.add(enquiry);
         System.out.println("Enquiry submitted.");
     }
@@ -39,7 +39,7 @@ public class ApplicantEnquiryService {
     public List<Enquiry> viewEnquiries(Applicant applicant) {
         List<Enquiry> applicantEnquiries = new ArrayList<>();
         for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicant().equals(applicant)) {
+            if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) {
                 applicantEnquiries.add(enquiry);
             }
         }
@@ -49,8 +49,8 @@ public class ApplicantEnquiryService {
     //edit enquiry
     public void editEnquiry(Applicant applicant, String enquiryId, String editedEnquiryContent) {
         for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicant().equals(applicant) && enquiry.getEnquiryID().equals(enquiryId)) {
-                enquiry.setEnquiry(editedEnquiryContent);
+            if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC()) && enquiry.getEnquiryID().equals(enquiryId)) {
+                enquiry.setQuery(editedEnquiryContent);
                 System.out.println("Enquiry edited.");
                 return;
             }
@@ -61,7 +61,7 @@ public class ApplicantEnquiryService {
     //delete enquiry
     public void deleteEnquiry(Applicant applicant, String enquiryId) {
         for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicant().equals(applicant) && enquiry.getEnquiryID().equals(enquiryId)) {
+            if (enquiry.getApplicantNRIC().equals(applicant) && enquiry.getEnquiryID().equals(enquiryId)) {
                 enquiries.remove(enquiry);
                 System.out.println("Enquiry deleted.");
                 return;

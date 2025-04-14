@@ -72,9 +72,9 @@ public class ApplicantController {
 
                 case 2:
                     //for applicant to submit enquiry
-                    Enquiry enquiryInput = enquiryView.getEnquiryInput(applicant.getNric(), allProjects); //call on views
+                    Enquiry enquiryInput = enquiryView.getEnquiryInput(applicant.getUserNRIC(), allProjects); //call on views
                     if (enquiryInput != null) { //if input is done correctly
-                        enquiryService.submitEnquiry(applicant, enquiryInput.getProject(), enquiryInput.getEnquiry()); //call services
+                        enquiryService.submitEnquiry(applicant, enquiryInput.getProjectID(), enquiryInput.getQuery()); //call services
                         enquiryView.showSuccess("Your enquiry has been submitted.");
                     } else {
                         enquiryView.showError("Failed to submit enquiry. Please check your input.");

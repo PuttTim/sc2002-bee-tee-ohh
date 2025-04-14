@@ -26,12 +26,13 @@ public class ProjectService implements IProjectService {
     }
 
     public boolean hasOfficerSlots(Project project) {
-        return project.getAvailableOfficerSlots() >= 0;
+        return project.getOfficers().size() < project.getOfficerSlots();
     }
 
     @Override
     public List<Project> findHandledProjects(Officer officer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findHandledProjects'");
+        return projectRepository.getAll().stream()
+                .filter(project -> project.getOfficers().contains(officer))
+                .collect(Collectors.toList());
     }
 }

@@ -3,7 +3,6 @@ package controllers;
 import models.*;
 import models.enums.MaritalStatus;
 import models.enums.Role;
-import stores.Database;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +48,7 @@ public class ManagerController {
         // get project manager password
         System.out.println("Enter the password of the Project manager:");
         String password = sc.nextLine();
-        Manager manager = new Manager(nric, managerName, managerAge, managerMS, password);
+        Manager manager = new Manager(managerName, managerName, password, managerAge, projectId);
         // get project name
         System.out.println("Enter the name of the Project:");
         String projectName = sc.nextLine();
@@ -111,7 +110,11 @@ public class ManagerController {
             break;
         }
 
-        Project newProject = new Project(projectId, manager, projectName, location, startDate, endDate, officerSlots, visibility);
+        Project newProject = new Project(projectId, nric, projectName, location,
+                null, null, null,
+                startDate.atStartOfDay(), endDate.atStartOfDay(),
+                officerSlots, visibility,
+                null, null);
         // store project to database
         databaseStoreProject(newProject);
         System.out.println("Project + \""  + projectName + "\" created successfully.");
@@ -120,14 +123,6 @@ public class ManagerController {
     // edit a BTO project as a manager
     public void editProject(String projectName, String location, String applicationStart, String applicationEnd){
         // switch case for user to choose which attribute of the project to edit
-    }
-
-    // edit a project (ignore)
-    public void editProject(Project project, String projectName, String location, String applicationStart, String applicationEnd){
-        project.setProjectName(projectName);
-        project.setLocation(location);
-        project.setApplicationStart(LocalDate.parse(applicationStart));
-        project.setApplicationEnd(LocalDate.parse(applicationEnd));
     }
 
     // delete a project

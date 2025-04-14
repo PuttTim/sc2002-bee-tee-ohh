@@ -5,7 +5,8 @@ import models.Officer;
 
 public class OfficerService implements IOfficerService {
     public boolean hasExistingProject(Officer officer) {
-        return officer.getHandledProject() != null;
+        // return officer.getHandledProject() != null;
+        return OfficerRepository.hasExistingProject(officer.getUserNRIC());
     }
 
     @Override

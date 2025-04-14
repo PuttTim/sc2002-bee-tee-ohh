@@ -1,5 +1,7 @@
 import controllers.ProjectController;
 import repositories.ProjectRepository;
+import repositories.RegistrationRepository;
+import repositories.UserRepository;
 import repositories.EnquiryRepository;
 
 // This is the main entrypoint of our application.
@@ -12,13 +14,16 @@ public class App {
         try {
             app.initRepositories();
 
-            ProjectController projectController = new ProjectController();
-            projectController.showMainMenu();
+            // ProjectController projectController = new ProjectController();
+            // projectController.showMainMenu();
 
-            app.saveRepositories();
+            System.out.println(RegistrationRepository.getAll().get(1).getProjectID());
+
+            // app.saveRepositories();
 
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
+            System.out.println("Error: " + e.getLocalizedMessage() + e.getStackTrace().toString());
 
             app.saveRepositories();
         }
@@ -28,6 +33,8 @@ public class App {
         // Initialize repositories
         ProjectRepository.load();
         EnquiryRepository.load();
+        UserRepository.load();
+        RegistrationRepository.load();
     }
 
     private void saveRepositories() {
@@ -35,5 +42,7 @@ public class App {
 
         ProjectRepository.saveAll();  
         EnquiryRepository.saveAll();
+        UserRepository.saveAll();
+        RegistrationRepository.saveAll();
     }
 }

@@ -35,7 +35,7 @@ public class ApplicantEnquiryView {
             System.out.println("Your Enquiries:");
             for (int i = 0; i < enquiries.size(); i++) {
                 Enquiry e = enquiries.get(i);
-                System.out.printf("%d. [%s] %s\n", i + 1, e.getProject().getProjectId(), e.getEnquiry());
+                System.out.printf("%d. [%s] %s\n", i + 1, e.getProject().getProjectID(), e.getEnquiry());
                 //print out each enquiry (project name, id, enquiry)
             }
         }
@@ -47,7 +47,7 @@ public class ApplicantEnquiryView {
         for (int i = 0; i < projects.size(); i++) {
             //display each project by id and name for applicant to choose from
             Project project = projects.get(i);
-            System.out.printf("%d. %s - %s\n", i + 1, project.getProjectId(), project.getProjectName());
+            System.out.printf("%d. %s - %s\n", i + 1, project.getProjectID(), project.getProjectName());
         }
 
         System.out.print("Enter project ID: "); //user input
@@ -56,7 +56,7 @@ public class ApplicantEnquiryView {
         //check projectId for validity
         Project selectedProject = null;
         for (Project project : projects) {
-            if (project.getProjectId().equals(projectId)) {
+            if (project.getProjectID().equals(projectId)) {
                 selectedProject = project; //assign the matching project (by id) to selectedProject
                 break;
             }
@@ -70,7 +70,7 @@ public class ApplicantEnquiryView {
         System.out.print("Enter your enquiry message: "); //user input
         String content = scanner.nextLine();
 
-        return new Enquiry(null, null, selectedProject, content); //return full enquiry
+        return new Enquiry(applicantNric, selectedProject.getProjectID(), content); //return full enquiry
     }
 
     //for editing or deleting enquiries

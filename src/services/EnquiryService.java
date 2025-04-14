@@ -10,7 +10,7 @@ public class EnquiryService {
     }
 
     public List<Enquiry> getEnquiriesByProject(Project project) {
-        return EnquiryRepository.getEnquiriesByProject(project.getProjectId());
+        return EnquiryRepository.getEnquiriesByProject(project.getProjectID());
     }
 
     public void createEnquiry(Enquiry enquiry) {

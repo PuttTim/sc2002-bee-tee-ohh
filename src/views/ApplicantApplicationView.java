@@ -47,15 +47,23 @@ public class ApplicantApplicationView {
         }
 
         Project selected = eligibleProjects.get(choice);
-        System.out.print("Enter flat type (2-Room / 3-Room): ");
-        String flatType = scanner.nextLine(); //user input
+        System.out.print("Enter flat type (e.g., TWO_ROOM, THREE_ROOM): "); // Updated prompt for clarity
+        String flatTypeInput = scanner.nextLine().trim(); //user input
 
         try {
             //initialise new application from applicant
-            Application application = applicationService.applyForProject(applicant, selected, flatType);
-            System.out.println("Application submitted. ID: " + application.getApplicationId()); //confirm application
+            // Assuming applicationService is instantiated correctly
+            Application application = applicationService.applyForProject(applicant, selected, flatTypeInput);
+            System.out.println("Application submitted successfully.");
+            System.out.println("Application ID: " + application.getApplicationID()); // Corrected getter
+            System.out.println("Project: " + selected.getProjectName());
+            System.out.println("Flat Type: " + application.getSelectedFlatType());
+
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage()); //error message
+            System.out.println("Error submitting application: " + e.getMessage()); //error message
+        } catch (Exception e) {
+            // Catch other potential exceptions during application process
+            System.out.println("An unexpected error occurred: " + e.getMessage());
         }
     }
 
@@ -67,7 +75,7 @@ public class ApplicantApplicationView {
 
         //else (if application exists)
         //display the id, project name and status
-        System.out.println("Application ID: " + application.getApplicationId());
+        System.out.println("Application ID: " + application.getApplicationID());
         System.out.println("Project: " + application.getProject().getProjectName());
         System.out.println("Status: " + application.getApplicationStatus());
     }

@@ -19,13 +19,14 @@ import interfaces.ICsvConfig;
 public class ProjectRepository {
     private static class ProjectCsvConfig implements ICsvConfig {
         @Override
-        public String[] getHeaders() {
-            return new String[] {
-                "ProjectID", "ManagerNRIC", "Project Name", "Location", 
-                "Flat Types", "Flat Type Units", "Flat Type Prices",
-                "Application Open Date", "Application Close Date",
-                "Officer Slots", "Is Visible", "Applicants", "Officers"
-            };
+        public List<String> getHeaders() {
+            return List.of(
+                "ProjectID","ManagerNRIC","ProjectName","Location","FlatTypes",
+                "FlatTypeUnits","FlatTypePrices","ApplicationOpenDate",
+                "ApplicationCloseDate","OfficerSlots","IsVisible",
+                "Applicants","Officers"
+
+            );
         }
 
         @Override

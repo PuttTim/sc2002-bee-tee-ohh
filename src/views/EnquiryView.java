@@ -20,9 +20,9 @@ public class EnquiryView {
         System.out.println("List of Enquiries:");
         for (Enquiry enquiry : enquiries) {
             System.out.println("----------------------------------");
-            System.out.println("Enquiry ID: " + enquiry.getEnquiryId());
-            System.out.println("Applicant NRIC: " + enquiry.getApplicantNric());
-            System.out.println("Project ID: " + enquiry.getProjectId());
+            System.out.println("Enquiry ID: " + enquiry.getEnquiryID());
+            System.out.println("Applicant NRIC: " + enquiry.getApplicantNRIC());
+            System.out.println("Project ID: " + enquiry.getProjectID());
             System.out.println("Query: " + enquiry.getQuery());
             System.out.println("Response: " + (enquiry.getResponse() != null ? enquiry.getResponse() : "Not yet responded"));
             System.out.println("Status: " + enquiry.getEnquiryStatus());

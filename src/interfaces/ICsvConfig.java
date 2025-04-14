@@ -1,6 +1,8 @@
 package interfaces;
 
+import java.util.List;
+
 public interface ICsvConfig {
-    String[] getHeaders();
+    List<String> getHeaders();
     String getFilePath();
 }

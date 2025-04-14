@@ -8,16 +8,16 @@ public class Registration {
     private static int lastRegistrationID = 0;
 
     private String registrationID;
-    private String officerNRIC;
+    private User officer;
     private String projectID;
     private RegistrationStatus registrationStatus;
     private LocalDateTime registrationDate;
     private LocalDateTime lastUpdated;
-    private String approvedBy;
+    private User approvedBy;
 
-    public Registration(String officerNRIC, String projectID) {
+    public Registration(User officer, String projectID) {
         this.registrationID = "R" + (++Registration.lastRegistrationID);
-        this.officerNRIC = officerNRIC;
+        this.officer = officer;
         this.projectID = projectID;
         this.registrationStatus = RegistrationStatus.PENDING;
         this.registrationDate = LocalDateTime.now();
@@ -25,11 +25,11 @@ public class Registration {
         this.approvedBy = null;
     }
 
-    public Registration(String registrationID, String officerNRIC, String projectID,
+    public Registration(String registrationID, User officer, String projectID,
                         RegistrationStatus registrationStatus, LocalDateTime registrationDate,
-                        LocalDateTime lastUpdated, String approvedBy) {
+                        LocalDateTime lastUpdated, User approvedBy) {
         this.registrationID = registrationID;
-        this.officerNRIC = officerNRIC;
+        this.officer = officer;
         this.projectID = projectID;
         this.registrationStatus = registrationStatus;
         this.registrationDate = registrationDate;
@@ -50,8 +50,8 @@ public class Registration {
         return registrationID;
     }
 
-    public String getOfficerNRIC() {
-        return officerNRIC;
+    public User getOfficer() {
+        return officer;
     }
 
     public String getProjectID() {
@@ -70,7 +70,7 @@ public class Registration {
         return lastUpdated;
     }
 
-    public String getApprovedBy() {
+    public User getApprovedBy() {
         return approvedBy;
     }
 
@@ -83,20 +83,20 @@ public class Registration {
         this.lastUpdated = lastUpdated;
     }
 
-    public void setApprovedBy(String approvedBy) {
+    public void setApprovedBy(User approvedBy) {
         this.approvedBy = approvedBy;
     }
 
     // Status Update Methods
-    public void approve(String managerNRIC) {
+    public void approve(User manager) {
         this.registrationStatus = RegistrationStatus.APPROVED;
-        this.approvedBy = managerNRIC;
+        this.approvedBy = manager;
         this.lastUpdated = LocalDateTime.now();
     }
 
-    public void reject(String managerNRIC) {
+    public void reject(User manager) {
         this.registrationStatus = RegistrationStatus.REJECTED;
-        this.approvedBy = managerNRIC;
+        this.approvedBy = manager;
         this.lastUpdated = LocalDateTime.now();
     }
 }
