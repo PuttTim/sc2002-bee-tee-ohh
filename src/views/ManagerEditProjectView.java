@@ -1,31 +1,27 @@
 package views;
 
-
 public class ManagerEditProjectView {
-    public void ProjectCreationSuccess(){
-        System.out.println("Project created successfully.");
+    public void ProjectCreationSuccess() {
+        CommonView.displaySuccess("Project created successfully.");
     }
 
-    public void ProjectCreationFailure(){
-        System.out.println("Project creation failed.");
+    public void ProjectCreationFailure() {
+        CommonView.displayError("Project creation failed.");
     }
 
-    public void ProjectEditSuccess(){
-        System.out.println("Project edited successfully.");
+    public void ProjectEditSuccess() {
+        CommonView.displaySuccess("Project edited successfully.");
     }
 
-    public void ProjectEditFailure(){
-        System.out.println("Project edit failed.");
+    public void ProjectEditFailure() {
+        CommonView.displayError("Project edit failed.");
     }
 
-    public void ProjectDeletionSuccess(){
-        System.out.println("Project deleted successfully.");
+    public void ProjectDeletionSuccess() {
+        CommonView.displaySuccess("Project deleted successfully.");
     }
 
-    public void ProjectDeletionFailure(){
-        System.out.println("Project deletion failed.");
+    public void ProjectDeletionFailure() {
+        CommonView.displayError("Project deletion failed.");
     }
-
-    
-    
 }

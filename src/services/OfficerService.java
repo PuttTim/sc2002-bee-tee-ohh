@@ -2,22 +2,19 @@ package services;
 
 import interfaces.IOfficerService;
 import models.Officer;
+import repositories.OfficerRepository;
 
-public class OfficerService implements IOfficerService {
-    public boolean hasExistingProject(Officer officer) {
-        // return officer.getHandledProject() != null;
+public class OfficerService {
+    public static boolean hasExistingProject(Officer officer) {
         return OfficerRepository.hasExistingProject(officer.getUserNRIC());
     }
 
-    @Override
-    public boolean hasExistingRegistration(Officer officer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'hasExistingRegistration'");
+    public static boolean hasExistingRegistration(Officer officer) {
+        // TODO: Implement this
+        return false;
     }
 
-    @Override
-    public void setOfficerRegistration(Officer officer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setOfficerRegistration'");
+    public static void setOfficerRegistration(Officer officer) {
+        // TODO: Implement this
     }
 }

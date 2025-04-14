@@ -1,8 +1,7 @@
 package repositories;
 
 import models.Manager;
-import models.enums.MaritalStatus;
-import models.enums.Role;
+import models.User;
 import utils.CsvReader;
 import utils.CsvWriter;
 
@@ -18,13 +17,13 @@ import interfaces.ICsvConfig;
 public class ManagerRepository {
     private static class ManagerCsvConfig implements ICsvConfig {
         @Override
-        public List<String> getHeaders() {
-            return List.of("NRIC", "Name", "Password", "Age", "MaritalStatus", "CurrentProjectID");
+        public String getFilePath() {
+            return "data/manager.csv";
         }
 
         @Override
-        public String getFilePath() {
-            return "data/manager.csv";
+        public List<String> getHeaders() {
+            return List.of("ManagerNRIC", "CurrentProjectID");
         }
     }
 
@@ -36,12 +35,8 @@ public class ManagerRepository {
         List<Map<String, String>> records = new ArrayList<>();
         for (Manager manager : managers) {
             Map<String, String> record = new HashMap<>();
-            record.put("NRIC", manager.getUserNRIC());
-            record.put("Name", manager.getName());
-            record.put("Password", manager.getPassword());
-            record.put("Age", String.valueOf(manager.getAge()));
-            record.put("MaritalStatus", manager.getMaritalStatus().toString());
-            record.put("CurrentProjectID", manager.getCurrentProjectID());
+            record.put("ManagerNRIC", manager.getUserNRIC());
+            record.put("CurrentProjectID", manager.getCurrentProjectID() != null ? manager.getCurrentProjectID() : "");
             records.add(record);
         }
 
@@ -58,16 +53,24 @@ public class ManagerRepository {
             managers = new ArrayList<>();
 
             for (Map<String, String> record : records) {
+                // Get user data from UserRepository
+                User userData = UserRepository.getByNRIC(record.get("ManagerNRIC"));
+                if (userData == null) {
+                    System.err.println("Manager NRIC not found in users.csv: " + record.get("ManagerNRIC"));
+                    continue;
+                }
+
                 Manager manager = new Manager(
-                    record.get("NRIC"),
-                    record.get("Name"),
-                    record.get("Password"),
-                    Integer.parseInt(record.get("Age")),
+                    userData.getUserNRIC(),
+                    userData.getName(),
+                    userData.getPassword(),
+                    userData.getAge(),
                     record.get("CurrentProjectID")
                 );
-                manager.setMaritalStatus(MaritalStatus.valueOf(record.get("MaritalStatus")));
+                manager.setMaritalStatus(userData.getMaritalStatus());
                 managers.add(manager);
             }
+            System.out.println("Loaded " + managers.size() + " managers from CSV.");
         } catch (IOException e) {
             System.err.println("Error loading managers: " + e.getMessage());
         }

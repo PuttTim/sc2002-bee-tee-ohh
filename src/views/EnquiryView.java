@@ -1,43 +1,61 @@
 package views;
 
 import models.Enquiry;
+import interfaces.IEnquiryView;
 import java.util.List;
-import java.util.Scanner;
 
 public class EnquiryView {
-    private final Scanner scanner;
-
-    public EnquiryView() {
-        this.scanner = new Scanner(System.in);
-    }
-
-    public void displayEnquiries(List<Enquiry> enquiries) {
+    public static void displayEnquiries(List<Enquiry> enquiries) {
         if (enquiries.isEmpty()) {
-            System.out.println("No enquiries found.");
+            CommonView.displayMessage("No enquiries found.");
             return;
         }
 
-        System.out.println("List of Enquiries:");
         for (Enquiry enquiry : enquiries) {
-            System.out.println("----------------------------------");
-            System.out.println("Enquiry ID: " + enquiry.getEnquiryID());
-            System.out.println("Applicant NRIC: " + enquiry.getApplicantNRIC());
-            System.out.println("Project ID: " + enquiry.getProjectID());
-            System.out.println("Query: " + enquiry.getQuery());
-            System.out.println("Response: " + (enquiry.getResponse() != null ? enquiry.getResponse() : "Not yet responded"));
-            System.out.println("Status: " + enquiry.getEnquiryStatus());
-            System.out.println("Enquiry Date: " + enquiry.getEnquiryDate());
-            System.out.println("Responded By: " + (enquiry.getRespondedBy() != null ? enquiry.getRespondedBy() : "Not yet responded"));
-            System.out.println("----------------------------------");
+            displayEnquiry(enquiry);
+            CommonView.displaySeparator();
         }
     }
 
-    public String getEnquiryDetails() {
-        System.out.println("\nEnter your enquiry:");
-        return scanner.nextLine().trim();
+    public static void displayEnquiry(Enquiry enquiry) {
+        CommonView.displayHeader("Enquiry Details");
+        CommonView.displayMessage("Enquiry ID: " + enquiry.getEnquiryID());
+        CommonView.displayMessage("From: " + enquiry.getApplicantNRIC());
+        CommonView.displayMessage("Project ID: " + enquiry.getProjectID());
+        CommonView.displayMessage("Query: " + enquiry.getQuery());
+        if (enquiry.isResponse()) {
+            CommonView.displayMessage("Response: " + enquiry.getResponse());
+            CommonView.displayMessage("Responded by: " + enquiry.getResponder());
+        } else {
+            CommonView.displayMessage("Status: Pending Response");
+        }
     }
 
-    public void displayEnquiryCreatedMessage() {
-        System.out.println("Enquiry has been created successfully.");
+    public static String getEnquiryDetails() {
+        return CommonView.prompt("\nEnter your enquiry: ");
+    }
+
+    public static void displayEnquiryCreatedMessage() {
+        CommonView.displaySuccess("Enquiry created successfully.");
+    }
+
+    public static void displayEmptyMessage() {
+        CommonView.displayMessage("No enquiries available.");
+    }
+
+    public static void showEnquiryList(List<Enquiry> enquiries) {
+        if (enquiries.isEmpty()) {
+            displayEmptyMessage();
+            return;
+        }
+
+        CommonView.displayHeader("Enquiries");
+        for (int i = 0; i < enquiries.size(); i++) {
+            Enquiry enquiry = enquiries.get(i);
+            CommonView.displayMessage(String.format("%d. From: %s", i + 1, enquiry.getApplicantNRIC()));
+            CommonView.displayMessage("   Query: " + enquiry.getQuery());
+            CommonView.displayMessage("   Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
+            CommonView.displaySeparator();
+        }
     }
 }

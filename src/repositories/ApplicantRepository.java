@@ -1,8 +1,7 @@
 package repositories;
 
 import models.Applicant;
-import models.enums.MaritalStatus;
-import models.enums.Role;
+import models.User;
 import utils.CsvReader;
 import utils.CsvWriter;
 
@@ -25,7 +24,7 @@ public class ApplicantRepository {
 
         @Override
         public List<String> getHeaders() {
-            return List.of("NRIC", "Name", "Password", "Age", "MaritalStatus", "AppliedProjects");
+            return List.of("ApplicantNRIC", "AppliedProjects");
         }
     }
 
@@ -37,11 +36,7 @@ public class ApplicantRepository {
         List<Map<String, String>> records = new ArrayList<>();
         for (Applicant applicant : applicants) {
             Map<String, String> record = new HashMap<>();
-            record.put("NRIC", applicant.getUserNRIC());
-            record.put("Name", applicant.getName());
-            record.put("Password", applicant.getPassword());
-            record.put("Age", String.valueOf(applicant.getAge()));
-            record.put("MaritalStatus", applicant.getMaritalStatus().toString());
+            record.put("ApplicantNRIC", applicant.getUserNRIC());
             record.put("AppliedProjects", String.join("/", applicant.getAppliedProjects()));
             records.add(record);
         }
@@ -59,21 +54,30 @@ public class ApplicantRepository {
             applicants = new ArrayList<>();
 
             for (Map<String, String> record : records) {
+                // gets base user data from UserRepository
+                User userData = UserRepository.getByNRIC(record.get("ApplicantNRIC"));
+                if (userData == null) {
+                    System.err.println("Applicant NRIC not found in users.csv: " + record.get("ApplicantNRIC"));
+                    continue;
+                }
+
                 List<String> appliedProjects = new ArrayList<>();
                 if (record.get("AppliedProjects") != null && !record.get("AppliedProjects").isEmpty()) {
                     appliedProjects = Arrays.asList(record.get("AppliedProjects").split("/"));
                 }
 
+                // Create applicant with user data and applied projects
                 Applicant applicant = new Applicant(
-                    record.get("NRIC"),
-                    record.get("Name"),
-                    record.get("Password"),
-                    Integer.parseInt(record.get("Age")),
+                    userData.getUserNRIC(),
+                    userData.getName(),
+                    userData.getPassword(),
+                    userData.getAge(),
                     appliedProjects
                 );
-                applicant.setMaritalStatus(MaritalStatus.valueOf(record.get("MaritalStatus")));
+                applicant.setMaritalStatus(userData.getMaritalStatus());
                 applicants.add(applicant);
             }
+            System.out.println("Loaded " + applicants.size() + " applicants from CSV.");
         } catch (IOException e) {
             System.err.println("Error loading applicants: " + e.getMessage());
         }

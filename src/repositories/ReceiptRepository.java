@@ -1,9 +1,7 @@
 package repositories;
 
-import models.Project;
 import models.Receipt;
 import models.enums.FlatType;
-import models.enums.MaritalStatus;
 import utils.CsvReader;
 import utils.CsvWriter;
 import utils.DateTimeUtils;
@@ -25,8 +23,9 @@ public class ReceiptRepository {
 
         @Override
         public List<String> getHeaders() {
-            return List.of("ApplicationID", "ApplicantName", "ApplicantNRIC", "ProjectName",
-                          "FlatType", "Price", "MaritalStatus", "DateIssued");
+            return List.of("ReceiptID", "ApplicantNRIC", "ApplicantAge", "MaritalStatus",
+                          "FlatType", "FlatPrice", "FlatUnitNumber", "ProjectID",
+                          "ProjectName", "ProjectLocation", "ReceiptDate");
         }
     }
 
@@ -38,14 +37,17 @@ public class ReceiptRepository {
         List<Map<String, String>> records = new ArrayList<>();
         for (Receipt receipt : receipts) {
             Map<String, String> record = new HashMap<>();
-            record.put("ApplicationID", receipt.getReceiptID());
-            record.put("ApplicantName", receipt.getApplicantName());
+            record.put("ReceiptID", receipt.getReceiptID());
             record.put("ApplicantNRIC", receipt.getApplicantNRIC());
-            record.put("ProjectName", receipt.getProjectName());
+            record.put("ApplicantAge", String.valueOf(UserRepository.getByNRIC(receipt.getApplicantNRIC()).getAge()));
+            record.put("MaritalStatus", UserRepository.getByNRIC(receipt.getApplicantNRIC()).getMaritalStatus().toString());
             record.put("FlatType", receipt.getFlatType().toString());
-            record.put("Price", String.valueOf(receipt.getFlatPrice()));
-            record.put("MaritalStatus", receipt.getMaritalStatus().toString());
-            record.put("DateIssued", DateTimeUtils.formatDateTime(receipt.getReceiptDate()));
+            record.put("FlatPrice", String.valueOf(receipt.getFlatPrice()));
+            record.put("FlatUnitNumber", receipt.getFlatUnitNumber());
+            record.put("ProjectID", receipt.getProjectID());
+            record.put("ProjectName", receipt.getProjectName());
+            record.put("ProjectLocation", ProjectRepository.getById(receipt.getProjectID()).getLocation());
+            record.put("ReceiptDate", DateTimeUtils.formatDateTime(receipt.getReceiptDate()));
             records.add(record);
         }
 
@@ -61,18 +63,26 @@ public class ReceiptRepository {
             List<Map<String, String>> records = CsvReader.read(new ReceiptCsvConfig());
             receipts = new ArrayList<>();
 
-
             for (Map<String, String> record : records) {
+                // Get the applicant and project objects
+                models.Applicant applicant = ApplicantRepository.getByNRIC(record.get("ApplicantNRIC"));
+                models.Project project = ProjectRepository.getById(record.get("ProjectID"));
+                
+                if (applicant == null || project == null) {
+                    System.err.println("Could not find applicant or project for receipt: " + record.get("ReceiptID"));
+                    continue;
+                }
+
                 Receipt receipt = new Receipt(
-                    ApplicantRepository.getByNRIC(record.get("ApplicantNRIC")),
-                    FlatType.valueOf(record.get("Flat Type")),
-                    Integer.parseInt(record.get("Price")),
-                    record.get("Flat Unit Number"),
-                    ProjectRepository.getByName(record.get("Project Name"))
-                        
+                    applicant,
+                    FlatType.valueOf(record.get("FlatType")),
+                    Integer.parseInt(record.get("FlatPrice")),
+                    record.get("FlatUnitNumber"),
+                    project
                 );
                 receipts.add(receipt);
             }
+            System.out.println("Loaded " + receipts.size() + " receipts from CSV.");
         } catch (IOException e) {
             System.err.println("Error loading receipts: " + e.getMessage());
         }
@@ -88,7 +98,7 @@ public class ReceiptRepository {
 
     public static Receipt getByApplicationId(String applicationId) {
         return receipts.stream()
-            .filter(receipt -> receipt.getApplicationID().equals(applicationId))
+            .filter(receipt -> receipt.getReceiptID().equals(applicationId))
             .findFirst()
             .orElse(null);
     }

@@ -7,7 +7,15 @@ public class DateTimeUtils {
     private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     
     public static LocalDateTime parseDateTime(String dateTimeStr, DateTimeFormatter formatter) {
-        return LocalDateTime.parse(dateTimeStr, formatter != null ? formatter : DEFAULT_FORMATTER);
+        if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(dateTimeStr.trim(), formatter != null ? formatter : DEFAULT_FORMATTER);
+        } catch (Exception e) {
+            System.err.println("Error parsing date: " + dateTimeStr + " - " + e.getMessage());
+            return null;
+        }
     }
 
     public static LocalDateTime parseDateTime(String dateTimeStr) {
@@ -15,7 +23,15 @@ public class DateTimeUtils {
     }
     
     public static String formatDateTime(LocalDateTime dateTime, DateTimeFormatter formatter) {
-        return dateTime.format(formatter != null ? formatter : DEFAULT_FORMATTER);
+        if (dateTime == null) {
+            return "";
+        }
+        try {
+            return dateTime.format(formatter != null ? formatter : DEFAULT_FORMATTER);
+        } catch (Exception e) {
+            System.err.println("Error formatting date: " + e.getMessage());
+            return "";
+        }
     }
 
     public static String formatDateTime(LocalDateTime dateTime) {

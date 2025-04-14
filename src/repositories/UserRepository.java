@@ -35,7 +35,7 @@ public class UserRepository {
         List<Map<String, String>> records = new ArrayList<>();
         for (User user : users) {
             Map<String, String> record = new HashMap<>();
-            record.put("NRIC", user.getUserNRIC());
+            record.put("UserNRIC", user.getUserNRIC());
             record.put("Name", user.getName());
             record.put("Password", user.getPassword());
             record.put("Age", String.valueOf(user.getAge()));

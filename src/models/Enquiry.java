@@ -29,6 +29,15 @@ public class Enquiry {
         this.respondedBy = null;
     }
 
+    public Enquiry(String enquiryID, String projectID, String applicantNRIC, String query) {
+        this.enquiryID = enquiryID;
+        this.projectID = projectID;
+        this.applicantNRIC = applicantNRIC;
+        this.query = query;
+        this.response = null;
+        this.respondedBy = null;
+    }
+
     public Enquiry(String enquiryID, String applicantNRIC, String projectID, String query, String response,
                    EnquiryStatus enquiryStatus, LocalDateTime enquiryDate,
                    LocalDateTime lastUpdated, String respondedBy) {
@@ -88,6 +97,10 @@ public class Enquiry {
         return respondedBy;
     }
 
+    public String getResponder() {
+        return respondedBy;
+    }
+
     // Setters
     public void setEnquiryID(String enquiryID) {
         this.enquiryID = enquiryID;
@@ -121,11 +134,20 @@ public class Enquiry {
         this.respondedBy = respondedBy;
     }
 
+    public void setResponder(String responder) {
+        this.respondedBy = responder;
+    }
+
     // Status Update Method
     public void markAsResponded(String responder, String response) {
         this.response = response;
         this.enquiryStatus = EnquiryStatus.RESPONDED;
         this.respondedBy = responder;
         this.lastUpdated = LocalDateTime.now();
+    }
+
+    // Helper methods
+    public boolean isResponse() {
+        return response != null && !response.trim().isEmpty();
     }
 }

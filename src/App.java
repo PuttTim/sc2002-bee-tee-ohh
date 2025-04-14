@@ -1,48 +1,42 @@
-import controllers.ProjectController;
-import repositories.ProjectRepository;
-import repositories.RegistrationRepository;
-import repositories.UserRepository;
-import repositories.EnquiryRepository;
+import controllers.*;
+import repositories.*;
 
 // This is the main entrypoint of our application.
 public class App {
-    private App() {
-    };
+    private App() {}
 
     public static void main(String[] args) {
         App app = new App();
         try {
             app.initRepositories();
-
-            // ProjectController projectController = new ProjectController();
-            // projectController.showMainMenu();
-
-            System.out.println(RegistrationRepository.getAll().get(1).getProjectID());
-
-            // app.saveRepositories();
-
+            AuthController.runAuthentication();
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
-            System.out.println("Error: " + e.getLocalizedMessage() + e.getStackTrace().toString());
-
-            app.saveRepositories();
+            e.printStackTrace();
+        } finally {
+            // app.saveRepositories();
         }
     }
 
     private void initRepositories() {
-        // Initialize repositories
         ProjectRepository.load();
         EnquiryRepository.load();
         UserRepository.load();
         RegistrationRepository.load();
+        ApplicantRepository.load();
+        ApplicationRepository.load();
+        OfficerRepository.load();
+        ManagerRepository.load();
     }
 
     private void saveRepositories() {
-        // Save repositories
-
-        ProjectRepository.saveAll();  
+        ProjectRepository.saveAll();
         EnquiryRepository.saveAll();
         UserRepository.saveAll();
         RegistrationRepository.saveAll();
+        ApplicantRepository.saveAll();
+        ApplicationRepository.saveAll();
+        OfficerRepository.saveAll();
+        ManagerRepository.saveAll();
     }
 }

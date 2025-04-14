@@ -7,28 +7,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import interfaces.ICsvConfig;
 
 public class CsvReader {
+    private static final Pattern CSV_PATTERN = Pattern.compile(
+        ",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))"  // Split on comma but not within quotes
+    );
+
     public static List<Map<String, String>> read(ICsvConfig config) throws IOException {
         List<Map<String, String>> records = new ArrayList<>();
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(config.getFilePath()))) {
-            String headerLine = br.readLine();
-            if (headerLine == null) {
-                return records;
-            }
+        List<String> headers = config.getHeaders();
 
+        try (BufferedReader br = new BufferedReader(new FileReader(config.getFilePath()))) {
             String line;
-            List<String> headers = config.getHeaders();
+            // Skip header line since we're using configured headers
+            br.readLine();
             
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
+                if (line.trim().isEmpty()) continue;
+                
+                String[] values = CSV_PATTERN.split(line);
                 Map<String, String> record = new HashMap<>();
                 
-                for (int i = 0; i < headers.size() && i < values.length; i++) {
-                    record.put(headers.get(i), values[i]);
+                for (int i = 0; i < headers.size(); i++) {
+                    String value = i < values.length ? unescapeValue(values[i]) : "";
+                    record.put(headers.get(i), value);
                 }
                 
                 records.add(record);
@@ -36,5 +41,23 @@ public class CsvReader {
         }
         
         return records;
+    }
+
+    private static String unescapeValue(String value) {
+        if (value == null || value.isEmpty()) {
+            return "";
+        }
+
+        value = value.trim();
+        
+        // Remove surrounding quotes if present
+        if (value.startsWith("\"") && value.endsWith("\"")) {
+            value = value.substring(1, value.length() - 1);
+        }
+        
+        // Replace escaped quotes with single quotes
+        value = value.replace("\"\"", "\"");
+        
+        return value;
     }
 }

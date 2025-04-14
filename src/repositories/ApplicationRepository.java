@@ -23,14 +23,24 @@ public class ApplicationRepository {
 
         @Override
         public List<String> getHeaders() {
-            return List.of("ApplicationID","ApplicantNRIC","ProjectID","SelectedFlatType","ApplicationStatus","IsWithdrawalRequested","ApplicationDate","ApprovedBy","ApplicationStatusHistory"
-            );
+            return List.of("ApplicationID", "ApplicantNRIC", "ProjectID", "SelectedFlatType", 
+                          "ApplicationStatus", "IsWithdrawalRequested", "ApplicationDate", 
+                          "ApprovedBy", "ApplicationStatusHistory");
         }
     }
 
+    private static ApplicationRepository instance;
     private static List<Application> applications = new ArrayList<>();
 
-    private ApplicationRepository() {} // private constructor
+    private ApplicationRepository() {} 
+
+    public static ApplicationRepository getInstance() {
+        if (instance == null) {
+            instance = new ApplicationRepository();
+            load();
+        }
+        return instance;
+    }
 
     public static void saveAll() {
         List<Map<String, String>> records = new ArrayList<>();
@@ -39,17 +49,17 @@ public class ApplicationRepository {
             record.put("ApplicationID", application.getApplicationID());
             record.put("ApplicantNRIC", application.getApplicantNRIC());
             record.put("ProjectID", application.getProjectId());
-            record.put("FlatType", application.getSelectedFlatType().toString());
+            record.put("SelectedFlatType", application.getSelectedFlatType().toString());
             record.put("ApplicationStatus", application.getApplicationStatus().toString());
-            record.put("WithdrawalRequested", String.valueOf(application.isWithdrawalRequested()));
+            record.put("IsWithdrawalRequested", String.valueOf(application.isWithdrawalRequested()));
             record.put("ApplicationDate", DateTimeUtils.formatDateTime(application.getApplicationDate()));
-            record.put("ApprovedBy", application.getApprovedBy());
+            record.put("ApprovedBy", application.getApprovedBy() != null ? application.getApprovedBy() : "");
             
             // Convert status history to string
             String statusHistory = application.getApplicationStatusHistory().entrySet().stream()
                 .map(entry -> entry.getKey() + ":" + DateTimeUtils.formatDateTime(entry.getValue()))
                 .collect(Collectors.joining("/"));
-            record.put("StatusHistory", statusHistory);
+            record.put("ApplicationStatusHistory", statusHistory);
             
             records.add(record);
         }
@@ -69,10 +79,10 @@ public class ApplicationRepository {
             for (Map<String, String> record : records) {
                 // Parse status history
                 Map<ApplicationStatus, LocalDateTime> statusHistory = new HashMap<>();
-                if (record.get("StatusHistory") != null && !record.get("StatusHistory").isEmpty()) {
-                    Arrays.stream(record.get("StatusHistory").split("/"))
+                if (record.get("ApplicationStatusHistory") != null && !record.get("ApplicationStatusHistory").isEmpty()) {
+                    Arrays.stream(record.get("ApplicationStatusHistory").split("/"))
                         .forEach(entry -> {
-                            String[] parts = entry.split(":");
+                            String[] parts = entry.split(";");
                             statusHistory.put(
                                 ApplicationStatus.valueOf(parts[0]),
                                 DateTimeUtils.parseDateTime(parts[1])
@@ -84,15 +94,16 @@ public class ApplicationRepository {
                     record.get("ApplicationID"),
                     record.get("ApplicantNRIC"),
                     record.get("ProjectID"),
-                    FlatType.valueOf(record.get("FlatType")),
+                    FlatType.valueOf(record.get("SelectedFlatType")),
                     ApplicationStatus.valueOf(record.get("ApplicationStatus")),
-                    Boolean.parseBoolean(record.get("WithdrawalRequested")),
+                    Boolean.parseBoolean(record.get("IsWithdrawalRequested")),
                     DateTimeUtils.parseDateTime(record.get("ApplicationDate")),
-                    record.get("ApprovedBy"),
+                    record.get("ApprovedBy").isEmpty() ? null : record.get("ApprovedBy"),
                     statusHistory
                 );
                 applications.add(application);
             }
+            System.out.println("Loaded " + applications.size() + " applications from CSV.");
         } catch (IOException e) {
             System.err.println("Error loading applications: " + e.getMessage());
         }
@@ -122,6 +133,12 @@ public class ApplicationRepository {
     public static List<Application> getByProject(String projectId) {
         return applications.stream()
             .filter(app -> app.getProjectId().equals(projectId))
+            .collect(Collectors.toList());
+    }
+
+    public static List<Application> getByStatus(ApplicationStatus status) {
+        return applications.stream()
+            .filter(app -> app.getApplicationStatus() == status)
             .collect(Collectors.toList());
     }
 }

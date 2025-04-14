@@ -2,98 +2,85 @@ package views;
 
 import models.Enquiry;
 import models.Project;
+import models.enums.EnquiryStatus;
+import repositories.ProjectRepository;
 import services.ApplicantEnquiryService;
-
+import utils.DateTimeUtils;
 import java.util.List;
-import java.util.Scanner;
 
 public class ApplicantEnquiryView {
-    private Scanner scanner = new Scanner(System.in);
-    private ApplicantEnquiryService enquiryService;
-
-    //constructor
-    public ApplicantEnquiryView(ApplicantEnquiryService service) {
-        this.enquiryService = service;
+    public static void showEnquiryMenu() {
+        List<String> options = List.of(
+            "View My Enquiries",
+            "Create New Enquiry",
+            "Edit Enquiry",
+            "Delete Enquiry",
+            "Back to Main Menu"
+        );
+        CommonView.displayMenu("Enquiry Management", options);
     }
 
-    //the menu for showing enquiry options
-    public void showEnquiryMenu() { //main menu for enquiries
-        System.out.println("\n===== Enquiry Menu =====");
-        System.out.println("1. View Enquiries");
-        System.out.println("2. Submit Enquiry");
-        System.out.println("3. Edit Enquiry");
-        System.out.println("4. Delete Enquiry");
-        System.out.println("5. Exit Enquiry Menu");
-        System.out.print("Select an option: ");
-    }
+    public static void displayEnquiries(List<Enquiry> enquiries) {
+        if (enquiries.isEmpty()) {
+            CommonView.displayMessage("No enquiries found.");
+            return;
+        }
 
-    //display submitted enquiries
-    public void displayEnquiries(List<Enquiry> enquiries) {
-        if (enquiries.isEmpty()) { //no enquiries submitted
-            System.out.println("You have not submitted any enquiries.");
-        } else {
-            System.out.println("Your Enquiries:");
-            for (int i = 0; i < enquiries.size(); i++) {
-                Enquiry e = enquiries.get(i);
-                System.out.printf("%d. [%s] %s\n", i + 1, e.getProject().getProjectID(), e.getEnquiry());
-                //print out each enquiry (project name, id, enquiry)
+        CommonView.displayHeader("Your Enquiries");
+        for (int i = 0; i < enquiries.size(); i++) {
+            Enquiry enquiry = enquiries.get(i);
+            CommonView.displayMessage(String.format("%d. Project ID: %s", i + 1, enquiry.getProjectID()));
+            CommonView.displayMessage("   Query: " + enquiry.getQuery());
+            CommonView.displayMessage("   Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
+            if (enquiry.isResponse()) {
+                CommonView.displayMessage("   Response: " + enquiry.getResponse());
             }
+            CommonView.displaySeparator();
         }
     }
 
-    //get applicant input for submitting enquiry
-    public Enquiry getEnquiryInput(String applicantNric, List<Project> projects) {
-        System.out.println("Select the project ID to enquire about:"); //user input
-        for (int i = 0; i < projects.size(); i++) {
-            //display each project by id and name for applicant to choose from
-            Project project = projects.get(i);
-            System.out.printf("%d. %s - %s\n", i + 1, project.getProjectID(), project.getProjectName());
-        }
-
-        System.out.print("Enter project ID: "); //user input
-        String projectId = scanner.nextLine();
-
-        //check projectId for validity
-        Project selectedProject = null;
-        for (Project project : projects) {
-            if (project.getProjectID().equals(projectId)) {
-                selectedProject = project; //assign the matching project (by id) to selectedProject
-                break;
-            }
-        }
-
-        if (selectedProject == null) {
-            System.out.println("Invalid project ID."); //handling invalid input
+    public static Enquiry getEnquiryInput(String applicantNric, List<Project> projects) {
+        if (projects.isEmpty()) {
+            CommonView.displayMessage("No projects available for enquiry.");
             return null;
         }
 
-        System.out.print("Enter your enquiry message: "); //user input
-        String content = scanner.nextLine();
+        CommonView.displayHeader("Available Projects");
+        for (int i = 0; i < projects.size(); i++) {
+            CommonView.displayMessage(String.format("%d. %s", i + 1, projects.get(i).getProjectName()));
+        }
 
-        return new Enquiry(applicantNric, selectedProject.getProjectID(), content); //return full enquiry
+        int projectChoice = CommonView.promptInt("\nSelect a project number (or 0 to cancel): ", 0, projects.size());
+        if (projectChoice == 0) return null;
+
+        Project selectedProject = projects.get(projectChoice - 1);
+        String query = CommonView.prompt("\nEnter your enquiry: ");
+
+        if (query.isEmpty()) {
+            CommonView.displayError("Enquiry cannot be empty.");
+            return null;
+        }
+
+        return new Enquiry(applicantNric, selectedProject.getProjectID(), query);
     }
 
-    //for editing or deleting enquiries
-    public int getEnquiryToEditOrDelete(String action, int size) {
-        System.out.printf("Enter the enquiry number to %s (1 to %d): ", action, size);
-        //action: edit or delete
-        return scanner.nextInt() - 1; //for enquiry list index
+    public static int getEnquiryToEditOrDelete(String action, int size) {
+        int choice = CommonView.promptInt(
+            String.format("Enter the number of the enquiry to %s (1-%d) or 0 to cancel: ", action, size),
+            0, size);
+        return choice - 1;
     }
 
-    //get updated enquiry contents
-    public String getUpdatedContents() {
-        scanner.nextLine(); // clear buffer
-        System.out.print("Enter your new message: "); //user input
-        return scanner.nextLine();
+    public static String getUpdatedContents() {
+        String content = CommonView.prompt("Enter your updated enquiry (or press Enter to cancel): ");
+        return content.isEmpty() ? null : content;
     }
 
-    //successful enquiry
-    public void showSuccess(String msg) {
-        System.out.println("Successful enquiry: " + msg); //display success
+    public static void showSuccess(String msg) {
+        CommonView.displaySuccess(msg);
     }
 
-    //error encountered
-    public void showError(String msg) {
-        System.out.println("Error occurred when submitting enquiry: " + msg); //display error
+    public static void showError(String msg) {
+        CommonView.displayError(msg);
     }
 }

@@ -1,140 +1,146 @@
 package views;
 
 import models.*;
+import models.enums.ApplicationStatus;
+import models.enums.FlatType;
+import repositories.ProjectRepository;
 import services.ApplicantApplicationService;
-import controllers.ApplicantController;
-
+import utils.DateTimeUtils;
 import java.util.List;
-import java.util.Scanner;
 
 public class ApplicantApplicationView {
-    private ApplicantApplicationView applicationView;
-    private ApplicantApplicationService applicationService;
-    private ApplicantController applicantController;
-    private Scanner scanner;
+    public static void showApplicationMenu(Applicant applicant, List<Project> allProjects) {
+        List<String> options = List.of(
+            "View Available Projects",
+            "Submit New Application",
+            "Check Application Status",
+            "Withdraw Application",
+            "Back to Main Menu"
+        );
 
-    //constructor
-    public ApplicantApplicationView(ApplicantApplicationView applicationView,
-                                    ApplicantApplicationService service,
-                                    ApplicantController applicantController) {
-        this.applicationView = applicationView;
-        this.applicationService = service;
-        this.applicantController = applicantController;
-        this.scanner = new Scanner(System.in);
+        while (true) {
+            int choice = CommonView.displayMenu("Application Management", options);
+            switch (choice) {
+                case 1 -> displayEligibleProjects(applicant, allProjects);
+                case 2 -> promptApplication(applicant, allProjects);
+                case 3 -> displayApplicationStatus(applicant);
+                case 4 -> handleWithdraw(applicant);
+                case 5 -> {return;}
+            }
+        }
     }
 
-    public void promptApplication(Applicant applicant, List<Project> allProjects) {
-        //get list of eligible projects
-        List<Project> eligibleProjects = applicationService.viewEligibleProjects(applicant, allProjects);
-
-        if (eligibleProjects.isEmpty()) { //no eligible projects for the applicant
-            System.out.println("No eligible projects available.");
+    private static void displayEligibleProjects(Applicant applicant, List<Project> allProjects) {
+        List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
+        if (eligibleProjects.isEmpty()) {
+            CommonView.displayMessage("No eligible projects found.");
             return;
         }
 
+        CommonView.displayHeader("Eligible Projects");
         for (int i = 0; i < eligibleProjects.size(); i++) {
             Project project = eligibleProjects.get(i);
-            System.out.printf("%d. %s (%s)\n", i + 1, project.getProjectName(), project.getLocation());
-            //display the eligible projects (name and location) for the applicant
-        }
-
-        System.out.print("Select a project number: ");
-        int choice = Integer.parseInt(scanner.nextLine()) - 1; //user input
-
-        if (choice < 0 || choice >= eligibleProjects.size()) {
-            System.out.println("Invalid selection.");
-            return;
-        }
-
-        Project selected = eligibleProjects.get(choice);
-        System.out.print("Enter flat type (e.g., TWO_ROOM, THREE_ROOM): "); // Updated prompt for clarity
-        String flatTypeInput = scanner.nextLine().trim(); //user input
-
-        try {
-            //initialise new application from applicant
-            // Assuming applicationService is instantiated correctly
-            Application application = applicationService.applyForProject(applicant, selected, flatTypeInput);
-            System.out.println("Application submitted successfully.");
-            System.out.println("Application ID: " + application.getApplicationID()); // Corrected getter
-            System.out.println("Project: " + selected.getProjectName());
-            System.out.println("Flat Type: " + application.getSelectedFlatType());
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error submitting application: " + e.getMessage()); //error message
-        } catch (Exception e) {
-            // Catch other potential exceptions during application process
-            System.out.println("An unexpected error occurred: " + e.getMessage());
+            CommonView.displayMessage(String.format("%d. %s (Location: %s)", 
+                i + 1, project.getProjectName(), project.getLocation()));
+            CommonView.displayMessage("   Application Period: " + 
+                DateTimeUtils.formatDateTime(project.getApplicationOpenDate()) +
+                " to " + DateTimeUtils.formatDateTime(project.getApplicationCloseDate()));
         }
     }
 
-    public void viewApplicationStatus(Application application) {
-        if (application == null) { //no application
-            System.out.println("No application found.");
+    public static void promptApplication(Applicant applicant, List<Project> allProjects) {
+        List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
+        if (eligibleProjects.isEmpty()) {
+            CommonView.displayMessage("No eligible projects available for application.");
             return;
         }
 
-        //else (if application exists)
-        //display the id, project name and status
-        System.out.println("Application ID: " + application.getApplicationID());
-        System.out.println("Project: " + application.getProject().getProjectName());
-        System.out.println("Status: " + application.getApplicationStatus());
+        displayEligibleProjects(applicant, allProjects);
+        int choice = CommonView.promptInt("\nSelect a project number (or 0 to cancel): ", 0, eligibleProjects.size());
+        if (choice == 0) return;
+
+        Project selectedProject = eligibleProjects.get(choice - 1);
+        CommonView.displayHeader("Available Flat Types");
+        List<FlatType> flatTypes = selectedProject.getFlatTypes();
+        for (int i = 0; i < flatTypes.size(); i++) {
+            CommonView.displayMessage(String.format("%d. %s", i + 1, flatTypes.get(i)));
+        }
+
+        int flatTypeChoice = CommonView.promptInt("Select a flat type number: ", 1, flatTypes.size());
+        FlatType selectedFlatType = flatTypes.get(flatTypeChoice - 1);
+        ApplicantApplicationService.submitApplication(applicant, selectedProject, selectedFlatType);
+        CommonView.displaySuccess("Application submitted successfully.");
     }
 
-    public void handleWithdraw(Application application) {
-        if (application == null) { //no application
-            System.out.println("No application found.");
+    public static void displayApplicationStatus(Applicant applicant) {
+        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
+        if (applications.isEmpty()) {
+            CommonView.displayMessage("No applications found.");
             return;
         }
 
-        //else call withdrawApplication from services
-        applicationService.withdrawApplication(application);
-        System.out.println("Withdrawal request submitted.");
-    }
-
-    //the menu for application options
-    public void showApplicationMenu(Applicant applicant,
-                                    List<Project> allProjects,
-                                    ApplicantController applicantController) {
-        Application application = null;
-        while (true) {
-            System.out.println("\n===== Application Menu =====");
-            System.out.println("1. Apply for a project");
-            System.out.println("2. View Application Status");
-            System.out.println("3. Withdraw Application");
-            System.out.println("4. Back to Main Menu");
-            System.out.print("Select an option: ");
-
-            int choice = Integer.parseInt(scanner.nextLine());
-
-            switch (choice) {
-                case 1:
-                    applicationView.promptApplication(applicant, allProjects);
-                    break;
-                case 2:
-                    //fetch application first
-                    application = applicationService.getApplicationByApplicant(applicant);
-                    //no application = display error message
-                    if (application == null) {
-                        System.out.println("No application found.");
-                    } else {
-                        //show application status, use ApplicantApplicationView method
-                        applicationView.viewApplicationStatus(application);
-                    }
-                case 3:
-                    //fetch application first
-                    application = applicationService.getApplicationByApplicant(applicant);
-                    if (application == null) { //check conditions
-                        System.out.println("No application found to withdraw.");
-                    } else {
-                        applicationView.handleWithdraw(application);
-                    }
-                    break;
-                case 4:
-                    applicantController.start(applicant, allProjects);
-                    return; //route back to ApplicantController.java
-                default:
-                    System.out.println("Invalid option. Please try again.");
+        CommonView.displayHeader("Your Applications");
+        for (Application app : applications) {
+            CommonView.displayMessage("Project: " + ProjectRepository.getById(app.getProjectId()).getProjectName());
+            CommonView.displayMessage("Flat Type: " + app.getSelectedFlatType());
+            CommonView.displayMessage("Status: " + getStatusDisplay(app.getApplicationStatus()));
+            CommonView.displayMessage("Application Date: " + DateTimeUtils.formatDateTime(app.getApplicationDate()));
+            if (app.getApprovedBy() != null) {
+                CommonView.displayMessage("Approved By: " + app.getApprovedBy());
             }
+            CommonView.displaySeparator();
+        }
+    }
+
+    private static String getStatusDisplay(ApplicationStatus status) {
+        return switch (status) {
+            case PENDING -> "Pending Review";
+            case SUCCESSFUL -> "Approved";
+            case UNSUCCESSFUL -> "Rejected";
+            case WITHDRAWN -> "Withdrawn";
+            default -> status.toString();
+        };
+    }
+
+    public static void handleWithdraw(Applicant applicant) {
+        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
+        if (applications.isEmpty()) {
+            CommonView.displayMessage("No applications available to withdraw.");
+            return;
+        }
+
+        CommonView.displayHeader("Your Active Applications");
+        int activeCount = 0;
+        for (int i = 0; i < applications.size(); i++) {
+            Application app = applications.get(i);
+            if (app.getApplicationStatus() == ApplicationStatus.PENDING) {
+                CommonView.displayMessage(String.format("%d. Project: %s, Flat Type: %s", 
+                    i + 1, 
+                    ProjectRepository.getById(app.getProjectId()).getProjectName(),
+                    app.getSelectedFlatType()));
+                activeCount++;
+            }
+        }
+
+        if (activeCount == 0) {
+            CommonView.displayMessage("No active applications available to withdraw.");
+            return;
+        }
+
+        int choice = CommonView.promptInt("\nSelect application number to withdraw (or 0 to cancel): ", 0, applications.size());
+        if (choice == 0) return;
+
+        Application selectedApp = applications.get(choice - 1);
+        if (selectedApp.getApplicationStatus() != ApplicationStatus.PENDING) {
+            CommonView.displayError("Can only withdraw pending applications.");
+            return;
+        }
+
+        if (CommonView.promptYesNo("Are you sure you want to withdraw this application?")) {
+            ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
+            CommonView.displaySuccess("Application withdrawn successfully.");
+        } else {
+            CommonView.displayMessage("Withdrawal cancelled.");
         }
     }
 }

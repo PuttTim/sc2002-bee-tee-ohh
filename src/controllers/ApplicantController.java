@@ -1,136 +1,190 @@
 package controllers;
 
 import models.*;
+import models.enums.FlatType;
+import repositories.ProjectRepository;
 import services.*;
 import views.*;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ApplicantController {
-    private ApplicantApplicationService applicationService;
-    private ApplicantEnquiryService enquiryService;
-    private ApplicantApplicationView applicationView;
-    private ApplicantEnquiryView enquiryView;
-    private ApplicantController applicantController;
-    private Scanner scanner;
+    private static final Scanner scanner = new Scanner(System.in);
 
-    //constructor
-    public ApplicantController(ApplicantApplicationService applicationService,
-                               ApplicantEnquiryService enquiryService,
-                               ApplicantApplicationView applicationView,
-                               ApplicantEnquiryView enquiryView,
-                               ApplicantController applicantController) {
-        this.applicationService = applicationService;
-        this.enquiryService = enquiryService;
-        this.applicationView = applicationView;
-        this.enquiryView = enquiryView;
-        this.applicantController = applicantController;
-        this.scanner = new Scanner(System.in);
-    }
-
-    //start the main menu
-    public void start(Applicant applicant, List<Project> allProjects) {
+    public static void start(Applicant applicant) {
         while (true) {
-            System.out.println("\n===== Applicant Main Menu =====");
-            System.out.println("1. Application Services");
-            System.out.println("2. Enquiry Services");
-            System.out.println("3. Logout");
-            System.out.print("Select an option: ");
+            try {
+                System.out.println("\n===== Applicant Main Menu =====");
+                System.out.println("Welcome, " + applicant.getName());
+                if (applicant.hasBookedFlat()) {
+                    System.out.println("You have a booked flat in project: " + applicant.getBookedProjectId());
+                }
+                System.out.println("\n1. Application Services");
+                System.out.println("2. Enquiry Services");
+                System.out.println("3. Logout");
+                System.out.print("Select an option: ");
 
-            int choice = Integer.parseInt(scanner.nextLine());
+                int choice = Integer.parseInt(scanner.nextLine().trim());
 
-            switch (choice) {
-                case 1:
-                    //call the method
-                    applicationView.showApplicationMenu(applicant, allProjects, this);
-                    break;
-                case 2:
-                    //call the method in enquiryView
-                    enquiryView.showEnquiryMenu();
-                    break;
-                case 3:
-                    return;
-                default:
-                    System.out.println("Invalid option. Please try again.");
+                switch (choice) {
+                    case 1:
+                        List<Project> allProjects = ProjectRepository.getAll();
+                        ApplicantApplicationView.showApplicationMenu(applicant, allProjects);
+                        break;
+                    case 2:
+                        showEnquiryMenu(applicant);
+                        break;
+                    case 3:
+                        System.out.println("Logging out...");
+                        return;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            } catch (Exception e) {
+                System.out.println("An error occurred: " + e.getMessage());
             }
         }
     }
 
-    //handle enquiry menu
-    public void showEnquiryMenu(Applicant applicant, List<Project> allProjects) {
+    private static void showEnquiryMenu(Applicant applicant) {
         while (true) {
-            enquiryView.showEnquiryMenu();  //display the menu from views
-            int choice = Integer.parseInt(scanner.nextLine());
+            try {
+                System.out.println("\n===== Enquiry Menu =====");
+                System.out.println("1. View All Enquiries");
+                System.out.println("2. Submit New Enquiry");
+                System.out.println("3. Edit Enquiry");
+                System.out.println("4. Delete Enquiry");
+                System.out.println("5. Back to Main Menu");
+                System.out.print("Select an option: ");
 
-            switch (choice) {
-                case 1:
-                    //to view enquiries
-                    List<Enquiry> enquiries = enquiryService.viewEnquiriesByApplicant(applicant);
-                    enquiryView.displayEnquiries(enquiries);
-                    break;
+                int choice = Integer.parseInt(scanner.nextLine().trim());
 
-                case 2:
-                    //for applicant to submit enquiry
-                    Enquiry enquiryInput = enquiryView.getEnquiryInput(applicant.getUserNRIC(), allProjects); //call on views
-                    if (enquiryInput != null) { //if input is done correctly
-                        enquiryService.submitEnquiry(applicant, enquiryInput.getProjectID(), enquiryInput.getQuery()); //call services
-                        enquiryView.showSuccess("Your enquiry has been submitted.");
-                    } else {
-                        enquiryView.showError("Failed to submit enquiry. Please check your input.");
-                    }
-                    break;
+                switch (choice) {
+                    case 1: // View All Enquiries
+                        List<Enquiry> enquiries = ApplicantEnquiryService.viewEnquiriesByApplicant(applicant);
+                        ApplicantEnquiryView.displayEnquiries(enquiries);
+                        break;
 
-                case 3:
-                    //for applicant to edit enquiry
-                    List<Enquiry> existingEnquiries = enquiryService.viewEnquiriesByApplicant(applicant);
-                    if (!existingEnquiries.isEmpty()) {
-                        int enquiryIndex = enquiryView.getEnquiryToEditOrDelete("edit", existingEnquiries.size());
-                        if (enquiryIndex >= 0 && enquiryIndex < existingEnquiries.size()) {
-                            Enquiry enquiryToEdit = existingEnquiries.get(enquiryIndex);
-
-                            //get the updated content to edit enquiry with
-                            String updatedContent = enquiryView.getUpdatedContents();
-
-                            //edit enquiry by passing the updated content
-                            enquiryService.editEnquiry(applicant, enquiryToEdit.getEnquiryID(), updatedContent);
-                            enquiryView.showSuccess("Enquiry updated successfully.");
-                        } else {
-                            enquiryView.showError("Invalid enquiry selection.");
+                    case 2: // Submit New Enquiry
+                        List<Project> availableProjects = ProjectRepository.getAll().stream()
+                                .filter(Project::isVisible)
+                                .collect(Collectors.toList());
+                        if (availableProjects.isEmpty()) {
+                            ApplicantEnquiryView.showError("No projects available for enquiry");
+                            break;
                         }
-                    } else {
-                        enquiryView.showError("No enquiries available to edit.");
-                    }
-                    break;
-
-                case 4:
-                    //for applicant to delete enquiry
-                    //get a list of enquiries that can be deleted
-                    List<Enquiry> deleteList = enquiryService.viewEnquiriesByApplicant(applicant);
-
-                    if (!deleteList.isEmpty()) { //if enquiries available
-                        enquiryView.displayEnquiries(deleteList); //display the enquiries
-
-                        //get the action (delete), method returns the index of enquiry in list
-                        int index = enquiryView.getEnquiryToEditOrDelete("delete", deleteList.size());
-
-                        if (index >= 0 && index < deleteList.size()) {
-                            Enquiry selected = deleteList.get(index);
-                            enquiryService.deleteEnquiry(applicant, selected.getEnquiryID()); //call on services
-                            enquiryView.showSuccess("Enquiry deleted successfully.");
-                        } else {
-                            enquiryView.showError("Invalid selection.");
+                        Enquiry newEnquiry = ApplicantEnquiryView.getEnquiryInput(applicant.getUserNRIC(), availableProjects);
+                        if (newEnquiry != null) {
+                            ApplicantEnquiryService.submitEnquiry(newEnquiry);
+                            ApplicantEnquiryView.showSuccess("Enquiry submitted successfully");
                         }
-                    } else {
-                        enquiryView.showError("No enquiries to delete.");
-                    }
-                    break;
+                        break;
 
-                case 5:
-                    return; //go back to start, which called this method
-                default:
-                    System.out.println("Invalid option. Please try again.");
+                    case 3: // Edit Enquiry
+                        List<Enquiry> existingEnquiries = ApplicantEnquiryService.viewEnquiriesByApplicant(applicant);
+                        if (existingEnquiries.isEmpty()) {
+                            ApplicantEnquiryView.showError("No enquiries available to edit");
+                            break;
+                        }
+                        ApplicantEnquiryView.displayEnquiries(existingEnquiries);
+                        int editIndex = ApplicantEnquiryView.getEnquiryToEditOrDelete("edit", existingEnquiries.size());
+                        if (editIndex >= 0 && editIndex < existingEnquiries.size()) {
+                            String newContent = ApplicantEnquiryView.getUpdatedContents();
+                            if (newContent != null) {
+                                ApplicantEnquiryService.editEnquiry(applicant, existingEnquiries.get(editIndex).getEnquiryID(), newContent);
+                                ApplicantEnquiryView.showSuccess("Enquiry updated successfully");
+                            }
+                        } else {
+                            ApplicantEnquiryView.showError("Invalid selection");
+                        }
+                        break;
+
+                    case 4: // Delete Enquiry
+                        List<Enquiry> enquiriesToDelete = ApplicantEnquiryService.viewEnquiriesByApplicant(applicant);
+                        if (enquiriesToDelete.isEmpty()) {
+                            ApplicantEnquiryView.showError("No enquiries available to delete");
+                            break;
+                        }
+                        ApplicantEnquiryView.displayEnquiries(enquiriesToDelete);
+                        int deleteIndex = ApplicantEnquiryView.getEnquiryToEditOrDelete("delete", enquiriesToDelete.size());
+                        if (deleteIndex >= 0 && deleteIndex < enquiriesToDelete.size()) {
+                            ApplicantEnquiryService.deleteEnquiry(applicant, enquiriesToDelete.get(deleteIndex).getEnquiryID());
+                            ApplicantEnquiryView.showSuccess("Enquiry deleted successfully");
+                        } else {
+                            ApplicantEnquiryView.showError("Invalid selection");
+                        }
+                        break;
+
+                    case 5: // Back to Main Menu
+                        return;
+
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            } catch (Exception e) {
+                System.out.println("An error occurred: " + e.getMessage());
             }
         }
+    }
+
+    public static void viewAvailableProjects() {
+        List<Project> projects = ProjectRepository.getAll().stream()
+                .filter(Project::isVisible)
+                .collect(Collectors.toList());
+                
+        if (projects.isEmpty()) {
+            System.out.println("No projects available at the moment.");
+            return;
+        }
+
+        System.out.println("\n===== Available Projects =====");
+        for (Project project : projects) {
+            System.out.println("\nProject Name: " + project.getProjectName());
+            System.out.println("Location: " + project.getLocation());
+            System.out.println("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
+            System.out.println("Available Flat Types:");
+            List<FlatType> flatTypes = project.getFlatTypes();
+            for (int i = 0; i < flatTypes.size(); i++) {
+                System.out.println((i + 1) + ". " + flatTypes.get(i));
+            }
+            System.out.println("-".repeat(30));
+        }
+    }
+
+    public static void submitApplication(Applicant applicant) {
+        List<Project> allProjects = ProjectRepository.getAll();
+        ApplicantApplicationView.promptApplication(applicant, allProjects);
+    }
+
+    public static void viewMyApplications(Applicant applicant) {
+        ApplicantApplicationView.displayApplicationStatus(applicant);
+    }
+
+    public static void submitEnquiry(Applicant applicant) {
+        List<Project> availableProjects = ProjectRepository.getAll().stream()
+                .filter(Project::isVisible)
+                .collect(Collectors.toList());
+                
+        if (availableProjects.isEmpty()) {
+            System.out.println("No projects available for enquiry.");
+            return;
+        }
+
+        Enquiry enquiry = ApplicantEnquiryView.getEnquiryInput(applicant.getUserNRIC(), availableProjects);
+        if (enquiry != null) {
+            ApplicantEnquiryService.submitEnquiry(enquiry);
+            System.out.println("Enquiry submitted successfully.");
+        }
+    }
+
+    public static void viewMyEnquiries(Applicant applicant) {
+        List<Enquiry> enquiries = ApplicantEnquiryService.viewEnquiriesByApplicant(applicant);
+        ApplicantEnquiryView.displayEnquiries(enquiries);
     }
 }

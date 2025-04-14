@@ -1,72 +1,62 @@
 package services;
 
 import models.*;
+import models.enums.EnquiryStatus;
+import repositories.EnquiryRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApplicantEnquiryService {
-    private static int enquiryIdCount = 1; //for generating enquiry id????
-    private List<Enquiry> enquiries = new ArrayList<>(); //list of all enquiries
-
-    private String generateEnquiryId() {
-        return "E" + enquiryIdCount++; //E1, E2, E3, etc
+    public static List<Enquiry> viewEnquiriesByApplicant(Applicant applicant) {
+        return EnquiryRepository.getAll().stream()
+                .filter(enquiry -> enquiry.getApplicantNRIC().equals(applicant.getUserNRIC()))
+                .collect(Collectors.toList());
     }
 
-    //enquiries section
-    //view the enquiries by applicant
-    public List<Enquiry> viewEnquiriesByApplicant(Applicant applicant) {
-        List<Enquiry> applicantEnquiries = new ArrayList<>();
-
-        //loop through list, filter by nric
-        for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) { //if equal
-                applicantEnquiries.add(enquiry); //add enquiry to display
-            }
+    public static void submitEnquiry(Enquiry enquiry) {
+        if (enquiry == null) {
+            throw new IllegalArgumentException("Enquiry cannot be null");
         }
-        return applicantEnquiries;
+
+        EnquiryRepository.add(enquiry);
+        EnquiryRepository.saveAll();
     }
 
-    //submit enquiries
-    public void submitEnquiry(Applicant applicant, Project project, String enquiryContent) {
-        String enquiryId = generateEnquiryId();
-        Enquiry enquiry = new Enquiry(applicant.getUserNRIC(), project.getProjectID(), enquiryContent);
-        enquiries.add(enquiry);
-        System.out.println("Enquiry submitted.");
-    }
-
-    //view enquiries
-    public List<Enquiry> viewEnquiries(Applicant applicant) {
-        List<Enquiry> applicantEnquiries = new ArrayList<>();
-        for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) {
-                applicantEnquiries.add(enquiry);
-            }
+    public static void editEnquiry(Applicant applicant, String enquiryId, String newContent) {
+        if (newContent == null || newContent.trim().isEmpty()) {
+            throw new IllegalArgumentException("New enquiry content cannot be empty");
         }
-        return applicantEnquiries;
+
+        Enquiry enquiry = EnquiryRepository.getEnquiryById(enquiryId);
+        if (enquiry == null) {
+            throw new IllegalArgumentException("Enquiry not found");
+        }
+
+        if (!enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) {
+            throw new IllegalStateException("You can only edit your own enquiries");
+        }
+
+        // Check if enquiry can be edited (e.g. not responded yet)
+        if (enquiry.getEnquiryStatus() == EnquiryStatus.RESPONDED) {
+            throw new IllegalStateException("Cannot edit an enquiry that has been responded to");
+        }
+
+        enquiry.setQuery(newContent.trim());
+        EnquiryRepository.saveAll();
     }
 
-    //edit enquiry
-    public void editEnquiry(Applicant applicant, String enquiryId, String editedEnquiryContent) {
-        for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC()) && enquiry.getEnquiryID().equals(enquiryId)) {
-                enquiry.setQuery(editedEnquiryContent);
-                System.out.println("Enquiry edited.");
-                return;
-            }
+    public static void deleteEnquiry(Applicant applicant, String enquiryId) {
+        Enquiry enquiry = EnquiryRepository.getEnquiryById(enquiryId);
+        if (enquiry == null) {
+            throw new IllegalArgumentException("Enquiry not found");
         }
-        System.out.println("Enquiry not found.");
-    }
 
-    //delete enquiry
-    public void deleteEnquiry(Applicant applicant, String enquiryId) {
-        for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicantNRIC().equals(applicant) && enquiry.getEnquiryID().equals(enquiryId)) {
-                enquiries.remove(enquiry);
-                System.out.println("Enquiry deleted.");
-                return;
-            }
+        if (!enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) {
+            throw new IllegalStateException("You can only delete your own enquiries");
         }
-        System.out.println("Enquiry not found.");
+
+        EnquiryRepository.delete(enquiry);
+        EnquiryRepository.saveAll();
     }
 }

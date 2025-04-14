@@ -1,6 +1,7 @@
 package repositories;
 
 import models.Registration;
+import models.User;
 import models.enums.RegistrationStatus;
 import utils.CsvReader;
 import utils.CsvWriter;
@@ -43,7 +44,7 @@ public class RegistrationRepository {
             record.put("RegistrationStatus", registration.getRegistrationStatus().toString());
             record.put("RegistrationDate", DateTimeUtils.formatDateTime(registration.getRegistrationDate()));
             record.put("LastUpdated", DateTimeUtils.formatDateTime(registration.getLastUpdated()));
-            record.put("ApprovedBy", registration.getApprovedBy().getUserNRIC());
+            record.put("ApprovedBy", registration.getApprovedBy() != null ? registration.getApprovedBy().getUserNRIC() : "");
             records.add(record);
         }
 
@@ -60,18 +61,26 @@ public class RegistrationRepository {
             registrations = new ArrayList<>();
 
             for (Map<String, String> record : records) {
+                User officer = UserRepository.getByNRIC(record.get("OfficerNRIC"));
+                User approver = record.get("ApprovedBy") != null && !record.get("ApprovedBy").isEmpty() ?
+                    UserRepository.getByNRIC(record.get("ApprovedBy")) : null;
+
+                if (officer == null) {
+                    System.err.println("Officer NRIC not found in users.csv: " + record.get("OfficerNRIC"));
+                    continue;
+                }
+
                 Registration registration = new Registration(
                     record.get("RegistrationID"),
-                    UserRepository.getByNRIC(record.get("OfficerNRIC")),
+                    officer,
                     record.get("ProjectID"),
                     RegistrationStatus.valueOf(record.get("RegistrationStatus")),
                     DateTimeUtils.parseDateTime(record.get("RegistrationDate")),
                     DateTimeUtils.parseDateTime(record.get("LastUpdated")),
-                    UserRepository.getByNRIC(record.get("ApprovedBy"))
+                    approver
                 );
                 registrations.add(registration);
             }
-
             System.out.println("Loaded " + registrations.size() + " registrations from CSV.");
         } catch (IOException e) {
             System.err.println("Error loading registrations: " + e.getMessage());

@@ -2,37 +2,35 @@ package services;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import interfaces.IProjectService;
 import models.Officer;
 import models.Project;
 import repositories.ProjectRepository;
 
-public class ProjectService implements IProjectService {
-    private final ProjectRepository projectRepository;
-
-    public ProjectService(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
+public class ProjectService {
+    public static List<Project> getAllProjects() {
+        return ProjectRepository.getAll();
     }
 
-    public List<Project> getAllProjects() {
-        return projectRepository.getAll();
-    }
-
-    public List<Project> getVisibleProjects() {
-        return projectRepository.getAll().stream()
+    public static List<Project> getVisibleProjects() {
+        return ProjectRepository.getAll().stream()
                 .filter(Project::isVisible)
                 .collect(Collectors.toList());
     }
 
-    public boolean hasOfficerSlots(Project project) {
+    public static boolean hasOfficerSlots(Project project) {
         return project.getOfficers().size() < project.getOfficerSlots();
     }
 
-    @Override
-    public List<Project> findHandledProjects(Officer officer) {
-        return projectRepository.getAll().stream()
-                .filter(project -> project.getOfficers().contains(officer))
+    public static List<Project> getHandledProjects(Officer officer) {
+        return ProjectRepository.getAll().stream()
+                .filter(project -> project.getOfficers().contains(officer.getUserNRIC()))
                 .collect(Collectors.toList());
+    }
+
+    public static Project getProjectByOfficer(Officer officer) {
+        return ProjectRepository.getAll().stream()
+                .filter(project -> project.getOfficers().contains(officer.getUserNRIC()))
+                .findFirst()
+                .orElse(null);
     }
 }

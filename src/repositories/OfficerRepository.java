@@ -1,8 +1,7 @@
 package repositories;
 
 import models.Officer;
-import models.enums.MaritalStatus;
-import models.enums.Role;
+import models.User;
 import utils.CsvReader;
 import utils.CsvWriter;
 
@@ -18,13 +17,13 @@ import interfaces.ICsvConfig;
 public class OfficerRepository {
     private static class OfficerCsvConfig implements ICsvConfig {
         @Override
-        public List<String> getHeaders() {
-            return List.of("NRIC", "Name", "Password", "Age", "MaritalStatus", "CurrentProjectID");
+        public String getFilePath() {
+            return "data/officers.csv";
         }
 
         @Override
-        public String getFilePath() {
-            return "data/officers.csv";
+        public List<String> getHeaders() {
+            return List.of("OfficerNRIC", "CurrentProjectID");
         }
     }
 
@@ -36,12 +35,8 @@ public class OfficerRepository {
         List<Map<String, String>> records = new ArrayList<>();
         for (Officer officer : officers) {
             Map<String, String> record = new HashMap<>();
-            record.put("NRIC", officer.getUserNRIC());
-            record.put("Name", officer.getName());
-            record.put("Password", officer.getPassword());
-            record.put("Age", String.valueOf(officer.getAge()));
-            record.put("MaritalStatus", officer.getMaritalStatus().toString());
-            record.put("CurrentProjectID", officer.getCurrentProjectID());
+            record.put("OfficerNRIC", officer.getUserNRIC());
+            record.put("CurrentProjectID", officer.getCurrentProjectID() != null ? officer.getCurrentProjectID() : "");
             records.add(record);
         }
 
@@ -58,16 +53,29 @@ public class OfficerRepository {
             officers = new ArrayList<>();
 
             for (Map<String, String> record : records) {
+                // Get user data from UserRepository
+                User userData = UserRepository.getByNRIC(record.get("OfficerNRIC"));
+                if (userData == null) {
+                    System.err.println("Officer NRIC not found in users.csv: " + record.get("OfficerNRIC"));
+                    continue;
+                }
+
                 Officer officer = new Officer(
-                    record.get("NRIC"),
-                    record.get("Name"),
-                    record.get("Password"),
-                    Integer.parseInt(record.get("Age"))
+                    userData.getUserNRIC(),
+                    userData.getName(),
+                    userData.getPassword(),
+                    userData.getAge()
                 );
-                officer.setMaritalStatus(MaritalStatus.valueOf(record.get("MaritalStatus")));
-                officer.setCurrentProjectID(record.get("CurrentProjectID"));
+                officer.setMaritalStatus(userData.getMaritalStatus());
+                
+                String projectId = record.get("CurrentProjectID");
+                if (projectId != null && !projectId.trim().isEmpty()) {
+                    officer.setCurrentProjectID(projectId);
+                }
+                
                 officers.add(officer);
             }
+            System.out.println("Loaded " + officers.size() + " officers from CSV.");
         } catch (IOException e) {
             System.err.println("Error loading officers: " + e.getMessage());
         }

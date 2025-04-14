@@ -3,217 +3,305 @@ package controllers;
 import models.*;
 import models.enums.MaritalStatus;
 import models.enums.Role;
+import repositories.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 public class ManagerController {
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // create a BTO project as a manager
-    public void createProject(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        Scanner sc = new Scanner(System.in);
-        // get projectID
+    public static void createProject() {
         System.out.println("Enter the ID of the Project:");
-        String projectId = sc.nextLine();
-        // get project manager NRIC
+        String projectId = scanner.nextLine();
         System.out.println("Enter the NRIC of the Project manager:");
-        String nric = sc.nextLine();
-        // get project manager name
+        String nric = scanner.nextLine();
         System.out.println("Enter the name of the Project manager:");
-        String managerName = sc.nextLine();
-        // get Project manager age
+        String managerName = scanner.nextLine();
         System.out.println("Enter the age of Project manager:");
-        int managerAge = sc.nextInt();
-        // get Project manager marital status
+        int managerAge = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+        
         System.out.println("Enter Project manager marital status (0 = SINGLE / 1 = MARRIED):");
-        int inputMS = sc.nextInt();
-        MaritalStatus managerMS;
-        while (true){
-            if(inputMS != 0 && inputMS != 1){
-                System.out.println("Invalid input, enter (0 = SINGLE / 1 = MARRIED):");
-                continue;
-            }
-            else if(inputMS == 0){
-                managerMS = MaritalStatus.SINGLE;
-                break;
-            }
-            else if(inputMS == 1){
-                managerMS = MaritalStatus.MARRIED;
-                break;
+        MaritalStatus managerMS = MaritalStatus.SINGLE;
+        while (true) {
+            try {
+                int inputMS = Integer.parseInt(scanner.nextLine());
+                if (inputMS == 0) {
+                    managerMS = MaritalStatus.SINGLE;
+                    break;
+                } else if (inputMS == 1) {
+                    managerMS = MaritalStatus.MARRIED;
+                    break;
+                } else {
+                    System.out.println("Invalid input, enter (0 = SINGLE / 1 = MARRIED):");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input, please enter a number (0 or 1):");
             }
         }
-        // get project manager password
+        
         System.out.println("Enter the password of the Project manager:");
-        String password = sc.nextLine();
+        String password = scanner.nextLine();
         Manager manager = new Manager(managerName, managerName, password, managerAge, projectId);
-        // get project name
+        
         System.out.println("Enter the name of the Project:");
-        String projectName = sc.nextLine();
-        // get project location
+        String projectName = scanner.nextLine();
         System.out.println("Enter the Project location:");
-        String location = sc.nextLine();
-        // get project start date
+        String location = scanner.nextLine();
+        
         LocalDate startDate;
         while (true) {
             System.out.print("Enter the Project start date in (dd/mm/yyyy):");
-            String startDateInput = sc.nextLine().trim();
+            String startDateInput = scanner.nextLine().trim();
             
-            // check if user entered the date in the correct format using regex
             if (!startDateInput.matches("\\d{2}/\\d{2}/\\d{4}")) {
                 System.out.println("Invalid format! Please use dd/mm/yyyy (e.g 25/12/2023)");
                 continue;
             }
             try {
-                // parse the input into a LocalDate object
                 startDate = LocalDate.parse(startDateInput, formatter);
                 break;
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid date! Please enter a valid date (e.g 25/12/2023)");
             }
         }
-        // get project end date
+        
         LocalDate endDate;
         while (true) {
             System.out.print("Enter the Project end date in (dd/mm/yyyy):");
-            String endDateInput = sc.nextLine().trim();
+            String endDateInput = scanner.nextLine().trim();
             
-            // check if user entered the date in the correct format using regex
             if (!endDateInput.matches("\\d{2}/\\d{2}/\\d{4}")) {
                 System.out.println("Invalid format! Please use dd/mm/yyyy (e.g 25/12/2023)");
                 continue;
             }
             try {
-                // parse the input into a LocalDate object
                 endDate = LocalDate.parse(endDateInput, formatter);
                 break;
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid date! Please enter a valid date (e.g 25/12/2023)");
             }
         }
-        // get Project officer slots
+        
         System.out.println("Enter the number of Officer slots:");
-        int officerSlots = sc.nextInt();
-        // get Project visibility
+        int officerSlots = Integer.parseInt(scanner.nextLine());
+        
         System.out.println("Is the Project visible to applicants? (yes/no):");
-        Boolean visibility = false;
-        String visInput;
-        while (true){
-            visInput = sc.nextLine();
-            if(visInput != "yes" && visInput != "no"){
+        boolean visibility = false;
+        while (true) {
+            String visInput = scanner.nextLine().toLowerCase();
+            if (visInput.equals("yes")) {
+                visibility = true;
+                break;
+            } else if (visInput.equals("no")) {
+                visibility = false;
+                break;
+            } else {
                 System.out.println("Invalid input! Please enter (yes/no):");
-                continue;
             }
-            visibility = true;
-            break;
         }
 
         Project newProject = new Project(projectId, nric, projectName, location,
-                null, null, null,
                 startDate.atStartOfDay(), endDate.atStartOfDay(),
-                officerSlots, visibility,
-                null, null);
-        // store project to database
-        databaseStoreProject(newProject);
-        System.out.println("Project + \""  + projectName + "\" created successfully.");
+                officerSlots, visibility);
+                
+        ProjectRepository.add(newProject);
+        ProjectRepository.saveAll();
+        System.out.println("Project \"" + projectName + "\" created successfully.");
     }
 
-    // edit a BTO project as a manager
-    public void editProject(String projectName, String location, String applicationStart, String applicationEnd){
-        // switch case for user to choose which attribute of the project to edit
+    public static void editProject(String projectName, String location, String applicationStart, String applicationEnd) {
+        Project project = ProjectRepository.getByName(projectName);
+        if (project == null) {
+            System.out.println("Project not found!");
+            return;
+        }
+        
+        try {
+            LocalDate startDate = LocalDate.parse(applicationStart, formatter);
+            LocalDate endDate = LocalDate.parse(applicationEnd, formatter);
+            
+            project.setLocation(location);
+            project.setApplicationStartDate(startDate.atStartOfDay());
+            project.setApplicationEndDate(endDate.atStartOfDay());
+            
+            ProjectRepository.saveAll();
+            System.out.println("Project updated successfully.");
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format! Please use dd/MM/yyyy");
+        }
     }
 
-    // delete a project
-    public void deleteProject(String projectName){
-        Database db = new Database();
-        if(db.databaseRemoveProject(projectName)){
+    public static void deleteProject(String projectName) {
+        Project project = ProjectRepository.getByName(projectName);
+        if (project != null) {
+            ProjectRepository.remove(project);
+            ProjectRepository.saveAll();
             System.out.println("Project deleted successfully.");
-        }
-        else{
-            System.out.println("Unable to delete, Project not found!");
-        }
-    }
-
-    // toggle visibility of a project
-    public void toggleVisibility(){
-        System.out.println("Enter Project name:");
-        Scanner sc = new Scanner(System.in);
-        String projectName = sc.nextLine();
-        Database db = new Database();
-        if(db.databaseFindProject(projectName)){
-            while (true){
-                System.out.println("Make Project visible? (yes/no):");
-                String input = sc.nextLine();
-                if(input != "yes" && input != "no"){
-                    System.out.println("Invalid input! Please enter (yes/no):");
-                    continue;
-                }
-                else if(input == "yes"){
-                    databaseSetProjectVisibility(projectName, true);
-                    System.out.println("Project is now visible to applicants.");
-                    break;
-                }
-                else if(input == "no"){
-                    databaseSetProjectVisibility(projectName, false);
-                    System.out.println("Project is now hidden from applicants.");
-                    break;
-                }
-            }
-        }
-        else{
+        } else {
             System.out.println("Project not found!");
         }
     }
 
-    // view all projects, regardless of visibility setting
-    public void viewAllProjects(){
-        databaseViewAllProjects(Role.MANAGER);
-    }
-
-    // filter and view lists of projects created by a manager
-
-    // view pending and approved Officer registration
-    public void viewOfficerRegistrations(){
-        // list each approved registrations (for loop)
-        // list each pending registrations (for loop)
-    }
-
-    // approve or reject Officer registrations
-    public void approveOfficerRegistration(Project project, boolean approve){
-        if(approve){
-            project.setOfficerSlots(project.getOfficerSlots()-1);
-            // add the officer and the registration to the list of approved registrations
-        }
-        else{
-            System.out.println("Officer registration rejected");
+    public static void toggleVisibility() {
+        System.out.println("Enter Project name:");
+        String projectName = scanner.nextLine();
+        
+        Project project = ProjectRepository.getByName(projectName);
+        if (project != null) {
+            System.out.println("Make Project visible? (yes/no):");
+            String input = scanner.nextLine().toLowerCase();
+            
+            if (input.equals("yes") || input.equals("no")) {
+                project.setVisible(input.equals("yes"));
+                ProjectRepository.saveAll();
+                System.out.println("Project visibility updated successfully.");
+            } else {
+                System.out.println("Invalid input! Please enter (yes/no)");
+            }
+        } else {
+            System.out.println("Project not found!");
         }
     }
 
-    // approve or reject applicant registrations
-    // TODO
-    /* 
-    public void approveApplicantRegistration(Project project, boolean approve){
-        if(approve){
-            if(DatabaseStore.getlocation(project.getLocation()) > 0){ // check if there are available supply of the selected flat
-                // add the applicant and the registration to the list of approved registrations
+    public static void viewAllProjects() {
+        List<Project> projects = ProjectRepository.getAll();
+        if (projects.isEmpty()) {
+            System.out.println("No projects found.");
+            return;
+        }
+        
+        System.out.println("\nAll Projects:");
+        System.out.println("----------------------------------------");
+        for (Project project : projects) {
+            System.out.println("ID: " + project.getProjectID());
+            System.out.println("Name: " + project.getProjectName());
+            System.out.println("Location: " + project.getLocation());
+            System.out.println("Application Open: " + project.getApplicationOpenDate());
+            System.out.println("Application Close: " + project.getApplicationCloseDate());
+            System.out.println("Officer Slots: " + project.getOfficerSlots());
+            System.out.println("Visible: " + (project.isVisible() ? "Yes" : "No"));
+            System.out.println("----------------------------------------");
+        }
+    }
+
+    public static void viewProjectEnquiries(Project project) {
+        List<Enquiry> enquiries = EnquiryRepository.getEnquiriesByProject(project.getProjectID());
+        
+        if (enquiries.isEmpty()) {
+            System.out.println("No enquiries found for project: " + project.getProjectName());
+            return;
+        }
+
+        System.out.println("\nEnquiries for project: " + project.getProjectName());
+        System.out.println("----------------------------------------");
+        
+        for (Enquiry enquiry : enquiries) {
+            System.out.println("Enquiry ID: " + enquiry.getEnquiryID());
+            System.out.println("From: " + enquiry.getApplicantNRIC());
+            System.out.println("Query: " + enquiry.getQuery());
+            System.out.println("Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
+            if (enquiry.isResponse()) {
+                System.out.println("Response: " + enquiry.getResponse());
+                System.out.println("Responded by: " + enquiry.getResponder());
+            }
+            System.out.println("----------------------------------------");
+        }
+
+        System.out.print("\nWould you like to respond to an enquiry? (yes/no): ");
+        String response = scanner.nextLine().trim().toLowerCase();
+        
+        if (response.equals("yes")) {
+            System.out.print("Enter enquiry ID to respond to: ");
+            String enquiryId = scanner.nextLine().trim();
+            
+            Enquiry selectedEnquiry = enquiries.stream()
+                .filter(e -> e.getEnquiryID().equals(enquiryId))
+                .findFirst()
+                .orElse(null);
+                
+            if (selectedEnquiry == null) {
+                System.out.println("Invalid enquiry ID.");
+                return;
+            }
+            
+            if (selectedEnquiry.isResponse()) {
+                System.out.println("This enquiry has already been responded to.");
+                return;
+            }
+            
+            System.out.print("Enter your response: ");
+            String enquiryResponse = scanner.nextLine().trim();
+            
+            selectedEnquiry.setResponse(enquiryResponse);
+            selectedEnquiry.setResponder("MANAGER");
+            EnquiryRepository.saveAll();
+            System.out.println("Response recorded successfully.");
+        }
+    }
+
+    public static void viewOfficerRegistrations() {
+        List<Project> projects = ProjectRepository.getAll();
+        if (projects.isEmpty()) {
+            System.out.println("No projects available.");
+            return;
+        }
+
+        System.out.println("\nProjects and their Officer Registrations:");
+        System.out.println("----------------------------------------");
+        
+        for (Project project : projects) {
+            System.out.println("Project: " + project.getProjectName());
+            List<String> officers = project.getOfficers();
+            if (officers.isEmpty()) {
+                System.out.println("No officers registered");
+            } else {
+                System.out.println("Registered Officers:");
+                for (String officerNRIC : officers) {
+                    System.out.println("- Officer NRIC: " + officerNRIC);
+                }
+            }
+            System.out.println("Available slots: " + project.getOfficerSlots());
+            System.out.println("----------------------------------------");
+        }
+    }
+
+    public static void approveOfficerRegistration(Project project, boolean approve) {
+        if (project == null) {
+            System.out.println("Project not found.");
+            return;
+        }
+
+        System.out.print("Enter officer NRIC: ");
+        String officerNRIC = scanner.nextLine().trim();
+        
+        if (approve) {
+            if (project.getOfficerSlots() <= 0) {
+                System.out.println("No available slots for this project.");
+                return;
+            }
+            
+            if (!project.getOfficers().contains(officerNRIC)) {
+                project.addOfficer(officerNRIC);
+                project.reduceOfficerSlot();
+                ProjectRepository.saveAll();
+                System.out.println("Officer registration approved successfully.");
+            } else {
+                System.out.println("Officer is already registered for this project.");
+            }
+        } else {
+            if (project.getOfficers().contains(officerNRIC)) {
+                project.removeOfficer(officerNRIC);
+                ProjectRepository.saveAll();
+                System.out.println("Officer registration rejected/removed successfully.");
+            } else {
+                System.out.println("Officer is not registered for this project.");
             }
         }
-        else{
-            System.out.println("Applicant registration rejected");
-        }
-    }*/
-
-    // approve or reject applicant registration withdrawal
-    // TODO
-
-    // generate a report of list of applicants with their respective registrations
-    // TODO
-
-    // view enquiries of all projects
-    // TODO
-
-    // view and reply to enquiries regarding the project a manager is handling
-    // TODO
+    }
 }

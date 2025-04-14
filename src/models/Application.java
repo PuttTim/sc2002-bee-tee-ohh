@@ -34,9 +34,9 @@ public class Application {
     }
 
     public Application(String applicationID, String applicantNRIC, String projectId,
-                       FlatType selectedFlatType, ApplicationStatus applicationStatus,
-                       boolean isWithdrawalRequested, LocalDateTime applicationDate,
-                       String approvedBy, Map<ApplicationStatus, LocalDateTime> statusHistory) {
+                      FlatType selectedFlatType, ApplicationStatus applicationStatus,
+                      boolean isWithdrawalRequested, LocalDateTime applicationDate,
+                      String approvedBy, Map<ApplicationStatus, LocalDateTime> statusHistory) {
         this.applicationID = applicationID;
         this.applicantNRIC = applicantNRIC;
         this.projectId = projectId;
@@ -45,7 +45,7 @@ public class Application {
         this.isWithdrawalRequested = isWithdrawalRequested;
         this.applicationDate = applicationDate;
         this.approvedBy = approvedBy;
-        this.applicationStatusHistory = statusHistory != null ? statusHistory : new HashMap<>();
+        this.applicationStatusHistory = statusHistory != null ? new HashMap<>(statusHistory) : new HashMap<>();
 
         try {
             int numericId = Integer.parseInt(applicationID.replaceAll("\\D+", ""));
@@ -90,7 +90,7 @@ public class Application {
     }
 
     public Map<ApplicationStatus, LocalDateTime> getApplicationStatusHistory() {
-        return applicationStatusHistory;
+        return new HashMap<>(applicationStatusHistory);
     }
 
     public LocalDateTime getApplicationStatusTimestamp(ApplicationStatus status) {
@@ -120,23 +120,47 @@ public class Application {
 
     // Status Update Methods
     public void approve(String manager) {
+        if (this.applicationStatus != ApplicationStatus.PENDING) {
+            throw new IllegalStateException("Can only approve pending applications");
+        }
+        if (this.isWithdrawalRequested) {
+            throw new IllegalStateException("Cannot approve an application with withdrawal requested");
+        }
         this.applicationStatus = ApplicationStatus.SUCCESSFUL;
         this.approvedBy = manager;
         recordStatusChange(ApplicationStatus.SUCCESSFUL);
     }
 
     public void reject(String manager) {
+        if (this.applicationStatus != ApplicationStatus.PENDING) {
+            throw new IllegalStateException("Can only reject pending applications");
+        }
         this.applicationStatus = ApplicationStatus.UNSUCCESSFUL;
         this.approvedBy = manager;
         recordStatusChange(ApplicationStatus.UNSUCCESSFUL);
     }
 
     public void book() {
+        if (this.applicationStatus != ApplicationStatus.SUCCESSFUL) {
+            throw new IllegalStateException("Can only book successful applications");
+        }
+        if (this.isWithdrawalRequested) {
+            throw new IllegalStateException("Cannot book an application with withdrawal requested");
+        }
         this.applicationStatus = ApplicationStatus.BOOKED;
         recordStatusChange(ApplicationStatus.BOOKED);
     }
 
     public void requestWithdrawal() {
+        if (this.isWithdrawalRequested) {
+            throw new IllegalStateException("Withdrawal already requested");
+        }
+        if (this.applicationStatus == ApplicationStatus.WITHDRAWN) {
+            throw new IllegalStateException("Application is already withdrawn");
+        }
+        if (this.applicationStatus == ApplicationStatus.UNSUCCESSFUL) {
+            throw new IllegalStateException("Cannot withdraw an unsuccessful application");
+        }
         this.isWithdrawalRequested = true;
         this.applicationStatus = ApplicationStatus.WITHDRAWN;
         recordStatusChange(ApplicationStatus.WITHDRAWN);
@@ -145,5 +169,23 @@ public class Application {
     // Helper
     private void recordStatusChange(ApplicationStatus status) {
         applicationStatusHistory.put(status, LocalDateTime.now());
+    }
+
+    public boolean canBook() {
+        return applicationStatus == ApplicationStatus.SUCCESSFUL && !isWithdrawalRequested;
+    }
+
+    public boolean canWithdraw() {
+        return !isWithdrawalRequested && 
+               applicationStatus != ApplicationStatus.WITHDRAWN && 
+               applicationStatus != ApplicationStatus.UNSUCCESSFUL;
+    }
+
+    public boolean canApprove() {
+        return applicationStatus == ApplicationStatus.PENDING && !isWithdrawalRequested;
+    }
+
+    public boolean canReject() {
+        return applicationStatus == ApplicationStatus.PENDING;
     }
 }

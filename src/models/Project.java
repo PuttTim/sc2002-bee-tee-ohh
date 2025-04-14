@@ -13,26 +13,23 @@ public class Project {
     private String managerNRIC;
     private String projectName;
     private String location;
-
     private List<FlatType> flatTypes;
     private List<Integer> flatTypeUnits;
-    private List<Integer> flatTypeSellingPrice; 
-
+    private List<Integer> flatTypeSellingPrice;
     private LocalDateTime applicationOpenDate;
     private LocalDateTime applicationCloseDate;
-
+    private LocalDateTime applicationStartDate;
+    private LocalDateTime applicationEndDate;
     private int officerSlots;
     private boolean isVisible;
-
+    private boolean visible;
     private List<String> applicants;
     private List<String> officers;
 
     public Project(String managerNRIC, String projectName, String location,
-                    List<FlatType> flatTypes, List<Integer> flatTypeUnits, List<Integer> flatTypeSellingPrice,
-                   LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
-                   int officerSlots, boolean isVisible,
-                   List<String> applicants, List<String> officers) {
-
+                  List<FlatType> flatTypes, List<Integer> flatTypeUnits, List<Integer> flatTypeSellingPrice,
+                  LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
+                  int officerSlots, boolean isVisible) {
         this.projectID = "P" + (++Project.lastProjectID);
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
@@ -44,16 +41,29 @@ public class Project {
         this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
         this.isVisible = isVisible;
-        this.applicants = applicants != null ? applicants : new ArrayList<>();
-        this.officers = officers != null ? officers : new ArrayList<>();
+        this.applicants = new ArrayList<>();
+        this.officers = new ArrayList<>();
     }
 
     public Project(String projectID, String managerNRIC, String projectName, String location,
-                    List<FlatType> flatTypes, List<Integer> flatTypeUnits, List<Integer> flatTypeSellingPrice,
-                   LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
-                   int officerSlots, boolean isVisible,
-                   List<String> applicants, List<String> officers) {
+                  LocalDateTime applicationStartDate, LocalDateTime applicationEndDate,
+                  int officerSlots, boolean visible) {
+        this.projectID = projectID;
+        this.managerNRIC = managerNRIC;
+        this.projectName = projectName;
+        this.location = location;
+        this.applicationStartDate = applicationStartDate;
+        this.applicationEndDate = applicationEndDate;
+        this.officerSlots = officerSlots;
+        this.visible = visible;
+    }
 
+    // This constructor is used when loading from repository
+    public Project(String projectID, String managerNRIC, String projectName, String location,
+                  List<FlatType> flatTypes, List<Integer> flatTypeUnits, List<Integer> flatTypeSellingPrice,
+                  LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
+                  int officerSlots, boolean isVisible,
+                  List<String> applicants, List<String> officers) {
         this.projectID = projectID;
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
@@ -95,15 +105,15 @@ public class Project {
     }
 
     public List<FlatType> getFlatTypes() {
-        return flatTypes;
+        return new ArrayList<>(flatTypes);
     }
 
     public List<Integer> getFlatTypeUnits() {
-        return flatTypeUnits;
+        return new ArrayList<>(flatTypeUnits);
     }
 
     public List<Integer> getFlatTypeSellingPrice() {
-        return flatTypeSellingPrice;
+        return new ArrayList<>(flatTypeSellingPrice);
     }
 
     public LocalDateTime getApplicationOpenDate() {
@@ -114,6 +124,14 @@ public class Project {
         return applicationCloseDate;
     }
 
+    public LocalDateTime getApplicationStartDate() {
+        return applicationStartDate;
+    }
+
+    public LocalDateTime getApplicationEndDate() {
+        return applicationEndDate;
+    }
+
     public int getOfficerSlots() {
         return officerSlots;
     }
@@ -122,12 +140,16 @@ public class Project {
         return isVisible;
     }
 
+    public boolean isVisibleFlag() {
+        return visible;
+    }
+
     public List<String> getApplicants() {
-        return applicants;
+        return new ArrayList<>(applicants);
     }
 
     public List<String> getOfficers() {
-        return officers;
+        return officers != null ? officers : new ArrayList<>();
     }
 
     // Setters
@@ -144,15 +166,15 @@ public class Project {
     }
 
     public void setFlatTypes(List<FlatType> flatTypes) {
-        this.flatTypes = flatTypes;
+        this.flatTypes = new ArrayList<>(flatTypes);
     }
 
     public void setFlatTypeUnits(List<Integer> flatTypeUnits) {
-        this.flatTypeUnits = flatTypeUnits;
+        this.flatTypeUnits = new ArrayList<>(flatTypeUnits);
     }
 
     public void setFlatTypeSellingPrice(List<Integer> flatTypeSellingPrice) {
-        this.flatTypeSellingPrice = flatTypeSellingPrice;
+        this.flatTypeSellingPrice = new ArrayList<>(flatTypeSellingPrice);
     }
 
     public void setApplicationOpenDate(LocalDateTime applicationOpenDate) {
@@ -163,8 +185,24 @@ public class Project {
         this.applicationCloseDate = applicationCloseDate;
     }
 
+    public void setApplicationStartDate(LocalDateTime applicationStartDate) {
+        this.applicationStartDate = applicationStartDate;
+    }
+
+    public void setApplicationEndDate(LocalDateTime applicationEndDate) {
+        this.applicationEndDate = applicationEndDate;
+    }
+
     public void setOfficerSlots(int officerSlots) {
         this.officerSlots = officerSlots;
+    }
+
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    public void setVisibleFlag(boolean visible) {
+        this.visible = visible;
     }
 
     // Helpers
@@ -179,8 +217,15 @@ public class Project {
     }
 
     public void addOfficer(String officerNRIC) {
-        if (!officers.contains(officerNRIC)) {
-            officers.add(officerNRIC);
+        if (officers == null) {
+            officers = new ArrayList<>();
+        }
+        officers.add(officerNRIC);
+    }
+
+    public void removeOfficer(String officerNRIC) {
+        if (officers != null) {
+            officers.remove(officerNRIC);
         }
     }
 
@@ -190,6 +235,10 @@ public class Project {
         }
     }
 
+    public void removeApplicant(String applicantNRIC) {
+        applicants.remove(applicantNRIC);
+    }
+
     public void reduceFlatCount(FlatType type) {
         int index = flatTypes.indexOf(type);
         if (index != -1 && flatTypeUnits.get(index) > 0) {
@@ -197,15 +246,17 @@ public class Project {
         }
     }
 
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
+    public int getFlatTypeIndex(FlatType type) {
+        return flatTypes.indexOf(type);
     }
 
-    public void setApplicants(List<String> applicants) {
-        this.applicants = applicants;
+    public int getAvailableUnits(FlatType type) {
+        int index = getFlatTypeIndex(type);
+        return index != -1 ? flatTypeUnits.get(index) : 0;
     }
 
-    public void setOfficers(List<String> officers) {
-        this.officers = officers;
+    public int getFlatPrice(FlatType type) {
+        int index = getFlatTypeIndex(type);
+        return index != -1 ? flatTypeSellingPrice.get(index) : 0;
     }
 }
