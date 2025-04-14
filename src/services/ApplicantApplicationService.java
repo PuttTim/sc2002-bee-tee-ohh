@@ -22,20 +22,21 @@ public class ApplicantApplicationService {
                 .collect(Collectors.toList());
     }
 
-    public static void submitApplication(Applicant applicant, Project project, FlatType flatType) {
+    public static boolean submitApplication(Applicant applicant, Project project, FlatType flatType) {
         // Check if applicant already has a pending or approved application
         boolean hasActiveApplication = getApplicationsByApplicant(applicant).stream()
                 .anyMatch(app -> app.getApplicationStatus() == ApplicationStatus.PENDING || 
                                app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL);
         
         if (hasActiveApplication) {
-            throw new IllegalStateException("You already have an active application");
+            return false;
         }
 
         Application application = new Application(applicant.getUserNRIC(), project.getProjectID(), flatType);
 
         ApplicationRepository.add(application);
         ApplicationRepository.saveAll();
+        return true;
     }
 
     public static void withdrawApplication(Applicant applicant, String applicationId) {

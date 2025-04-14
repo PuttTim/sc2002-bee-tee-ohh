@@ -57,7 +57,7 @@ public class ApplicationRepository {
             
             // Convert status history to string
             String statusHistory = application.getApplicationStatusHistory().entrySet().stream()
-                .map(entry -> entry.getKey() + ":" + DateTimeUtils.formatDateTime(entry.getValue()))
+                .map(entry -> entry.getKey() + ";" + DateTimeUtils.formatDateTime(entry.getValue()))
                 .collect(Collectors.joining("/"));
             record.put("ApplicationStatusHistory", statusHistory);
             

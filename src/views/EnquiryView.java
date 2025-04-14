@@ -2,6 +2,9 @@ package views;
 
 import models.Enquiry;
 import models.Project;
+import repositories.ProjectRepository;
+import repositories.UserRepository;
+
 import java.util.List;
 
 public class EnquiryView {
@@ -25,13 +28,16 @@ public class EnquiryView {
         CommonView.displayHeader("Enquiries");
         for (int i = 0; i < enquiries.size(); i++) {
             Enquiry enquiry = enquiries.get(i);
+            Project project = ProjectRepository.getById(enquiry.getProjectID());
+
             CommonView.displayMessage(String.format("%d. From: %s", i + 1, enquiry.getApplicantNRIC()));
             CommonView.displayMessage("   Query: " + enquiry.getQuery());
             CommonView.displayMessage("   Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
             if (enquiry.isResponse()) {
                 CommonView.displayMessage("   Response: " + enquiry.getResponse());
-                CommonView.displayMessage("   Responded by: " + enquiry.getResponder());
+                CommonView.displayMessage("   Responded by: " + UserRepository.getByNRIC(enquiry.getResponder()).getName());
             }
+            CommonView.displayMessage("   Project: " + project.getProjectName());
             
 
             System.out.println("-----------------------------------");

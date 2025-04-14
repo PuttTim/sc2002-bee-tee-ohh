@@ -68,8 +68,12 @@ public class ApplicantApplicationView {
 
         int flatTypeChoice = CommonView.promptInt("Select a flat type number: ", 1, flatTypes.size());
         FlatType selectedFlatType = flatTypes.get(flatTypeChoice - 1);
-        ApplicantApplicationService.submitApplication(applicant, selectedProject, selectedFlatType);
-        CommonView.displaySuccess("Application submitted successfully.");
+        if (ApplicantApplicationService.submitApplication(applicant, selectedProject, selectedFlatType)) {
+            CommonView.displaySuccess("Application submitted successfully.");
+        } else {
+            CommonView.displayError("You have an existing BTO application. Please try again later.");
+            return;
+        }
     }
 
     public static void displayApplicationStatus(Applicant applicant) {

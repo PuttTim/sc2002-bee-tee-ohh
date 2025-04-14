@@ -1,14 +1,9 @@
 package controllers;
 
-import models.Enquiry;
 import models.Officer;
 import models.Project;
-import repositories.ProjectRepository;
 import services.*;
 import views.*;
-
-import java.util.List;
-import java.util.Optional;
 
 public class OfficerController {
     //register to join project as officer
@@ -23,11 +18,7 @@ public class OfficerController {
             return;
         }
 
-        if (!ProjectService.hasOfficerSlots(project)) {
-            CommonView.displayError("Project has no more officer slots.");
-            return;
-        }
-        CommonView.displaySuccess("Officer registration submitted successfully.");
+        ProjectController.handleOfficerRegistration(officer, project.getProjectName());
     }
 
     public static void checkHandlerRegistration(Officer officer) {
@@ -43,48 +34,24 @@ public class OfficerController {
         }
     }
 
-    private static Optional<Project> getProjectSelection(Officer officer) {
-        List<Project> availableProjects = ProjectRepository.getAll().stream()
-            .filter(Project::isVisible)
-            .toList();
-
-        if (availableProjects.isEmpty()) {
-            CommonView.displayMessage("No projects available for registration.");
-            return Optional.empty();
-        }
-
-        ProjectView.showProjectList(availableProjects);
-        int choice = CommonView.promptInt("Select a project number (or 0 to cancel): ");
-
-        if (choice == 0) {
-            return Optional.empty();
-        }
-
-        if (choice < 1 || choice > availableProjects.size()) {
-            CommonView.displayError("Invalid project selection.");
-            return Optional.empty();
-        }
-
-        return Optional.of(availableProjects.get(choice - 1));
-    }
-
     //view details of project
     public static void viewHandledProjectDetails(Officer officer) {
-        Optional<Project> selectedProjectOptional = getProjectSelection(officer);
-        if (selectedProjectOptional.isPresent()) {
-            Project selectedProject = selectedProjectOptional.get();
-            ProjectView.displayProjectDetails(selectedProject);
+        Project project = ProjectService.getProjectByOfficer(officer);
+        if (project != null) {
+            ProjectController.viewProjectEnquiries(project.getProjectName());
+        } else {
+            CommonView.displayError("You are not handling any project.");
         }
     }
 
     //view and reply to enquiries
     public static void manageProjectEnquiries(Officer officer) {
-        Optional<Project> selectedProjectOptional = getProjectSelection(officer);
-        if (selectedProjectOptional.isEmpty()) {
-            return;
+        Project project = ProjectService.getProjectByOfficer(officer);
+        if (project != null) {
+            ProjectController.viewProjectEnquiries(project.getProjectName());
+        } else {
+            CommonView.displayError("You are not handling any project.");
         }
-        Project selectedProject = selectedProjectOptional.get();
-        EnquiryController.manageProjectEnquiries(Optional.of(officer), Optional.empty(), selectedProject);
     }
 
     //help select flat

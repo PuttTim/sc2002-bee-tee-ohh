@@ -3,91 +3,132 @@ package views;
 import models.Project;
 import models.enums.FlatType;
 import java.util.List;
-import java.time.format.DateTimeFormatter;
 
 public class ProjectView {
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    public static void showProjectList(List<Project> projects) {
-        CommonView.displayHeader("Available Projects");
+    public static void displayProjectList(List<Project> projects) {
         if (projects.isEmpty()) {
-            displayEmptyMessage();
+            CommonView.displayMessage("No projects available.");
             return;
         }
-        
+
+        CommonView.displayHeader("Available Projects");
         for (int i = 0; i < projects.size(); i++) {
             Project project = projects.get(i);
-            CommonView.displayMessage(String.format("%d. %s (Location: %s)", 
-                i + 1, project.getProjectName(), project.getLocation()));
+            CommonView.displayMessage((i + 1) + ". " + project.getProjectName());
+        }
+    }
 
-            List<FlatType> flatTypes = project.getFlatTypes();
-            List<Integer> units = project.getFlatTypeUnits();
-            List<Integer> prices = project.getFlatTypeSellingPrice();
+    public static void displayAvailableProjects(List<Project> projects) {
+        if (projects.isEmpty()) {
+            CommonView.displayMessage("No projects available at the moment.");
+            return;
+        }
 
-            StringBuilder flatTypesInfo = new StringBuilder("   Flat Types/Units/Prices: ");
-            if (flatTypes.isEmpty()) {
-                flatTypesInfo.append("N/A");
-            } else {
-                for (int j = 0; j < flatTypes.size(); j++) {
-                    flatTypesInfo.append(String.format("%s (%d units, $%d)%s",
-                        flatTypes.get(j).toString().replace("_", "-"),
-                        (j < units.size() ? units.get(j) : 0),
-                        (j < prices.size() ? prices.get(j) : 0),
-                        j < flatTypes.size() - 1 ? ", " : ""));
-                }
-            }
-            CommonView.displayMessage(flatTypesInfo.toString());
+        CommonView.displayHeader("Available Projects");
+        for (Project project : projects) {
+            displayProjectDetails(project);
+            CommonView.displayMessage("----------------------------------------");
         }
     }
 
     public static void displayProjectDetails(Project project) {
-        CommonView.displayHeader("Project Details");
-        CommonView.displayMessage("ID: " + project.getProjectID());
-        CommonView.displayMessage("Name: " + project.getProjectName());
+        CommonView.displayMessage("\nProject Name: " + project.getProjectName());
         CommonView.displayMessage("Location: " + project.getLocation());
-        CommonView.displayMessage("Application Period: " + 
-            project.getApplicationOpenDate().format(dateTimeFormatter) + " to " +
-            project.getApplicationCloseDate().format(dateTimeFormatter));
-        
+        CommonView.displayMessage("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
+        CommonView.displayMessage("Available Flat Types:");
         List<FlatType> flatTypes = project.getFlatTypes();
-        List<Integer> units = project.getFlatTypeUnits();
-        List<Integer> prices = project.getFlatTypeSellingPrice();
-        
-        CommonView.displayMessage("Flat Types Available:");
-        if (flatTypes.isEmpty()) {
-            CommonView.displayMessage("  No flat types defined");
-        } else {
-            for (int j = 0; j < flatTypes.size(); j++) {
-                CommonView.displayMessage(String.format("  - Type: %s, Units: %d, Price: $%d",
-                    flatTypes.get(j).toString().replace("_", "-"),
-                    (j < units.size() ? units.get(j) : 0),
-                    (j < prices.size() ? prices.get(j) : 0)
-                ));
-            }
+        for (int i = 0; i < flatTypes.size(); i++) {
+            CommonView.displayMessage((i + 1) + ". " + flatTypes.get(i));
+        }
+    }
+
+    public static void displayOfficerRegistrations(List<Project> projects) {
+        if (projects.isEmpty()) {
+            CommonView.displayMessage("No projects available.");
+            return;
         }
 
-        CommonView.displayMessage("Total Officer Slots: " + project.getOfficerSlots());
-        CommonView.displayMessage("Assigned Officers: " + project.getOfficers().size() + " " + project.getOfficers());
-        CommonView.displayMessage("Applicants: " + project.getApplicants().size() + " " + project.getApplicants());
-        CommonView.displaySeparator();
-    }
-
-    public static void displayEmptyMessage() {
-        CommonView.displayMessage("No projects available.");
-    }
-
-    public static int getProjectChoice(int maxChoice) {
-        return CommonView.promptInt("\nSelect a project number (or 0 to cancel): ", 0, maxChoice);
+        CommonView.displayHeader("Projects and their Officer Registrations");
+        for (Project project : projects) {
+            CommonView.displayMessage("\nProject: " + project.getProjectName());
+            List<String> officers = project.getOfficers();
+            if (officers.isEmpty()) {
+                CommonView.displayMessage("No officers registered");
+            } else {
+                CommonView.displayMessage("Registered Officers:");
+                for (String officerNRIC : officers) {
+                    CommonView.displayMessage("- Officer NRIC: " + officerNRIC);
+                }
+            }
+            CommonView.displayMessage("Available slots: " + project.getOfficerSlots());
+            CommonView.displayMessage("----------------------------------------");
+        }
     }
 
     public static int getProjectMenuChoice() {
         List<String> options = List.of(
-            "Back",
-            "View Project Enquiries",
-            "Submit New Enquiry",
-            "Apply for Project"
+            "Return to Previous Menu",
+            "View Project Details",
+            "Submit Enquiry"
         );
-        
-        return CommonView.displayMenu("Project Actions", options) - 1;
+        return CommonView.displayMenu("Project Menu", options);
+    }
+
+    public static String getProjectName() {
+        return CommonView.prompt("Enter project name: ");
+    }
+
+    public static String getProjectLocation() {
+        return CommonView.prompt("Enter project location: ");
+    }
+
+    public static String getProjectId() {
+        return CommonView.prompt("Enter project ID: ");
+    }
+
+    public static int getOfficerSlots() {
+        return CommonView.promptInt("Enter the number of Officer slots: ");
+    }
+
+    public static boolean getProjectVisibility() {
+        String input = CommonView.prompt("Make project visible? (yes/no): ").toLowerCase();
+        while (!input.equals("yes") && !input.equals("no")) {
+            CommonView.displayError("Invalid input! Please enter (yes/no)");
+            input = CommonView.prompt("Make project visible? (yes/no): ").toLowerCase();
+        }
+        return input.equals("yes");
+    }
+
+    public static int getProjectChoice(List<Project> projects) {
+        if (projects.isEmpty()) {
+            CommonView.displayError("No projects available.");
+            return -1;
+        }
+
+        CommonView.displayHeader("Select a project to view details:");
+        for (int i = 0; i < projects.size(); i++) {
+            CommonView.displayMessage((i + 1) + ". " + projects.get(i).getProjectName());
+        }
+        return CommonView.promptInt("Enter your choice: ") - 1;
+    }
+
+    public static void displayProjectCreationSuccess(String projectName) {
+        CommonView.displaySuccess("Project \"" + projectName + "\" created successfully.");
+    }
+
+    public static void displayProjectUpdateSuccess() {
+        CommonView.displaySuccess("Project updated successfully.");
+    }
+
+    public static void displayProjectDeleteSuccess() {
+        CommonView.displaySuccess("Project deleted successfully.");
+    }
+
+    public static void displayProjectNotFound() {
+        CommonView.displayError("Project not found!");
+    }
+
+    public static void displayVisibilityUpdateSuccess() {
+        CommonView.displaySuccess("Project visibility updated successfully.");
     }
 }

@@ -77,10 +77,10 @@ public class CommonView {
 
     public static boolean promptYesNo(String message) {
         while (true) {
-            String response = prompt(message + " (yes/no): ").toLowerCase();
-            if (response.equals("yes")) return true;
-            if (response.equals("no")) return false;
-            displayError("Please enter 'yes' or 'no'.");
+            String response = prompt(message + " (Y/N): ").toUpperCase();
+            if (response.equals("Y")) return true;
+            if (response.equals("N")) return false;
+            displayError("Please enter 'Y' or 'N'.");
         }
     }
 }

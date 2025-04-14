@@ -109,16 +109,7 @@ public class AuthView {
 
     public static boolean showTestingMenu() {
         System.out.println("\n=== Testing Menu ===");
-        while (true) {
-            System.out.println("Would you like to use a test account?");
-            String input = CommonView.prompt("Enter your choice (Y/N): ").trim().toUpperCase();
-            if (input.equals("Y")) {
-                return true;
-            } else if (input.equals("N")) {
-                return false;
-            }
-            CommonView.displayError("Invalid input. Please enter Y or N.");
-        }
+        return CommonView.promptYesNo("Would you like to use a test account?");
     }
 
     public static int showTestUserOptions() {

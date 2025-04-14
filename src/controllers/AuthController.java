@@ -5,10 +5,9 @@ import models.*;
 import services.AuthService;
 import views.AuthView;
 import views.CommonView;
-import repositories.ApplicantRepository;
-import repositories.ManagerRepository;
-import repositories.OfficerRepository;
-import repositories.ProjectRepository;
+import views.ProjectView;
+import repositories.*;
+import services.ProjectService;
 import java.util.List;
 
 public class AuthController {
@@ -20,7 +19,6 @@ public class AuthController {
     public static void runAuthentication() {
         while (true) {
             AuthView.displayLoginHeader();
-            
             boolean isTestingMode = AuthView.showTestingMenu();
 
             if (isTestingMode) {
@@ -38,7 +36,6 @@ public class AuthController {
             try {
                 User user = AuthService.login(nric, password);
                 AuthView.displayLoginSuccess(user.getName());
-                
                 dispatchToController(user);
             } catch (AuthenticationException e) {
                 AuthView.displayLoginFailed(e.getMessage());
@@ -74,20 +71,10 @@ public class AuthController {
 
     private static void dispatchToController(User user) {
         switch (user.getRole()) {
-            case APPLICANT:
-                Applicant applicant = ApplicantRepository.getByNRIC(user.getUserNRIC());
-                showApplicantMenu(applicant);
-                break;
-            case OFFICER:
-                Officer officer = OfficerRepository.getByNRIC(user.getUserNRIC());
-                showOfficerMenu(officer);
-                break;
-            case MANAGER:
-                Manager manager = ManagerRepository.getByNRIC(user.getUserNRIC());
-                showManagerMenu(manager);
-                break;
-            default:
-                throw new IllegalStateException("Unknown role: " + user.getRole());
+            case APPLICANT -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()));
+            case OFFICER -> showOfficerMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
+            case MANAGER -> showManagerMenu(ManagerRepository.getByNRIC(user.getUserNRIC()));
+            default -> throw new IllegalStateException("Unknown role: " + user.getRole());
         }
     }
 
@@ -97,33 +84,18 @@ public class AuthController {
             int choice = AuthView.showApplicantMenu();
             try {
                 switch (choice) {
-                    case 1:
-                        ApplicantController.viewAvailableProjects();
-                        break;
-                    case 2:
-                        ApplicantController.submitApplication(applicant);
-                        break;
-                    case 3:
-                        ApplicantController.viewMyApplications(applicant);
-                        break;
-                    case 4:
-                        EnquiryController.createNewEnquiry(applicant);
-                        break;
-                    case 5:
-                        EnquiryController.viewApplicantEnquiries(applicant);
-                        break;
-                    case 6:
-                        handleChangePassword(applicant);
-                        break;
-                    case 7:
-                        running = false;
-                        break;
+                    case 1 -> ProjectController.viewAvailableProjects();
+                    case 2 -> ApplicantController.newApplication(applicant);
+                    case 3 -> ApplicantController.viewMyApplications(applicant);
+                    case 4 -> EnquiryController.createNewEnquiry(applicant);
+                    case 5 -> EnquiryController.viewApplicantEnquiries(applicant);
+                    case 6 -> handleChangePassword(applicant);
+                    case 7 -> running = false;
                 }
             } catch (NumberFormatException e) {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
-
         System.out.println("Logging out of user: " + applicant.getName());
         AuthService.logout();
     }
@@ -135,19 +107,15 @@ public class AuthController {
             try {
                 switch (choice) {
                     case 1 -> {
-                        List<Project> projects = ProjectRepository.getAll();
+                        List<Project> projects = ProjectService.getVisibleProjects();
                         if (projects.isEmpty()) {
                             CommonView.displayMessage("No projects available for registration.");
                             break;
                         }
-                        CommonView.displayHeader("Available Projects");
-                        for (int i = 0; i < projects.size(); i++) {
-                            CommonView.displayMessage((i + 1) + ". " + projects.get(i).getProjectName());
-                        }
+                        ProjectView.displayProjectList(projects);
                         int projectChoice = CommonView.promptInt("Select project number (or 0 to cancel): ", 0, projects.size());
                         if (projectChoice > 0) {
-                            Project selectedProject = projects.get(projectChoice - 1);
-                            OfficerController.registerToHandleProject(officer, selectedProject);
+                            OfficerController.registerToHandleProject(officer, projects.get(projectChoice - 1));
                         }
                     }
                     case 2 -> OfficerController.checkHandlerRegistration(officer);
@@ -162,7 +130,6 @@ public class AuthController {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
-
         System.out.println("Logging out of user: " + officer.getName());
         AuthService.logout();
     }
@@ -173,28 +140,14 @@ public class AuthController {
             int choice = AuthView.showManagerMenu();
             try {
                 switch (choice) {
-                    case 1 -> ManagerController.createProject();
-                    case 2 -> {
-                        String projectName = AuthView.getProjectName();
-                        String location = AuthView.getNewLocation();
-                        String startDate = AuthView.getApplicationDate("start");
-                        String endDate = AuthView.getApplicationDate("end");
-                        ManagerController.editProject(projectName, location, startDate, endDate);
-                    }
-                    case 3 -> {
-                        String projectName = AuthView.getProjectName();
-                        ManagerController.deleteProject(projectName);
-                    }
-                    case 4 -> ManagerController.toggleVisibility();
-                    case 5 -> ManagerController.viewAllProjects();
+                    case 1 -> ProjectController.createProject();
+                    case 2 -> ProjectController.editProject();
+                    case 3 -> ProjectController.deleteProject();
+                    case 4 -> ProjectController.toggleProjectVisibility();
+                    case 5 -> ProjectController.viewAllProjects();
                     case 6 -> {
-                        String projectName = AuthView.getProjectName();
-                        Project project = ProjectRepository.getByName(projectName);
-                        if (project != null) {
-                            ManagerController.viewProjectEnquiries(project);
-                        } else {
-                            AuthView.displayProjectNotFound();
-                        }
+                        String projectName = ProjectView.getProjectName();
+                        ProjectController.viewProjectEnquiries(projectName);
                     }
                     case 7 -> handleOfficerRegistrations();
                     case 8 -> handleChangePassword(manager);
@@ -204,7 +157,6 @@ public class AuthController {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
-
         System.out.println("Logging out of user: " + manager.getName());
         AuthService.logout();
     }
@@ -227,12 +179,12 @@ public class AuthController {
         switch (choice) {
             case 1 -> ManagerController.viewOfficerRegistrations();
             case 2, 3 -> {
-                String projectName = AuthView.getProjectName();
-                Project project = ProjectRepository.getByName(projectName);
+                String projectName = ProjectView.getProjectName();
+                Project project = ProjectService.getProjectByName(projectName);
                 if (project != null) {
                     ManagerController.approveOfficerRegistration(project, choice == 2);
                 } else {
-                    AuthView.displayProjectNotFound();
+                    ProjectView.displayProjectNotFound();
                 }
             }
         }
