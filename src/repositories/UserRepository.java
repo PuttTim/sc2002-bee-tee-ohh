@@ -28,6 +28,7 @@ public class UserRepository {
     }
 
     private static List<User> users = new ArrayList<>();
+    private static User activeUser = null;
 
     private UserRepository() {} // private constructor
 
@@ -91,5 +92,21 @@ public class UserRepository {
             .filter(user -> user.getUserNRIC().equals(nric))
             .findFirst()
             .orElse(null);
+    }
+
+    public static User getActiveUser() {
+        return activeUser;
+    }
+
+    public static void setActiveUser(User user) {
+        activeUser = user;
+    }
+
+    public static boolean isActiveUser(User user) {
+        return activeUser != null && activeUser.getUserNRIC().equals(user.getUserNRIC());
+    }
+
+    public static void clearActiveUser() {
+        activeUser = null;
     }
 }

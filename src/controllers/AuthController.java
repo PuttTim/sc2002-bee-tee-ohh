@@ -123,6 +123,9 @@ public class AuthController {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
+
+        System.out.println("Logging out of user: " + applicant.getName());
+        AuthService.logout();
     }
 
     private static void showOfficerMenu(Officer officer) {
@@ -159,6 +162,9 @@ public class AuthController {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
+
+        System.out.println("Logging out of user: " + officer.getName());
+        AuthService.logout();
     }
 
     private static void showManagerMenu(Manager manager) {
@@ -198,6 +204,9 @@ public class AuthController {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
+
+        System.out.println("Logging out of user: " + manager.getName());
+        AuthService.logout();
     }
 
     private static void handleChangePassword(User user) {

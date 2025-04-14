@@ -15,8 +15,14 @@ public class AuthService {
         if (!user.getPassword().equals(password)) {
             throw new AuthenticationException("Invalid password");
         }
-        
+
+        UserRepository.setActiveUser(user);
+
         return user;
+    }
+
+    public static void logout() {
+        UserRepository.clearActiveUser();
     }
     
     public static void changePassword(User user, String oldPassword, String newPassword) throws AuthenticationException {
