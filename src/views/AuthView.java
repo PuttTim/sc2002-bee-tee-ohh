@@ -1,6 +1,7 @@
 package views;
 
 import java.util.List;
+import utils.CliUtils;
 
 public class AuthView {
     public static void displayLoginHeader() {
@@ -48,6 +49,7 @@ public class AuthView {
             "Manage Project Enquiries",
             "Process Applications",
             "Generate Receipt",
+            "Change Password",
             "Logout"
         );
         return CommonView.displayMenu("Officer Menu", options);
@@ -62,6 +64,7 @@ public class AuthView {
             "View All Projects",
             "View Project Enquiries",
             "Manage Officer Registrations",
+            "Change Password",
             "Logout"
         );
         return CommonView.displayMenu("Manager Menu", options);
@@ -102,5 +105,33 @@ public class AuthView {
             "Reject/Remove Officer Registration"
         );
         return CommonView.displayMenu("Officer Registration Management", options);
+    }
+
+    public static boolean showTestingMenu() {
+        System.out.println("\n=== Testing Menu ===");
+        while (true) {
+            System.out.println("Would you like to use a test account?");
+            String input = CommonView.prompt("Enter your choice (Y/N): ").trim().toUpperCase();
+            if (input.equals("Y")) {
+                return true;
+            } else if (input.equals("N")) {
+                return false;
+            }
+            CommonView.displayError("Invalid input. Please enter Y or N.");
+        }
+    }
+
+    public static int showTestUserOptions() {
+        System.out.println("\n=== Test Users ===");
+        System.out.println("1. Test Applicant");
+        System.out.println("2. Test Officer");
+        System.out.println("3. Test Manager");
+        while (true) {
+            int choice = CliUtils.promptInt("Enter your choice (1-3): ");
+            if (choice >= 1 && choice <= 3) {
+                return choice;
+            }
+            CommonView.displayError("Invalid choice. Please enter a number between 1 and 3.");
+        }
     }
 }

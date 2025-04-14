@@ -12,9 +12,21 @@ import repositories.ProjectRepository;
 import java.util.List;
 
 public class AuthController {
+    private static final String TEST_APPLICANT_NRIC = "S1234567A";
+    private static final String TEST_OFFICER_NRIC = "S2345678B";
+    private static final String TEST_MANAGER_NRIC = "S6789012F";
+    private static final String TEST_PASSWORD = "password";
+
     public static void runAuthentication() {
         while (true) {
             AuthView.displayLoginHeader();
+            
+            boolean isTestingMode = AuthView.showTestingMenu();
+
+            if (isTestingMode) {
+                handleTestLogin();
+                continue;
+            }
             
             String nric = AuthView.getNRIC();
             if (nric.equalsIgnoreCase("exit")) {
@@ -34,6 +46,29 @@ public class AuthController {
                     return;
                 }
             }
+        }
+    }
+
+    private static void handleTestLogin() {
+        int choice = AuthView.showTestUserOptions();
+        String nric;
+        
+        switch (choice) {
+            case 1 -> nric = TEST_APPLICANT_NRIC;
+            case 2 -> nric = TEST_OFFICER_NRIC;
+            case 3 -> nric = TEST_MANAGER_NRIC;
+            default -> {
+                CommonView.displayError("Invalid choice!");
+                return;
+            }
+        }
+
+        try {
+            User user = AuthService.login(nric, TEST_PASSWORD);
+            AuthView.displayLoginSuccess(user.getName());
+            dispatchToController(user);
+        } catch (AuthenticationException e) {
+            AuthView.displayLoginFailed("Test user not found. Please ensure test data is properly set up.");
         }
     }
 
@@ -117,7 +152,8 @@ public class AuthController {
                     case 4 -> OfficerController.manageProjectEnquiries(officer);
                     case 5 -> OfficerController.processApplication();
                     case 6 -> OfficerController.generateReceipt();
-                    case 7 -> running = false;
+                    case 7 -> handleChangePassword(officer);
+                    case 8 -> running = false;
                 }
             } catch (NumberFormatException e) {
                 CommonView.displayError("Please enter a valid number!");
@@ -155,7 +191,8 @@ public class AuthController {
                         }
                     }
                     case 7 -> handleOfficerRegistrations();
-                    case 8 -> running = false;
+                    case 8 -> handleChangePassword(manager);
+                    case 9 -> running = false;
                 }
             } catch (NumberFormatException e) {
                 CommonView.displayError("Please enter a valid number!");
