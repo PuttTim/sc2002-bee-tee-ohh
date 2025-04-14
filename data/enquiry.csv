@@ -1,1 +1,3 @@
-EnquiryID,ProjectID,ApplicantNRIC,Content,Status,Reply,CreatedAt,LastUpdated
+EnquiryID,ApplicantNRIC,ProjectID,Query,Response,EnquiryStatus,EnquiryDate,LastUpdated,RespondedBy
+E1,S3456789E,P1,What is the expected completion date for this project?,,PENDING,2025-04-08T10:30:00,2025-04-08T10:30:00,
+E2,S1234567A,P2,Are pets allowed in the housing estate?,"Yes, pets are allowed according to HDB guidelines.",RESPONDED,2025-04-07T15:00:00,2025-04-08T09:00:00,S6543210I
