@@ -109,4 +109,14 @@ public class UserRepository {
     public static void clearActiveUser() {
         activeUser = null;
     }
+
+    public static void updateUser(User user) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUserNRIC().equals(user.getUserNRIC())) {
+                users.set(i, user);
+                saveAll();
+                return;
+            }
+        }
+    }
 }

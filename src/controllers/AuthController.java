@@ -163,9 +163,32 @@ public class AuthController {
 
     private static void handleChangePassword(User user) {
         AuthView.showChangePasswordHeader();
-        String oldPassword = AuthView.getPassword();
-        String newPassword = AuthView.getPassword();
+        String oldPassword = CommonView.prompt("Enter old password: ");
+        if (oldPassword.isEmpty()) {
+            AuthView.displayPasswordChangeError("Old password cannot be empty.");
+            return;
+        }
+        if (!user.getPassword().equals(oldPassword)) {
+            AuthView.displayPasswordChangeError("Old password is incorrect.");
+            return;
+        }
+
+        String newPassword = CommonView.prompt("Enter new password: ");
+        if (newPassword.isEmpty()) {
+            AuthView.displayPasswordChangeError("New password cannot be empty.");
+            return;
+        }
+        if (newPassword.equals(oldPassword)) {
+            AuthView.displayPasswordChangeError("New password cannot be the same as old password.");
+            return;
+        }
         
+        String confirmPassword = CommonView.prompt("Confirm new password: ");
+        if (!newPassword.equals(confirmPassword)) {
+            AuthView.displayPasswordChangeError("New passwords do not match.");
+            return;
+        }
+
         try {
             AuthService.changePassword(user, oldPassword, newPassword);
             AuthView.displayPasswordChangeSuccess();

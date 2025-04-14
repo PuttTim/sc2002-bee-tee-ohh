@@ -8,12 +8,8 @@ public class AuthService {
     public static User login(String nric, String password) throws AuthenticationException {
         User user = UserRepository.getByNRIC(nric);
         
-        if (user == null) {
-            throw new AuthenticationException("Invalid NRIC");
-        }
-        
-        if (!user.getPassword().equals(password)) {
-            throw new AuthenticationException("Invalid password");
+        if (user == null || !user.getPassword().equals(password)) {
+            throw new AuthenticationException("Invalid NRIC or password");
         }
 
         UserRepository.setActiveUser(user);
@@ -35,6 +31,6 @@ public class AuthService {
         }
         
         user.setPassword(newPassword.trim());
-        UserRepository.saveAll();
+        UserRepository.updateUser(user);
     }
 }
