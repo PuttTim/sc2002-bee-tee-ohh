@@ -3,6 +3,7 @@ package controllers;
 import exceptions.AuthenticationException;
 import models.*;
 import services.AuthService;
+import utils.Hash;
 import views.AuthView;
 import views.CommonView;
 import views.ProjectView;
@@ -168,7 +169,7 @@ public class AuthController {
             AuthView.displayPasswordChangeError("Old password cannot be empty.");
             return;
         }
-        if (!user.getPassword().equals(oldPassword)) {
+        if (!Hash.verifyPassword(oldPassword, user.getPassword())) {
             AuthView.displayPasswordChangeError("Old password is incorrect.");
             return;
         }
@@ -178,7 +179,7 @@ public class AuthController {
             AuthView.displayPasswordChangeError("New password cannot be empty.");
             return;
         }
-        if (newPassword.equals(oldPassword)) {
+        if (Hash.verifyPassword(newPassword, user.getPassword())) {
             AuthView.displayPasswordChangeError("New password cannot be the same as old password.");
             return;
         }

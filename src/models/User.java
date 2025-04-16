@@ -2,6 +2,7 @@ package models;
 
 import models.enums.MaritalStatus;
 import models.enums.Role;
+import utils.Hash;
 
 public class User {
     protected String userNRIC;
@@ -48,7 +49,7 @@ public class User {
     // Setters
     public void setPassword(String password) {
         // TODO: Hash the password
-        this.password = password;
+        this.password = Hash.hash(password);
     }
 
     public void setAge(int age) {

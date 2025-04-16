@@ -3,12 +3,13 @@ package services;
 import exceptions.AuthenticationException;
 import models.User;
 import repositories.UserRepository;
+import utils.Hash;
 
 public class AuthService {
     public static User login(String nric, String password) throws AuthenticationException {
         User user = UserRepository.getByNRIC(nric);
         
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || !Hash.verifyPassword(password, user.getPassword())) {
             throw new AuthenticationException("Invalid NRIC or password");
         }
 
@@ -22,7 +23,7 @@ public class AuthService {
     }
     
     public static void changePassword(User user, String oldPassword, String newPassword) throws AuthenticationException {
-        if (!user.getPassword().equals(oldPassword)) {
+        if (!Hash.verifyPassword(oldPassword, user.getPassword())) {
             throw new AuthenticationException("Current password is incorrect");
         }
         
