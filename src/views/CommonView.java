@@ -1,8 +1,10 @@
 package views;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 import interfaces.ICommonView;
+import utils.DateTimeUtils;
 
 public class CommonView {
     private static final Scanner scanner = new Scanner(System.in);
@@ -98,6 +100,26 @@ public class CommonView {
             if (response.equals("Y")) return true;
             if (response.equals("N")) return false;
             displayError("Please enter 'Y' or 'N'.");
+        }
+    }
+
+    public static boolean promptYesNo12(String message) {
+        while (true) {
+            String response = prompt(message + " (Y/N): ").toUpperCase();
+            if (response.equals("Y") || response.equals("1")) return true;
+            if (response.equals("N") || response.equals("0")) return false;
+            displayError("Please enter 'Y' or 'N'.");
+        }
+    }
+
+    public static LocalDateTime promptDate(String message) {
+        while (true) {
+            String dateStr = prompt(message + " (dd/MM/yyyy): ");
+            try {
+                return DateTimeUtils.parseDateTime(dateStr);
+            } catch (Exception e) {
+                displayError("Invalid date format. Please use dd/MM/yyyy.");
+            }
         }
     }
 }

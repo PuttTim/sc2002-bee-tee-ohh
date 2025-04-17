@@ -1,7 +1,6 @@
 package views;
 
 import java.util.List;
-import utils.CliUtils;
 
 public class AuthView {
     public static void displayLoginHeader() {
@@ -45,7 +44,7 @@ public class AuthView {
         List<String> options = List.of(
             "Register to Handle Project",
             "Check Registration Status",
-            "View Project Details",
+            "View Handled Project Details",
             "Manage Project Enquiries",
             "Process Applications",
             "Generate Receipt",
@@ -82,10 +81,6 @@ public class AuthView {
         return CommonView.prompt("Enter new location: ");
     }
 
-    public static String getApplicationDate(String type) {
-        return CommonView.prompt("Enter new application " + type + " date (dd/MM/yyyy): ");
-    }
-
     public static void displayPasswordChangeSuccess() {
         CommonView.displaySuccess("Password changed successfully!");
     }
@@ -109,7 +104,7 @@ public class AuthView {
 
     public static boolean showTestingMenu() {
         System.out.println("\n=== Testing Menu ===");
-        return CommonView.promptYesNo("Would you like to use a test account?");
+        return CommonView.promptYesNo12("Would you like to use a test account?");
     }
 
     public static int showTestUserOptions() {
@@ -118,7 +113,7 @@ public class AuthView {
         System.out.println("2. Test Officer");
         System.out.println("3. Test Manager");
         while (true) {
-            int choice = CliUtils.promptInt("Enter your choice (1-3): ");
+            int choice = CommonView.promptInt("Enter your choice (1-3): ", 1, 3);
             if (choice >= 1 && choice <= 3) {
                 return choice;
             }

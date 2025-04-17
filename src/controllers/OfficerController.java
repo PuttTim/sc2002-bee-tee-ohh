@@ -40,7 +40,7 @@ public class OfficerController {
         if (project != null) {
             ProjectController.viewProjectEnquiries(project.getProjectName());
         } else {
-            CommonView.displayError("You are not handling any project.");
+            CommonView.displayError("You do not have any projects assigned to you.");
         }
     }
 

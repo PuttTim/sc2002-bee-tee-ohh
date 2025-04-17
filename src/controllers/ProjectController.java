@@ -68,12 +68,9 @@ public class ProjectController {
         String location = ProjectView.getProjectLocation();
         
         try {
-            String startDateStr = AuthView.getApplicationDate("start");
-            String endDateStr = AuthView.getApplicationDate("end");
-            
-            LocalDateTime startDate = LocalDate.parse(startDateStr, dateFormatter).atStartOfDay();
-            LocalDateTime endDate = LocalDate.parse(endDateStr, dateFormatter).atStartOfDay();
-            
+            LocalDateTime startDate = CommonView.promptDate("Enter start date (dd/MM/yyyy): ");
+            LocalDateTime endDate = CommonView.promptDate("Enter end date (dd/MM/yyyy): ");
+                        
             int officerSlots = ProjectView.getOfficerSlots();
             boolean visibility = ProjectView.getProjectVisibility();
 
@@ -96,11 +93,8 @@ public class ProjectController {
 
         String location = ProjectView.getProjectLocation();
         try {
-            String startDateStr = AuthView.getApplicationDate("start");
-            String endDateStr = AuthView.getApplicationDate("end");
-            
-            LocalDateTime startDate = LocalDate.parse(startDateStr, dateFormatter).atStartOfDay();
-            LocalDateTime endDate = LocalDate.parse(endDateStr, dateFormatter).atStartOfDay();
+            LocalDateTime startDate = CommonView.promptDate("Enter start date (dd/MM/yyyy): ");
+            LocalDateTime endDate = CommonView.promptDate("Enter end date (dd/MM/yyyy): ");
 
             ProjectService.updateProject(project, location, startDate, endDate);
             ProjectView.displayProjectUpdateSuccess();

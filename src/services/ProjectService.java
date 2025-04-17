@@ -2,7 +2,10 @@ package services;
 
 import models.Project;
 import models.Officer;
+import models.User;
+import models.enums.Role;
 import repositories.ProjectRepository;
+import repositories.UserRepository;
 import utils.DateTimeUtils;
 
 import java.time.LocalDateTime;
@@ -15,12 +18,27 @@ public class ProjectService {
     }
 
     public static List<Project> getVisibleProjects() {
+        Role userRole = UserRepository.getUserRole();
 
-        return ProjectRepository.getAll().stream()
-                .filter(Project::isVisible)
-                .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime()) 
+        switch (userRole) {
+            case APPLICANT:
+                return ProjectRepository.getAll().stream()
+                    .filter(Project::isVisible)
+                    .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime()) 
                         && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
-                .collect(Collectors.toList());
+                    .collect(Collectors.toList());
+            case OFFICER:
+                return ProjectRepository.getAll().stream()
+                    .filter(Project::isVisible)
+                    .collect(Collectors.toList());
+            case MANAGER:
+                return ProjectRepository.getAll();
+            default:
+                return List.of();
+        }
+
+
+
     }
 
     public static Project getProjectByName(String projectName) {
