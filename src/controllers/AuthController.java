@@ -6,6 +6,7 @@ import services.AuthService;
 import utils.Hash;
 import views.AuthView;
 import views.CommonView;
+import views.FilterView;
 import views.ProjectView;
 import repositories.*;
 import services.ProjectService;
@@ -108,6 +109,8 @@ public class AuthController {
             try {
                 switch (choice) {
                     case 1 -> {
+//                        List<Filter> filters = FilterView.getFilters();
+//                        List<Project> projects = ProjectService.getProjects(filters);
                         List<Project> projects = ProjectService.getVisibleProjects();
                         if (projects.isEmpty()) {
                             CommonView.displayMessage("No projects available for registration.");
@@ -145,7 +148,9 @@ public class AuthController {
                     case 2 -> ProjectController.editProject();
                     case 3 -> ProjectController.deleteProject();
                     case 4 -> ProjectController.toggleProjectVisibility();
-                    case 5 -> ProjectController.viewAllProjects();
+                    case 5 -> {
+                        ProjectController.viewAllProjects();
+                    }
                     case 6 -> {
                         String projectName = ProjectView.getProjectName();
                         ProjectController.viewProjectEnquiries(projectName);

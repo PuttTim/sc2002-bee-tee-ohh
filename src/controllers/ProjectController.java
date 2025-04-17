@@ -1,5 +1,6 @@
 package controllers;
 
+import models.Filter;
 import models.Project;
 import models.Officer;
 import services.ProjectService;
