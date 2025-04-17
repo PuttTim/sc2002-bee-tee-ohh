@@ -66,6 +66,23 @@ public class CommonView {
         return promptInt("Enter your choice: ", 1, options.size());
     }
 
+    public static int displayMenuWithBacking(String title, List<String> options) {
+        displayHeader(title);
+        
+        if (options == null || options.isEmpty()) {
+            displayMessage("No options available.");
+            return -1;
+        }
+
+        for (int i = 0; i < options.size(); i++) {
+            System.out.println((i + 1) + ". " + options.get(i));
+        }
+
+        System.out.println("0. Back to previous menu");
+
+        return promptInt("Enter your choice: ", 1, options.size());
+    }
+
     public static void displaySeparator() {
         System.out.println(SEPARATOR);
     }
