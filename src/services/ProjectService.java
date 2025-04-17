@@ -3,6 +3,8 @@ package services;
 import models.Project;
 import models.Officer;
 import repositories.ProjectRepository;
+import utils.DateTimeUtils;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,8 +15,11 @@ public class ProjectService {
     }
 
     public static List<Project> getVisibleProjects() {
+
         return ProjectRepository.getAll().stream()
                 .filter(Project::isVisible)
+                .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime()) 
+                        && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
                 .collect(Collectors.toList());
     }
 
@@ -41,8 +46,8 @@ public class ProjectService {
     public static void updateProject(Project project, String location, 
             LocalDateTime startDate, LocalDateTime endDate) {
         project.setLocation(location);
-        project.setApplicationStartDate(startDate);
-        project.setApplicationEndDate(endDate);
+        project.setApplicationOpenDate(startDate);
+        project.setApplicationCloseDate(endDate);
         ProjectRepository.saveAll();
     }
 
