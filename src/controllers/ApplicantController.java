@@ -3,7 +3,7 @@ package controllers;
 import models.*;
 import repositories.ProjectRepository;
 import views.*;
-import java.util.Scanner;
+import java.util.List;
 
 public class ApplicantController {
 
@@ -12,8 +12,8 @@ public class ApplicantController {
     }
 
     public static void viewMyApplications(Applicant applicant) {
+        List<Project> projects = ProjectRepository.getAll();
         ApplicantApplicationView.displayApplicationStatus(applicant);
-
-
+        ApplicantApplicationView.showApplicationMenu(applicant, projects);
     }
 }
