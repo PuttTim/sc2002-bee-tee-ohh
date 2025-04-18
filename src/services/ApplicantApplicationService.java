@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ApplicantApplicationService {
-    public static List<Project> getEligibleProjects(Applicant applicant, List<Project> allProjects) {
+    public static List<Project> getEligibleProjects(User user, List<Project> allProjects) {
         LocalDateTime now = LocalDateTime.now();
         return allProjects.stream()
                 .filter(Project::isVisible)

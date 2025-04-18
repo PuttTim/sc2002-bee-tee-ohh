@@ -37,4 +37,12 @@ public class DateTimeUtils {
     public static String formatDateTime(LocalDateTime dateTime) {
         return formatDateTime(dateTime, DEFAULT_FORMATTER);
     }
+
+    public static LocalDateTime getCurrentDateTime() {
+        LocalDateTime now = LocalDateTime.now(
+            java.time.ZoneId.of("Asia/Singapore")
+            
+        );
+        return now;
+    }
 }

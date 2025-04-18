@@ -7,6 +7,7 @@ import utils.CsvWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class OfficerRepository {
             Map<String, String> record = new HashMap<>();
             record.put("OfficerNRIC", officer.getUserNRIC());
             record.put("CurrentProjectID", officer.getCurrentProjectID() != null ? officer.getCurrentProjectID() : "");
+            record.put("AppliedProjects", String.join("/", officer.getAppliedProjects()));
             records.add(record);
         }
 
@@ -60,11 +62,17 @@ public class OfficerRepository {
                     continue;
                 }
 
+                List<String> appliedProjects = new ArrayList<>();
+                if (record.get("AppliedProjects") != null && !record.get("AppliedProjects").isEmpty()) {
+                    appliedProjects = Arrays.asList(record.get("AppliedProjects").split("/"));
+                }
+
                 Officer officer = new Officer(
                     userData.getUserNRIC(),
                     userData.getName(),
                     userData.getPassword(),
-                    userData.getAge()
+                    userData.getAge(),
+                    appliedProjects
                 );
                 officer.setMaritalStatus(userData.getMaritalStatus());
                 
@@ -103,8 +111,11 @@ public class OfficerRepository {
     }
 
     public static boolean hasExistingProject(String officerNRIC) {
-        return officers.stream()
-            .anyMatch(officer -> officer.getUserNRIC().equals(officerNRIC) 
-                && officer.getCurrentProjectID() != null);
+        boolean withinProjects = ProjectRepository.getAll().stream()
+            .anyMatch(project -> project.getOfficers().contains(officerNRIC));
+
+        boolean withinOfficer = getByNRIC(officerNRIC) != null && getByNRIC(officerNRIC).getCurrentProjectID() == null;
+
+        return !withinProjects && !withinOfficer;
     }
 }

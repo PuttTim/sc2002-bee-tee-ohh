@@ -72,38 +72,69 @@ public class AuthController {
     }
 
     private static void dispatchToController(User user) {
+        boolean running = true;
         switch (user.getRole()) {
-            case APPLICANT -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()));
-            case OFFICER -> showOfficerMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
-            case MANAGER -> showManagerMenu(ManagerRepository.getByNRIC(user.getUserNRIC()));
+            case APPLICANT -> {
+                while (running) {
+                    switch (AuthView.showApplicantMainMenu()) {
+                        case 1 -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()));
+                        case 2 -> handleChangePassword(user);
+                        case 3 -> { running = false; }
+                        default -> CommonView.displayError("Invalid option. Please try again.");
+                    }
+                }
+            }
+            case OFFICER -> {
+                while (running) {
+                    switch (AuthView.showOfficerMainMenu()) {
+                        case 1 -> showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
+                        case 2 -> showOfficerMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
+                        case 3 -> handleChangePassword(user);
+                        case 4 -> { running = false; }
+                        default -> CommonView.displayError("Invalid option. Please try again.");
+                    }
+                }
+            }
+            case MANAGER -> {
+                while (running) {
+                    switch (AuthView.showManagerMainMenu()) {
+                        case 1 -> showManagerMenu(ManagerRepository.getByNRIC(user.getUserNRIC()));
+                        case 2 -> handleChangePassword(user);
+                        case 3 -> { running = false; }
+                        default -> CommonView.displayError("Invalid option. Please try again.");
+                    }
+                }
+            }
             default -> throw new IllegalStateException("Unknown role: " + user.getRole());
         }
+
+        AuthService.logout();
+        CommonView.displayMessage("Logged out of: " + user.getName());
     }
 
-    private static void showApplicantMenu(Applicant applicant) {
+    private static void showApplicantMenu(Applicant user) {
         boolean running = true;
         while (running) {
             int choice = AuthView.showApplicantMenu();
             try {
                 switch (choice) {
-                    case 1 -> ProjectController.viewAvailableProjects(applicant);
-                    case 2 -> ApplicantController.newApplication(applicant);
-                    case 3 -> ApplicantController.viewMyApplications(applicant);
-                    case 4 -> EnquiryController.createNewEnquiry(applicant);
-                    case 5 -> EnquiryController.viewApplicantEnquiries(applicant);
-                    case 6 -> handleChangePassword(applicant);
-                    case 7 -> running = false;
+                    case 1 -> ProjectController.viewAvailableProjects(user);
+                    case 2 -> ApplicantController.newApplication(user);
+                    case 3 -> ApplicantController.viewMyApplications(user);
+                    case 4 -> EnquiryController.createNewEnquiry(user);
+                    case 5 -> EnquiryController.viewApplicantEnquiries(user);
+                    case 0 -> {return;}
                 }
             } catch (NumberFormatException e) {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
-        System.out.println("Logging out of user: " + applicant.getName());
-        AuthService.logout();
+        // System.out.println("Logging out of user: " + applicant.getName());
     }
 
     private static void showOfficerMenu(Officer officer) {
         boolean running = true;
+
         while (running) {
             int choice = AuthView.showOfficerMenu();
             try {
@@ -127,15 +158,12 @@ public class AuthController {
                     case 4 -> OfficerController.manageProjectEnquiries(officer);
                     case 5 -> OfficerController.processApplication();
                     case 6 -> OfficerController.generateReceipt();
-                    case 7 -> handleChangePassword(officer);
-                    case 8 -> running = false;
+                    case 0 -> {return;}
                 }
             } catch (NumberFormatException e) {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
-        System.out.println("Logging out of user: " + officer.getName());
-        AuthService.logout();
     }
 
     private static void showManagerMenu(Manager manager) {
@@ -156,15 +184,12 @@ public class AuthController {
                         ProjectController.viewProjectEnquiries(projectName);
                     }
                     case 7 -> handleOfficerRegistrations();
-                    case 8 -> handleChangePassword(manager);
-                    case 9 -> running = false;
+                    case 0 -> {return;}
                 }
             } catch (NumberFormatException e) {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
-        System.out.println("Logging out of user: " + manager.getName());
-        AuthService.logout();
     }
 
     private static void handleChangePassword(User user) {

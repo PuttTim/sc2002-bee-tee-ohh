@@ -119,4 +119,13 @@ public class UserRepository {
             }
         }
     }
+
+    
+    public static Role getUserRole() {
+        
+        if (activeUser != null) {
+            return activeUser.getRole();
+        }
+        return null; // Return null if no active user is set
+    }
 }
