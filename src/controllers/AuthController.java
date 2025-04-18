@@ -85,7 +85,7 @@ public class AuthController {
             int choice = AuthView.showApplicantMenu();
             try {
                 switch (choice) {
-                    case 1 -> ProjectController.viewAvailableProjects();
+                    case 1 -> ProjectController.viewAvailableProjects(applicant);
                     case 2 -> ApplicantController.newApplication(applicant);
                     case 3 -> ApplicantController.viewMyApplications(applicant);
                     case 4 -> EnquiryController.createNewEnquiry(applicant);

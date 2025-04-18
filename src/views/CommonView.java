@@ -63,7 +63,7 @@ public class CommonView {
             System.out.println((i + 1) + ". " + options.get(i));
         }
 
-        return promptInt("Enter your choice: ", 1, options.size());
+        return promptInt("\nEnter your choice: ", 1, options.size());
     }
 
     public static int displayMenuWithBacking(String title, List<String> options) {

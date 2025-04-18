@@ -138,7 +138,7 @@ public class Enquiry {
         this.respondedBy = responder;
     }
 
-    // Status Update Method
+    // Helpers
     public void markAsResponded(String responder, String response) {
         this.response = response;
         this.enquiryStatus = EnquiryStatus.RESPONDED;
@@ -146,7 +146,6 @@ public class Enquiry {
         this.lastUpdated = LocalDateTime.now();
     }
 
-    // Helper methods
     public boolean isResponse() {
         return response != null && !response.trim().isEmpty();
     }

@@ -48,7 +48,7 @@ public class Applicant extends Officer {
         this.bookedFlatType = flatType;
     }
 
-    // Helper
+    // Helpers
     public void addAppliedProject(String projectId) {
         if (projectId != null && !appliedProjects.contains(projectId)) {
             appliedProjects.add(projectId);

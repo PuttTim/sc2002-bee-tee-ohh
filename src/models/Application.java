@@ -118,7 +118,7 @@ public class Application {
         this.applicationDate = applicationDate;
     }
 
-    // Status Update Methods
+    // Helpers
     public void approve(String manager) {
         if (this.applicationStatus != ApplicationStatus.PENDING) {
             throw new IllegalStateException("Can only approve pending applications");
@@ -166,7 +166,6 @@ public class Application {
         recordStatusChange(ApplicationStatus.WITHDRAWN);
     }
 
-    // Helper
     private void recordStatusChange(ApplicationStatus status) {
         applicationStatusHistory.put(status, LocalDateTime.now());
     }

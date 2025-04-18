@@ -32,7 +32,7 @@ public class ProjectView {
     }
 
     public static void displayProjectDetails(Project project) {
-        CommonView.displayMessage("\nProject Name: " + project.getProjectName());
+        CommonView.displayMessage("Project Name: " + project.getProjectName());
         CommonView.displayMessage("Location: " + project.getLocation());
         CommonView.displayMessage("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
         CommonView.displayMessage("Available Flat Types:");
@@ -69,7 +69,7 @@ public class ProjectView {
         List<String> options = List.of(
             "Return to Previous Menu",
             "View Project Details",
-            "Submit Enquiry"
+            "Create New Enquiry"
         );
         return CommonView.displayMenu("Project Menu", options);
     }
@@ -109,7 +109,7 @@ public class ProjectView {
         for (int i = 0; i < projects.size(); i++) {
             CommonView.displayMessage((i + 1) + ". " + projects.get(i).getProjectName());
         }
-        return CommonView.promptInt("Enter your choice: ") - 1;
+        return CommonView.promptInt("\nEnter your choice: ", 1, projects.size());
     }
 
     public static void displayProjectCreationSuccess(String projectName) {

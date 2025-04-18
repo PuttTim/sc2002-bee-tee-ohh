@@ -65,7 +65,7 @@ public class EnquiryView {
             return null;
         }
 
-        CommonView.displayHeader("Select a Project for Enquiry");
+        CommonView.displayHeader("Select a project for enquiry");
         for (int i = 0; i < projects.size(); i++) {
             CommonView.displayMessage(String.format("%d. %s", i + 1, projects.get(i).getProjectName()));
         }

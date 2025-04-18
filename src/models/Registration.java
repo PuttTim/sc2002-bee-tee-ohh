@@ -87,7 +87,7 @@ public class Registration {
         this.approvedBy = approvedBy;
     }
 
-    // Status Update Methods
+    // Helpers
     public void approve(User manager) {
         this.registrationStatus = RegistrationStatus.APPROVED;
         this.approvedBy = manager;

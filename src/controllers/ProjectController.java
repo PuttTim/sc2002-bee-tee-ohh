@@ -1,12 +1,12 @@
 package controllers;
 
+import models.Applicant;
 import models.Project;
 import models.Officer;
 import services.ProjectService;
 import views.ProjectView;
 import views.AuthView;
 import views.CommonView;
-import views.EnquiryView;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,50 +15,41 @@ import java.util.List;
 public class ProjectController {
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public static void showMainMenu() {
+    public static void viewAvailableProjects(Applicant applicant) {
         List<Project> projects = ProjectService.getVisibleProjects();
-        
-        while (true) {
-            ProjectView.displayAvailableProjects(projects);
-            
-            if (projects.isEmpty()) {
-                System.out.println("No projects available.");
-                return;
-            }
 
-            int projectChoice = ProjectView.getProjectChoice(projects);
-            
-            if (projectChoice == 0) {
-                return;
-            }
+        if (projects.isEmpty()) {
+            CommonView.displayMessage("No projects available.");
+            return;
+        }
 
-            Project selectedProject = projects.get(projectChoice - 1);
-            
-            boolean continueProjectMenu = true;
-            while (continueProjectMenu) {
-                int menuChoice = ProjectView.getProjectMenuChoice();
-                
-                switch (menuChoice) {
-                    case 0:
-                        continueProjectMenu = false;
-                        break;
-                    case 1:
-                        EnquiryController.viewProjectEnquiries(selectedProject);
-                        break;
-                    case 2:
-                        System.out.println("PLACEHOLDER: View Project Details");
-                        break;
-                    default:
-                        System.out.println("Application feature not implemented yet");
-                        break;
+        ProjectView.displayAvailableProjects(projects);
+
+        boolean continueProjectMenu = true;
+        while (continueProjectMenu) {
+            int menuChoice = ProjectView.getProjectMenuChoice();
+
+            switch (menuChoice) {
+                case 1:
+                    continueProjectMenu = false;
+                    break;
+
+                case 2: {
+                    int projectChoice = ProjectView.getProjectChoice(projects);
+                    ProjectView.displayProjectDetails(projects.get(projectChoice));
+                    break;
                 }
+
+                case 3: {
+                    EnquiryController.createNewEnquiry(applicant);
+                    break;
+                }
+
+                default:
+                    CommonView.displayError("Please enter a valid number!");
+                    break;
             }
         }
-    }
-
-    public static void viewAvailableProjects() {
-        List<Project> projects = ProjectService.getVisibleProjects();
-        ProjectView.displayAvailableProjects(projects);
     }
 
     public static void createProject() {
