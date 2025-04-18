@@ -25,7 +25,7 @@ public class OfficerController {
         if (OfficerService.hasExistingProject(officer)) {
             Project project = ProjectService.getProjectByOfficer(officer);
             if (project != null) {
-                CommonView.displaySuccess("You are currently handling project: " + project.getProjectName());
+                CommonView.displayMessage("You are currently handling project: " + project.getProjectName());
             }
         } else if (OfficerService.hasExistingRegistration(officer)) {
             CommonView.displayMessage("You have a pending registration request.");

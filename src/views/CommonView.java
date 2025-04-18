@@ -82,7 +82,7 @@ public class CommonView {
 
         System.out.println("0. Back to previous menu");
 
-        return promptInt("Enter your choice: ", 1, options.size());
+        return promptInt("Enter your choice: ", 0, options.size());
     }
 
     public static void displaySeparator() {

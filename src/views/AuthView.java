@@ -33,11 +33,9 @@ public class AuthView {
             "Submit Project Application",
             "View My Applications",
             "Create New Enquiry",
-            "View My Enquiries",
-            "Change Password",
-            "Logout"
+            "View My Enquiries"
         );
-        return CommonView.displayMenu("Applicant Menu", options);
+        return CommonView.displayMenuWithBacking("Applicant Menu", options);
     }
 
     public static int showOfficerMenu() {
@@ -47,11 +45,10 @@ public class AuthView {
             "View Handled Project Details",
             "Manage Project Enquiries",
             "Process Applications",
-            "Generate Receipt",
-            "Change Password",
-            "Logout"
+            "Generate Receipt"
+            
         );
-        return CommonView.displayMenu("Officer Menu", options);
+        return CommonView.displayMenuWithBacking("Officer Menu", options);
     }
 
     public static int showManagerMenu() {
@@ -62,11 +59,33 @@ public class AuthView {
             "Toggle Project Visibility",
             "View All Projects",
             "View Project Enquiries",
-            "Manage Officer Registrations",
+            "Manage Officer Registrations"
+        );
+        return CommonView.displayMenuWithBacking("Manager Menu", options);
+    }
+
+    public static int showApplicantMainMenu() {
+        List<String> options = List.of("Proceed to Applicant Menu", "Change Password", "Logout");
+        return CommonView.displayMenu("Applicant Main Menu", options);
+    }
+
+    public static int showOfficerMainMenu() {
+        List<String> options = List.of(
+            "Applicant Mode",
+            "Officer Mode",
             "Change Password",
             "Logout"
         );
-        return CommonView.displayMenu("Manager Menu", options);
+        return CommonView.displayMenu("Main Menu", options);
+    }
+
+    public static int showManagerMainMenu() {
+        List<String> options = List.of(
+            "Proceed to Manager Menu",
+            "Change Password",
+            "Logout"
+        );
+        return CommonView.displayMenu("Main Menu", options);
     }
 
     public static void showChangePasswordHeader() {

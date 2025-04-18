@@ -31,7 +31,7 @@ public class ApplicantApplicationView {
         }
     }
 
-    public static void displayEligibleProjects(Applicant applicant, List<Project> allProjects) {
+    public static void displayEligibleProjects(User applicant, List<Project> allProjects) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
         if (eligibleProjects.isEmpty()) {
             CommonView.displayMessage("No eligible projects found.");
