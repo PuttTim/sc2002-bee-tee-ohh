@@ -4,7 +4,12 @@ import models.Filter;
 import models.Project;
 import models.Officer;
 import models.enums.FlatType;
+import models.User;
+import models.enums.Role;
 import repositories.ProjectRepository;
+import repositories.UserRepository;
+import utils.DateTimeUtils;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,9 +59,27 @@ public class ProjectService {
     }
 
     public static List<Project> getVisibleProjects() {
-        return ProjectRepository.getAll().stream()
-                .filter(Project::isVisible)
-                .collect(Collectors.toList());
+        Role userRole = UserRepository.getUserRole();
+
+        switch (userRole) {
+            case APPLICANT:
+                return ProjectRepository.getAll().stream()
+                    .filter(Project::isVisible)
+                    .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime()) 
+                        && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
+                    .collect(Collectors.toList());
+            case OFFICER:
+                return ProjectRepository.getAll().stream()
+                    .filter(Project::isVisible)
+                    .collect(Collectors.toList());
+            case MANAGER:
+                return ProjectRepository.getAll();
+            default:
+                return List.of();
+        }
+
+
+
     }
 
     public static Project getProjectByName(String projectName) {
@@ -82,8 +105,8 @@ public class ProjectService {
     public static void updateProject(Project project, String location, 
             LocalDateTime startDate, LocalDateTime endDate) {
         project.setLocation(location);
-        project.setApplicationStartDate(startDate);
-        project.setApplicationEndDate(endDate);
+        project.setApplicationOpenDate(startDate);
+        project.setApplicationCloseDate(endDate);
         ProjectRepository.saveAll();
     }
 

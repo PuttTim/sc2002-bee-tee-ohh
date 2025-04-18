@@ -18,8 +18,6 @@ public class Project {
     private List<Integer> flatTypeSellingPrice;
     private LocalDateTime applicationOpenDate;
     private LocalDateTime applicationCloseDate;
-    private LocalDateTime applicationStartDate;
-    private LocalDateTime applicationEndDate;
     private int officerSlots;
     private boolean isVisible;
     private boolean visible;
@@ -46,14 +44,14 @@ public class Project {
     }
 
     public Project(String projectID, String managerNRIC, String projectName, String location,
-                  LocalDateTime applicationStartDate, LocalDateTime applicationEndDate,
+                  LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
                   int officerSlots, boolean visible) {
         this.projectID = projectID;
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
         this.location = location;
-        this.applicationStartDate = applicationStartDate;
-        this.applicationEndDate = applicationEndDate;
+        this.applicationOpenDate = applicationOpenDate;
+        this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
         this.visible = visible;
     }
@@ -124,14 +122,6 @@ public class Project {
         return applicationCloseDate;
     }
 
-    public LocalDateTime getApplicationStartDate() {
-        return applicationStartDate;
-    }
-
-    public LocalDateTime getApplicationEndDate() {
-        return applicationEndDate;
-    }
-
     public int getOfficerSlots() {
         return officerSlots;
     }
@@ -183,14 +173,6 @@ public class Project {
 
     public void setApplicationCloseDate(LocalDateTime applicationCloseDate) {
         this.applicationCloseDate = applicationCloseDate;
-    }
-
-    public void setApplicationStartDate(LocalDateTime applicationStartDate) {
-        this.applicationStartDate = applicationStartDate;
-    }
-
-    public void setApplicationEndDate(LocalDateTime applicationEndDate) {
-        this.applicationEndDate = applicationEndDate;
     }
 
     public void setOfficerSlots(int officerSlots) {

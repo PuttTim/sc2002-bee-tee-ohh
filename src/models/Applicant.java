@@ -7,7 +7,7 @@ import models.enums.MaritalStatus;
 import models.enums.Role;
 import models.enums.FlatType;
 
-public class Applicant extends Officer {
+public class Applicant extends User {
     private List<String> appliedProjects;
     private FlatType bookedFlatType;
     private String bookedProjectId;

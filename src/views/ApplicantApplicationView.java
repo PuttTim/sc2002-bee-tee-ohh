@@ -4,6 +4,7 @@ import models.*;
 import models.enums.ApplicationStatus;
 import models.enums.FlatType;
 import repositories.ProjectRepository;
+import repositories.UserRepository;
 import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ApplicantApplicationView {
         }
     }
 
-    public static void displayEligibleProjects(Applicant applicant, List<Project> allProjects) {
+    public static void displayEligibleProjects(User applicant, List<Project> allProjects) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
         if (eligibleProjects.isEmpty()) {
             CommonView.displayMessage("No eligible projects found.");
@@ -96,7 +97,11 @@ public class ApplicantApplicationView {
             CommonView.displayMessage("Status: " + getStatusDisplay(app.getApplicationStatus()));
             CommonView.displayMessage("Application Date: " + DateTimeUtils.formatDateTime(app.getApplicationDate()));
             if (app.getApprovedBy() != null) {
-                CommonView.displayMessage("Approved By: " + app.getApprovedBy());
+                if (app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL) {
+                    CommonView.displayMessage("Approved By: " + UserRepository.getByNRIC(app.getApprovedBy()).getName());
+                } else {
+                    CommonView.displayMessage("Rejected By: " + UserRepository.getByNRIC(app.getApprovedBy()).getName());
+                }
             }
             CommonView.displaySeparator();
         }
