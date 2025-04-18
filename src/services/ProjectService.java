@@ -1,13 +1,54 @@
 package services;
 
+import models.Filter;
 import models.Project;
 import models.Officer;
+import models.enums.FlatType;
 import repositories.ProjectRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProjectService {
+    public static List<Project> getProjects(List<Filter> filters) {
+        Stream<Project> projectStream = ProjectRepository.getAll().stream();
+
+        if (!filters.isEmpty()) {
+            projectStream = projectStream.filter(project ->
+                    filters.stream().allMatch(filter ->
+                            checkPassesFilter(project, filter)
+                    )
+            );
+        }
+
+        return projectStream.collect(Collectors.toList());
+    }
+
+    private static boolean checkPassesFilter(Project project, Filter filter) {
+        if (project == null) {
+            return true;
+        }
+
+        String key = filter.getKey();
+        List<String> value = filter.getValue();
+        return switch (key) {
+            case "location" -> value.contains(project.getLocation());
+            case "flat_type" -> {
+                for (FlatType flattype : project.getFlatTypes()) {
+                    if (value.contains(flattype.toString())) {
+                        yield true;
+                    }
+                }
+                yield false;
+            }
+            default -> {
+                System.err.println("Warning: Unknown filter key skipped: " + key);
+                yield true;
+            }
+        };
+    }
+
     public static List<Project> getAllProjects() {
         return ProjectRepository.getAll();
     }
