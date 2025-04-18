@@ -14,29 +14,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EnquiryController {
-    public static void showEnquiryMenu(Applicant applicant) {
-        while (true) {
-            EnquiryView.displayMenu();
-            int choice = CommonView.promptInt("Select an option: ");
-
-            try {
-                switch (choice) {
-                    case 1 -> viewApplicantEnquiries(applicant);
-                    case 2 -> createNewEnquiry(applicant);
-                    case 3 -> editEnquiry(applicant);
-                    case 4 -> deleteEnquiry(applicant);
-                    case 5 -> {return;}
-                    default -> EnquiryView.displayError("Invalid option selected");
-                }
-            } catch (Exception e) {
-                EnquiryView.displayError(e.getMessage());
-            }
-        }
-    }
-
-    public static void viewApplicantEnquiries(Applicant applicant) {
+        public static void viewApplicantEnquiries(Applicant applicant) {
         List<Enquiry> enquiries = EnquiryService.getEnquiriesByApplicant(applicant);
         EnquiryView.displayEnquiryList(enquiries);
+        EnquiryView.showEnquiryMenu(applicant);
     }
 
     public static void createNewEnquiry(Applicant applicant) {

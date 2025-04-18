@@ -9,7 +9,7 @@ import utils.DateTimeUtils;
 import java.util.List;
 
 public class ApplicantApplicationView {
-    public static void showApplicationMenu(Applicant applicant, List<Project> allProjects) {
+    public static void showApplicationMenu(Applicant applicant, List<Project> projects) {
         List<String> options = List.of(
             "View Available Projects",
             "Submit New Application",
@@ -19,13 +19,19 @@ public class ApplicantApplicationView {
         );
 
         while (true) {
-            int choice = CommonView.displayMenu("Application Management", options);
-            switch (choice) {
-                case 1 -> displayEligibleProjects(applicant, allProjects);
-                case 2 -> promptApplication(applicant, allProjects);
-                case 3 -> displayApplicationStatus(applicant);
-                case 4 -> handleWithdraw(applicant);
-                case 5 -> {return;}
+            int choice = CommonView.displayMenu("Application Menu", options);
+            try {
+                switch (choice) {
+                    case 1 -> displayEligibleProjects(applicant, projects);
+                    case 2 -> promptApplication(applicant, projects);
+                    case 3 -> displayApplicationStatus(applicant);
+                    case 4 -> handleWithdraw(applicant);
+                    case 5 -> {
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                CommonView.displayError("Please enter a valid number!");
             }
         }
     }

@@ -1,10 +1,41 @@
 package views;
 
+import controllers.EnquiryController;
+import models.Applicant;
 import models.Project;
 import models.enums.FlatType;
 import java.util.List;
 
 public class ProjectView {
+    public static void showProjectMenu(Applicant applicant, List<Project> projects) {
+        List<String> options = List.of(
+                "View Project Details",
+                "Create New Enquiry",
+                "Back to Main Menu"
+        );
+
+        while (true) {
+            int choice = CommonView.displayMenu("Project Menu", options);
+            try {
+                switch (choice) {
+                    case 1 -> {
+                        int projectChoice = getProjectChoice(projects);
+                        if (projectChoice != -1) {
+                            Project selectedProject = projects.get(projectChoice - 1);
+                            displayProjectDetails(selectedProject);
+                        }
+                    }
+                    case 2 -> EnquiryController.createNewEnquiry(applicant);
+                    case 3 -> {
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                CommonView.displayError("Please enter a valid number!");
+            }
+        }
+    }
+
     public static void displayProjectList(List<Project> projects) {
         if (projects.isEmpty()) {
             CommonView.displayMessage("No projects available.");
@@ -63,15 +94,6 @@ public class ProjectView {
             CommonView.displayMessage("Available slots: " + project.getOfficerSlots());
             CommonView.displayMessage("----------------------------------------");
         }
-    }
-
-    public static int getProjectMenuChoice() {
-        List<String> options = List.of(
-            "Return to Previous Menu",
-            "View Project Details",
-            "Create New Enquiry"
-        );
-        return CommonView.displayMenu("Project Menu", options);
     }
 
     public static String getProjectName() {

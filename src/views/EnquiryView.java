@@ -1,5 +1,7 @@
 package views;
 
+import controllers.EnquiryController;
+import models.Applicant;
 import models.Enquiry;
 import models.Project;
 import repositories.ProjectRepository;
@@ -8,15 +10,27 @@ import repositories.UserRepository;
 import java.util.List;
 
 public class EnquiryView {
-    public static void displayMenu() {
+    public static void showEnquiryMenu(Applicant applicant) {
         List<String> options = List.of(
-            "View My Enquiries",
-            "Create New Enquiry",
-            "Edit Enquiry",
-            "Delete Enquiry",
-            "Back to Main Menu"
+                "Create New Enquiry",
+                "Edit Enquiry",
+                "Delete Enquiry",
+                "Back to Main Menu"
         );
-        CommonView.displayMenu("Enquiry Management", options);
+
+        while (true) {
+            int choice = CommonView.displayMenu("Enquiry Menu", options);
+            try {
+                switch (choice) {
+                    case 1 -> EnquiryController.createNewEnquiry(applicant);
+                    case 2 -> EnquiryController.editEnquiry(applicant);
+                    case 3 -> EnquiryController.deleteEnquiry(applicant);
+                    case 4 -> {return;}
+                }
+            } catch (Exception e) {
+                EnquiryView.displayError(e.getMessage());
+            }
+        }
     }
 
     public static void displayEnquiryList(List<Enquiry> enquiries) {
@@ -38,7 +52,6 @@ public class EnquiryView {
                 CommonView.displayMessage("   Responded by: " + UserRepository.getByNRIC(enquiry.getResponder()).getName());
             }
             CommonView.displayMessage("   Project: " + project.getProjectName());
-            
 
             System.out.println("-----------------------------------");
             System.out.println();

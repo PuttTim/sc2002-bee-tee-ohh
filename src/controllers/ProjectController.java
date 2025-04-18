@@ -17,39 +17,8 @@ public class ProjectController {
 
     public static void viewAvailableProjects(Applicant applicant) {
         List<Project> projects = ProjectService.getVisibleProjects();
-
-        if (projects.isEmpty()) {
-            CommonView.displayMessage("No projects available.");
-            return;
-        }
-
         ProjectView.displayAvailableProjects(projects);
-
-        boolean continueProjectMenu = true;
-        while (continueProjectMenu) {
-            int menuChoice = ProjectView.getProjectMenuChoice();
-
-            switch (menuChoice) {
-                case 1:
-                    continueProjectMenu = false;
-                    break;
-
-                case 2: {
-                    int projectChoice = ProjectView.getProjectChoice(projects);
-                    ProjectView.displayProjectDetails(projects.get(projectChoice));
-                    break;
-                }
-
-                case 3: {
-                    EnquiryController.createNewEnquiry(applicant);
-                    break;
-                }
-
-                default:
-                    CommonView.displayError("Please enter a valid number!");
-                    break;
-            }
-        }
+        ProjectView.showProjectMenu(applicant, projects);
     }
 
     public static void createProject() {
