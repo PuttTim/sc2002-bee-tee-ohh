@@ -14,7 +14,15 @@ import java.util.stream.Collectors;
 
 import interfaces.ICsvConfig;
 
+/**
+ * A repository class for managing managers in the system.
+ * Supports loading and saving data to CSV and searching managers by NRIC and project.
+ */
 public class ManagerRepository {
+
+    /**
+     * Configuration for reading and writing the CSV file containing managers.
+     */
     private static class ManagerCsvConfig implements ICsvConfig {
         @Override
         public String getFilePath() {
@@ -29,8 +37,11 @@ public class ManagerRepository {
 
     private static List<Manager> managers = new ArrayList<>();
 
-    private ManagerRepository() {} // private constructor
+    private ManagerRepository() {}
 
+    /**
+     * Saves all managers to the CSV file.
+     */
     public static void saveAll() {
         List<Map<String, String>> records = new ArrayList<>();
         for (Manager manager : managers) {
@@ -47,6 +58,9 @@ public class ManagerRepository {
         }
     }
 
+    /**
+     * Loads all managers from the CSV file.
+     */
     public static void load() {
         try {
             List<Map<String, String>> records = CsvReader.read(new ManagerCsvConfig());
@@ -61,11 +75,11 @@ public class ManagerRepository {
                 }
 
                 Manager manager = new Manager(
-                    userData.getUserNRIC(),
-                    userData.getName(),
-                    userData.getPassword(),
-                    userData.getAge(),
-                    record.get("CurrentProjectID")
+                        userData.getUserNRIC(),
+                        userData.getName(),
+                        userData.getPassword(),
+                        userData.getAge(),
+                        record.get("CurrentProjectID")
                 );
                 manager.setMaritalStatus(userData.getMaritalStatus());
                 managers.add(manager);
@@ -76,24 +90,46 @@ public class ManagerRepository {
         }
     }
 
+    /**
+     * Returns all managers in the system.
+     *
+     * @return list of all managers
+     */
     public static List<Manager> getAll() {
         return managers;
     }
 
+    /**
+     * Adds a new manager to the repository.
+     *
+     * @param manager the manager to add
+     */
     public static void add(Manager manager) {
         managers.add(manager);
     }
 
+    /**
+     * Finds a manager by NRIC.
+     *
+     * @param nric the NRIC of the manager to search for
+     * @return the matching manager, or <code>null</code> if not found
+     */
     public static Manager getByNRIC(String nric) {
         return managers.stream()
-            .filter(manager -> manager.getUserNRIC().equals(nric))
-            .findFirst()
-            .orElse(null);
+                .filter(manager -> manager.getUserNRIC().equals(nric))
+                .findFirst()
+                .orElse(null);
     }
 
+    /**
+     * Returns a list of managers working on a specific project.
+     *
+     * @param projectId the ID of the project
+     * @return list of managers working on the given project
+     */
     public static List<Manager> getByProject(String projectId) {
         return managers.stream()
-            .filter(manager -> projectId.equals(manager.getCurrentProjectID()))
-            .collect(Collectors.toList());
+                .filter(manager -> projectId.equals(manager.getCurrentProjectID()))
+                .collect(Collectors.toList());
     }
 }
