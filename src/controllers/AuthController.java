@@ -188,6 +188,11 @@ public class AuthController {
     private static void handleChangePassword(User user) {
         AuthView.showChangePasswordHeader();
         String oldPassword = CommonView.prompt("Enter old password: ");
+        if (oldPassword.equals("0")) {
+            CommonView.displayMessage("Password change cancelled.");
+            return;
+        }
+
         if (oldPassword.isEmpty()) {
             AuthView.displayPasswordChangeError("Old password cannot be empty.");
             return;
@@ -198,6 +203,10 @@ public class AuthController {
         }
 
         String newPassword = CommonView.prompt("Enter new password: ");
+        if (newPassword.equals("0")) {
+            CommonView.displayMessage("Password change cancelled.");
+            return;
+        }
         if (newPassword.isEmpty()) {
             AuthView.displayPasswordChangeError("New password cannot be empty.");
             return;
@@ -208,6 +217,11 @@ public class AuthController {
         }
         
         String confirmPassword = CommonView.prompt("Confirm new password: ");
+        if (confirmPassword.equals("0")) {
+            CommonView.displayMessage("Password change cancelled.");
+            return;
+        }
+
         if (!newPassword.equals(confirmPassword)) {
             AuthView.displayPasswordChangeError("New passwords do not match.");
             return;
