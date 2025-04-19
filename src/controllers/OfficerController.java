@@ -1,28 +1,81 @@
 package controllers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import models.Application;
 import models.Officer;
 import models.Project;
+import models.Registration;
+import models.enums.RegistrationStatus;
+import repositories.ApplicationRepository;
+import repositories.OfficerRepository;
+import repositories.RegistrationRepository;
 import services.*;
 import views.*;
 
 public class OfficerController {
     //register to join project as officer
-    public static void registerToHandleProject(Officer officer, Project project) {
-        if (OfficerService.hasExistingProject(officer)) {
-            CommonView.displayError("You are already handling another project.");
+    public static void registerToHandleProject(Officer officer) {
+        List<Project> projects = ProjectService.getVisibleProjects();
+        List<Registration> officerRegistrations = RegistrationRepository.getByOfficer(officer);
+        List<Project> registeredProjects = projects.stream()
+                .filter(p -> officerRegistrations.stream().filter(r -> r.getRegistrationStatus() != RegistrationStatus.REJECTED).anyMatch(r -> r.getProjectID().equals(p.getProjectID())))
+                .collect(Collectors.toList());
+        if (projects.isEmpty()) {
+            CommonView.displayMessage("No projects available for registration.");
             return;
         }
 
-        if (OfficerService.hasExistingRegistration(officer)) {
-            CommonView.displayError("You already have an existing registration for another project.");
-            return;
+        int projectChoice = -1;
+
+        while (true) {
+            ProjectView.displayOfficerRegistrations(projects, officerRegistrations, officer);
+            projectChoice = CommonView.promptInt("Select project number (or 0 to cancel): ", 0, projects.size());
+
+            if (projectChoice == 0) {
+                break; // Cancel registration
+            }
+
+            Project project = projects.get(projectChoice - 1);
+            if (project.getOfficerSlots() <= project.getOfficers().size()) {
+                CommonView.displayError("No available slots for this project.");
+                continue;
+            }
+
+            if (ApplicationRepository.hasApplication(officer, project.getProjectID())) {
+                CommonView.displayError("You have an existing BTO application for this project.");
+                continue;
+            }
+
+            if (officerRegistrations.stream().anyMatch(r -> r.getProjectID().equals(project.getProjectID()))) {
+                CommonView.displayError("You have an existing registration for this project.");
+                continue; 
+            }
+            
+            if (registeredProjects.stream().anyMatch(r -> r.getApplicationOpenDate().isBefore(project.getApplicationCloseDate()) &&
+                    r.getApplicationCloseDate().isAfter(project.getApplicationOpenDate()))) {
+                CommonView.displayError("You have an existing registration that overlaps with this project's timeline.");
+                continue; 
+            }
+
+            break;
         }
 
-        ProjectController.handleOfficerRegistration(officer, project.getProjectName());
+        System.out.println("Selected project: " + (projectChoice != 0 ? projects.get(projectChoice - 1).getProjectName() : "None"));
+
+        if (projectChoice != 0) {
+            Project selectedProject = projects.get(projectChoice - 1);
+            Registration registration = new Registration(officer, selectedProject.getProjectID());
+            RegistrationRepository.add(registration);
+            CommonView.displayMessage("You have successfully registered to handle project: " + selectedProject.getProjectName() + " Please wait for approval.");
+        } else {
+            CommonView.displayMessage("Registration cancelled.");
+        }
     }
 
     public static void checkHandlerRegistration(Officer officer) {
-        if (OfficerService.hasExistingProject(officer)) {
+        if (OfficerRepository.hasExistingProject(officer)) {
             Project project = ProjectService.getProjectByOfficer(officer);
             if (project != null) {
                 CommonView.displayMessage("You are currently handling project: " + project.getProjectName());
@@ -38,6 +91,8 @@ public class OfficerController {
     public static void viewHandledProjectDetails(Officer officer) {
         Project project = ProjectService.getProjectByOfficer(officer);
         if (project != null) {
+            CommonView.displayHeader("Project Details");
+            ProjectView.displayProjectDetails(project);
             ProjectController.viewProjectEnquiries(project.getProjectName());
         } else {
             CommonView.displayError("You do not have any projects assigned to you.");

@@ -29,6 +29,7 @@ public class UserRepository {
 
     private static List<User> users = new ArrayList<>();
     private static User activeUser = null;
+    private static Role userMode = null;
 
     private UserRepository() {} // private constructor
 
@@ -127,5 +128,14 @@ public class UserRepository {
             return activeUser.getRole();
         }
         return null; // Return null if no active user is set
+    }
+
+        
+    public static Role getUserMode() {
+        return userMode;
+    }
+
+    public static void setUserMode(Role mode) {
+        userMode = mode;
     }
 }

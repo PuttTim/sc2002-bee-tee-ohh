@@ -1,5 +1,6 @@
 package repositories;
 
+import models.Officer;
 import models.Project;
 import models.enums.FlatType;
 import utils.CsvReader;
@@ -158,5 +159,18 @@ public class ProjectRepository {
     public static void remove(Project project) {
         projects.remove(project);
         saveAll();
+    }
+
+    public static List<String> getProjectOfficerNames(String projectID) {
+        Project project = getById(projectID);
+        if (project != null) {
+            return project.getOfficers().stream()
+                .map(officerNRIC -> OfficerRepository.getByNRIC(officerNRIC))
+                .map(Officer::getName)
+                .distinct()
+                .collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
     }
 }

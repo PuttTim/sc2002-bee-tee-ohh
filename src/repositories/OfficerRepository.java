@@ -110,12 +110,19 @@ public class OfficerRepository {
             .collect(Collectors.toList());
     }
 
-    public static boolean hasExistingProject(String officerNRIC) {
+    public static boolean hasExistingProject(Officer officer) {
+        String officerNRIC = officer.getUserNRIC();
         boolean withinProjects = ProjectRepository.getAll().stream()
             .anyMatch(project -> project.getOfficers().contains(officerNRIC));
 
         boolean withinOfficer = getByNRIC(officerNRIC) != null && getByNRIC(officerNRIC).getCurrentProjectID() == null;
 
-        return !withinProjects && !withinOfficer;
+        return withinProjects || withinOfficer;
+    }
+
+    public static boolean hasActiveApplication(Officer officer) {
+        boolean withinApplications = ApplicationRepository.getAll().stream()
+            .anyMatch(application -> application.getApplicantNRIC().equals(officer.getUserNRIC()));
+        return withinApplications;
     }
 }

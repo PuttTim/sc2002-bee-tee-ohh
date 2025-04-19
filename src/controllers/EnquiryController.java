@@ -47,6 +47,7 @@ public class EnquiryController {
             if (newContent != null) {
                 EnquiryService.editEnquiry(applicant, existingEnquiries.get(editIndex).getEnquiryID(), newContent);
                 EnquiryView.displaySuccess("Enquiry updated successfully");
+                EnquiryView.showEnquiryMenu(applicant);
             }
         } else {
             EnquiryView.displayError("Invalid selection");

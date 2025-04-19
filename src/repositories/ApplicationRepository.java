@@ -1,5 +1,6 @@
 package repositories;
 
+import models.Applicant;
 import models.Application;
 import models.enums.ApplicationStatus;
 import models.enums.FlatType;
@@ -140,5 +141,10 @@ public class ApplicationRepository {
         return applications.stream()
             .filter(app -> app.getApplicationStatus() == status)
             .collect(Collectors.toList());
+    }
+
+    public static boolean hasApplication(Applicant applicant, String projectId) {
+        return getByProject(projectId).stream()
+            .anyMatch(app -> app.getApplicantNRIC().equals(applicant.getUserNRIC()));
     }
 }

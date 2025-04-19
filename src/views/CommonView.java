@@ -8,7 +8,7 @@ import utils.DateTimeUtils;
 
 public class CommonView {
     private static final Scanner scanner = new Scanner(System.in);
-    private static final String SEPARATOR = "====================================";
+    private static final String SEPARATOR = "=====================================================================";
 
     public static void displayHeader(String title) {
         System.out.println("\n" + SEPARATOR);

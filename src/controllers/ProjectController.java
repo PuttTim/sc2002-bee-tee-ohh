@@ -13,8 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ProjectController {
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
     public static void viewAvailableProjects(Applicant applicant) {
         List<Project> projects = ProjectService.getVisibleProjects();
         ProjectView.displayAvailableProjects(projects);
@@ -92,7 +90,7 @@ public class ProjectController {
 
     public static void viewOfficerRegistrations() {
         List<Project> projects = ProjectService.getAllProjects();
-        ProjectView.displayOfficerRegistrations(projects);
+        // ProjectView.displayOfficerRegistrations(projects);
     }
 
     public static void handleOfficerRegistration(Officer officer, String projectName) {

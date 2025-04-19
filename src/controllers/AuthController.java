@@ -2,6 +2,7 @@ package controllers;
 
 import exceptions.AuthenticationException;
 import models.*;
+import models.enums.Role;
 import services.AuthService;
 import utils.Hash;
 import views.AuthView;
@@ -86,9 +87,16 @@ public class AuthController {
             }
             case OFFICER -> {
                 while (running) {
+
                     switch (AuthView.showOfficerMainMenu()) {
-                        case 1 -> showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
-                        case 2 -> showOfficerMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
+                        case 1 -> {
+                            UserRepository.setUserMode(Role.APPLICANT);
+                            showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
+                        }
+                        case 2 -> {
+                            UserRepository.setUserMode(Role.OFFICER);
+                            showOfficerMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
+                        }
                         case 3 -> handleChangePassword(user);
                         case 4 -> { running = false; }
                         default -> CommonView.displayError("Invalid option. Please try again.");
@@ -139,20 +147,7 @@ public class AuthController {
             int choice = AuthView.showOfficerMenu();
             try {
                 switch (choice) {
-                    case 1 -> {
-//                        List<Filter> filters = FilterView.getFilters();
-//                        List<Project> projects = ProjectService.getProjects(filters);
-                        List<Project> projects = ProjectService.getVisibleProjects();
-                        if (projects.isEmpty()) {
-                            CommonView.displayMessage("No projects available for registration.");
-                            break;
-                        }
-                        ProjectView.displayProjectList(projects);
-                        int projectChoice = CommonView.promptInt("Select project number (or 0 to cancel): ", 0, projects.size());
-                        if (projectChoice > 0) {
-                            OfficerController.registerToHandleProject(officer, projects.get(projectChoice - 1));
-                        }
-                    }
+                    case 1 -> OfficerController.registerToHandleProject(officer);
                     case 2 -> OfficerController.checkHandlerRegistration(officer);
                     case 3 -> OfficerController.viewHandledProjectDetails(officer);
                     case 4 -> OfficerController.manageProjectEnquiries(officer);
@@ -176,9 +171,7 @@ public class AuthController {
                     case 2 -> ProjectController.editProject();
                     case 3 -> ProjectController.deleteProject();
                     case 4 -> ProjectController.toggleProjectVisibility();
-                    case 5 -> {
-                        ProjectController.viewAllProjects();
-                    }
+                    case 5 -> ProjectController.viewAllProjects(); 
                     case 6 -> {
                         String projectName = ProjectView.getProjectName();
                         ProjectController.viewProjectEnquiries(projectName);

@@ -59,23 +59,32 @@ public class ProjectService {
     }
 
     public static List<Project> getVisibleProjects() {
-        Role userRole = UserRepository.getUserRole();
+        User user = UserRepository.getActiveUser();
+        Role userMode;
+        if (user.getRole() == Role.OFFICER) {
+            userMode = UserRepository.getUserMode();
+        } else {
+            userMode = user.getRole();
+        }
 
-        switch (userRole) {
+        switch (userMode) {
             case APPLICANT:
                 return ProjectRepository.getAll().stream()
                     .filter(Project::isVisible)
                     .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime()) 
                         && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
+                    .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
                     .collect(Collectors.toList());
             case OFFICER:
                 return ProjectRepository.getAll().stream()
                     .filter(Project::isVisible)
                     .collect(Collectors.toList());
-            case MANAGER:
-                return ProjectRepository.getAll();
             default:
-                return List.of();
+                if (user.getRole() == Role.MANAGER) {
+                    return ProjectRepository.getAll();
+                } else {
+                    return List.of();
+                }
         }
 
 

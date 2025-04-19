@@ -9,7 +9,7 @@ import java.util.List;
 public class ApplicantController {
 
     public static void newApplication(Applicant applicant) {
-        ApplicantApplicationView.promptApplication(applicant, ProjectRepository.getAll());
+        ApplicantApplicationView.promptApplication(applicant, ProjectService.getVisibleProjects());
     }
 
     public static void viewMyApplications(Applicant applicant) {

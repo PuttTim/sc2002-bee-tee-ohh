@@ -1,5 +1,6 @@
 package repositories;
 
+import models.Officer;
 import models.Registration;
 import models.User;
 import models.enums.RegistrationStatus;
@@ -93,6 +94,7 @@ public class RegistrationRepository {
 
     public static void add(Registration registration) {
         registrations.add(registration);
+        saveAll();
     }
 
     public static Registration getById(String registrationId) {
@@ -102,9 +104,8 @@ public class RegistrationRepository {
             .orElse(null);
     }
 
-    public static List<Registration> getByOfficer(String officerNRIC) {
-        return registrations.stream()
-            .filter(reg -> reg.getOfficer().getUserNRIC().equals(officerNRIC))
+    public static List<Registration> getByOfficer(Officer officer) {
+        return registrations.stream().filter(reg -> reg.getOfficer().getUserNRIC().equals(officer.getUserNRIC()))
             .collect(Collectors.toList());
     }
 

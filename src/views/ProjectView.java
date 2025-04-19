@@ -2,8 +2,13 @@ package views;
 
 import controllers.EnquiryController;
 import models.Applicant;
+import models.Officer;
 import models.Project;
+import models.Registration;
 import models.enums.FlatType;
+import repositories.ApplicationRepository;
+import repositories.ProjectRepository;
+
 import java.util.List;
 
 public class ProjectView {
@@ -70,28 +75,51 @@ public class ProjectView {
         List<FlatType> flatTypes = project.getFlatTypes();
         for (int i = 0; i < flatTypes.size(); i++) {
             CommonView.displayMessage((i + 1) + ". " + flatTypes.get(i));
+            CommonView.displayMessage("   Available Units: " + project.getFlatTypeUnits().get(i));
+            CommonView.displayMessage("   Price: " + project.getFlatTypeSellingPrice().get(i));
         }
     }
 
-    public static void displayOfficerRegistrations(List<Project> projects) {
+    public static void displayOfficerRegistrations(List<Project> projects, List<Registration> officerRegistrations, Officer officer) {
         if (projects.isEmpty()) {
             CommonView.displayMessage("No projects available.");
             return;
         }
 
         CommonView.displayHeader("Projects and their Officer Registrations");
-        for (Project project : projects) {
-            CommonView.displayMessage("\nProject: " + project.getProjectName());
-            List<String> officers = project.getOfficers();
-            if (officers.isEmpty()) {
-                CommonView.displayMessage("No officers registered");
+        for (int i = 0; i < projects.size(); i++) {
+            Project project = projects.get(i);
+            CommonView.displayMessage((i + 1) + ". Project: " + project.getProjectName());
+
+            if (officerRegistrations.stream().anyMatch(r -> r.getProjectID().equals(project.getProjectID()))) {
+                officerRegistrations.stream()
+                        .filter(r -> r.getProjectID().equals(project.getProjectID()) && r.getOfficer().getUserNRIC().equals(officer.getUserNRIC()))
+                        .forEach(r -> CommonView.displayMessage(
+                                "   Status: " + r.getRegistrationStatus() + " AS Officer" +
+                                        "\n      Registration Date: " + r.getRegistrationDate() +
+                                        "\n      Last Updated: " + r.getLastUpdated() +
+                                        "\n      Approved By: " + (r.getApprovedBy() != null ? r.getApprovedBy().getName() : "N/A"
+                                        )));
+                
+            } 
+            else if (ApplicationRepository.getByProject(project.getProjectID()).stream().anyMatch(a -> a.getApplicantNRIC().equals(officer.getUserNRIC()))) {
+                CommonView.displayMessage("   Status: Registered as Applicant");
+            } 
+            else {
+                CommonView.displayMessage("   Status: Not Registered");
+            }
+            CommonView.displayMessage("   Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
+            List<String> officersNames = ProjectRepository.getProjectOfficerNames(project.getProjectID());
+            CommonView.displayMessage("   Available Officer Slots: " + project.getOfficerSlots());
+
+            if (officersNames.isEmpty()) {
+                CommonView.displayMessage("   No officers registered");
             } else {
-                CommonView.displayMessage("Registered Officers:");
-                for (String officerNRIC : officers) {
-                    CommonView.displayMessage("- Officer NRIC: " + officerNRIC);
+                CommonView.displayMessage("   Registered Officers:");
+                for (String name : officersNames) {
+                    CommonView.displayMessage("     - " + name);
                 }
             }
-            CommonView.displayMessage("Available slots: " + project.getOfficerSlots());
             CommonView.displayMessage("----------------------------------------");
         }
     }

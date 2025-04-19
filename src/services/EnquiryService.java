@@ -21,7 +21,6 @@ public class EnquiryService {
         List<Enquiry> filteredEnquiries = new ArrayList<Enquiry>();
 
         for (Enquiry enquiry : enquiries) {
-            System.out.println("Enquiry: " + enquiry.getEnquiryID() + ", Applicant NRIC: " + enquiry.getApplicantNRIC() + ", Applicant NRIC: " + applicant.getUserNRIC());
             if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) {
                 filteredEnquiries.add(enquiry);
             }

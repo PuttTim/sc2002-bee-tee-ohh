@@ -6,7 +6,7 @@ import repositories.OfficerRepository;
 
 public class OfficerService {
     public static boolean hasExistingProject(Officer officer) {
-        return OfficerRepository.hasExistingProject(officer.getUserNRIC());
+        return OfficerRepository.hasExistingProject(officer);
     }
 
     public static boolean hasExistingRegistration(Officer officer) {

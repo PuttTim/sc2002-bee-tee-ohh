@@ -6,6 +6,7 @@ import models.Enquiry;
 import models.Project;
 import repositories.ProjectRepository;
 import repositories.UserRepository;
+import utils.DateTimeUtils;
 
 import java.util.List;
 
@@ -44,13 +45,16 @@ public class EnquiryView {
             Enquiry enquiry = enquiries.get(i);
             Project project = ProjectRepository.getById(enquiry.getProjectID());
 
-            CommonView.displayMessage(String.format("%d. From: %s", i + 1, enquiry.getApplicantNRIC()));
+            CommonView.displayMessage(i + 1 + ". " + "Enquiry ID: " + enquiry.getEnquiryID());
+            CommonView.displayMessage(String.format("   From: %s", UserRepository.getByNRIC(enquiry.getApplicantNRIC()).getName()));
+            CommonView.displayMessage("   Enquiry Date: " + DateTimeUtils.formatDateTime(enquiry.getEnquiryDate()));
             CommonView.displayMessage("   Query: " + enquiry.getQuery());
             CommonView.displayMessage("   Status: " + (enquiry.isResponse() ? "Responded" : "Pending"));
             if (enquiry.isResponse()) {
                 CommonView.displayMessage("   Response: " + enquiry.getResponse());
                 CommonView.displayMessage("   Responded by: " + UserRepository.getByNRIC(enquiry.getResponder()).getName());
             }
+            CommonView.displayMessage("   Last Updated: " + DateTimeUtils.formatDateTime(enquiry.getLastUpdated()));
             CommonView.displayMessage("   Project: " + project.getProjectName());
 
             System.out.println("-----------------------------------");
