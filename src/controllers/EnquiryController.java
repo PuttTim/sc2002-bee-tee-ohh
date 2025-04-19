@@ -1,17 +1,20 @@
 package controllers;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import models.Applicant;
 import models.Project;
 import models.Enquiry;
 import models.Manager;
 import models.Officer;
+
 import repositories.ProjectRepository;
 import services.EnquiryService;
-import views.EnquiryView;
+
 import views.CommonView;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import views.EnquiryView;
 
 public class EnquiryController {
         public static void viewApplicantEnquiries(Applicant applicant) {

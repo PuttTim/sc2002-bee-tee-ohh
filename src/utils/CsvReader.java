@@ -1,15 +1,12 @@
 package utils;
 
+import interfaces.ICsvConfig;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
-
-import interfaces.ICsvConfig;
 
 public class CsvReader {
     private static final Pattern CSV_PATTERN = Pattern.compile(

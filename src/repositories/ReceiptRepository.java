@@ -1,18 +1,16 @@
 package repositories;
 
+import interfaces.ICsvConfig;
+
+import java.io.IOException;
+import java.util.*;
+
 import models.Receipt;
 import models.enums.FlatType;
+
 import utils.CsvReader;
 import utils.CsvWriter;
 import utils.DateTimeUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import interfaces.ICsvConfig;
 
 public class ReceiptRepository {
     private static class ReceiptCsvConfig implements ICsvConfig {

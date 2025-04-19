@@ -1,19 +1,17 @@
 package repositories;
 
+import interfaces.ICsvConfig;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import models.Enquiry;
 import models.enums.EnquiryStatus;
+
 import utils.CsvReader;
 import utils.CsvWriter;
 import utils.DateTimeUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import interfaces.ICsvConfig;
 
 public class EnquiryRepository {
     private static class EnquiryCsvConfig implements ICsvConfig {

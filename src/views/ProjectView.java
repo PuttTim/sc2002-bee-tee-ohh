@@ -1,9 +1,11 @@
 package views;
 
 import controllers.EnquiryController;
+
 import models.Applicant;
 import models.Project;
 import models.enums.FlatType;
+
 import java.util.List;
 
 public class ProjectView {

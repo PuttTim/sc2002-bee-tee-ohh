@@ -1,9 +1,11 @@
 package views;
 
+import interfaces.ICommonView;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
-import interfaces.ICommonView;
+
 import utils.DateTimeUtils;
 
 public class CommonView {

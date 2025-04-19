@@ -1,19 +1,19 @@
 package controllers;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import models.Applicant;
-import models.Project;
 import models.Officer;
+import models.Project;
+
 import services.ProjectService;
+
 import views.ProjectView;
 import views.AuthView;
 import views.CommonView;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class ProjectController {
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static void viewAvailableProjects(Applicant applicant) {
         List<Project> projects = ProjectService.getVisibleProjects();

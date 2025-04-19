@@ -1,8 +1,8 @@
 package interfaces;
 
-import models.Project;
-
 import java.util.List;
+
+import models.Project;
 
 public interface IProjectView {
     public void showProjectList(List<Project> projects);

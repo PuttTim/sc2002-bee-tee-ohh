@@ -1,10 +1,13 @@
 package controllers;
 
-import models.*;
+import java.util.List;
+
+import models.Applicant;
+import models.Project;
+
 import repositories.ProjectRepository;
 import services.ProjectService;
-import views.*;
-import java.util.List;
+import views.ApplicantApplicationView;
 
 public class ApplicantController {
 

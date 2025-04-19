@@ -1,14 +1,14 @@
 package services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import models.Applicant;
 import models.Enquiry;
 import models.Project;
 import models.enums.EnquiryStatus;
-import repositories.EnquiryRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import repositories.EnquiryRepository;
 
 public class EnquiryService {
     public static List<Enquiry> getProjectEnquiries(Project project) {

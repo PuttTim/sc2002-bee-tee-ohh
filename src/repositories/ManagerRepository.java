@@ -1,18 +1,16 @@
 package repositories;
 
-import models.Manager;
-import models.User;
-import utils.CsvReader;
-import utils.CsvWriter;
+import interfaces.ICsvConfig;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import interfaces.ICsvConfig;
+import models.Manager;
+import models.User;
+
+import utils.CsvReader;
+import utils.CsvWriter;
 
 public class ManagerRepository {
     private static class ManagerCsvConfig implements ICsvConfig {

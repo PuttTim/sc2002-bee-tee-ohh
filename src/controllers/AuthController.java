@@ -1,16 +1,18 @@
 package controllers;
 
 import exceptions.AuthenticationException;
+import java.util.List;
 import models.*;
+import repositories.*;
+
 import services.AuthService;
+import services.ProjectService;
+
 import utils.Hash;
+
 import views.AuthView;
 import views.CommonView;
-import views.FilterView;
 import views.ProjectView;
-import repositories.*;
-import services.ProjectService;
-import java.util.List;
 
 public class AuthController {
     private static final String TEST_APPLICANT_NRIC = "S1234567A";

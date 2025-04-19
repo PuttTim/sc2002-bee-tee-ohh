@@ -2,8 +2,11 @@ package controllers;
 
 import models.Officer;
 import models.Project;
-import services.*;
-import views.*;
+
+import services.OfficerService;
+import services.ProjectService;
+
+import views.CommonView;
 
 public class OfficerController {
     //register to join project as officer
