@@ -42,7 +42,7 @@ public class AuthView {
         List<String> options = List.of(
             "Register to Handle Project",
             "Check Registration Status",
-            "View Handled Project Details",
+            "View Handled Projects",
             "Manage Project Enquiries",
             "Process Applications",
             "Generate Receipt"

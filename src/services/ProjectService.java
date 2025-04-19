@@ -153,4 +153,10 @@ public class ProjectService {
             ProjectRepository.saveAll();
         }
     }
+
+    public static List<Project> getAllOfficersProjects(String officerNRIC) {
+        return ProjectRepository.getAll().stream()
+                .filter(p -> p.getOfficers().contains(officerNRIC))
+                .collect(Collectors.toList());
+    }
 }

@@ -89,11 +89,24 @@ public class OfficerController {
 
     //view details of project
     public static void viewHandledProjectDetails(Officer officer) {
-        Project project = ProjectService.getProjectByOfficer(officer);
-        if (project != null) {
+        List<Project> projects = ProjectService.getAllOfficersProjects(officer.getUserNRIC());
+        if (projects != null && !projects.isEmpty()) {
             CommonView.displayHeader("Project Details");
-            ProjectView.displayProjectDetails(project);
-            ProjectController.viewProjectEnquiries(project.getProjectName());
+            OfficerView.displayOfficerHandledProjects(projects);
+
+            int projectChoice = CommonView.promptInt("Select project number to view details (or 0 to cancel): ", 0, projects.size());
+
+            if (projectChoice == 0) {
+                CommonView.displayMessage("Cancelled viewing project details.");
+                return;
+            }
+
+            Project selectedProject = projects.get(projectChoice - 1);
+
+            CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
+            ProjectView.displayProjectDetails(selectedProject);
+            
+
         } else {
             CommonView.displayError("You do not have any projects assigned to you.");
         }
