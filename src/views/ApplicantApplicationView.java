@@ -17,7 +17,6 @@ public class ApplicantApplicationView {
         List<String> options = List.of(
             "View Available Projects",
             "Submit New Application",
-            "Check Application Status",
             "Withdraw Application",
             "Back to Main Menu"
         );
@@ -28,9 +27,8 @@ public class ApplicantApplicationView {
                 switch (choice) {
                     case 1 -> displayEligibleProjects(applicant, projects);
                     case 2 -> promptApplication(applicant, projects);
-                    case 3 -> displayApplicationStatus(applicant);
-                    case 4 -> handleWithdraw(applicant);
-                    case 5 -> {
+                    case 3 -> handleWithdraw(applicant);
+                    case 4 -> {
                         return;
                     }
                 }

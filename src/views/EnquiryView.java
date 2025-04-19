@@ -14,7 +14,6 @@ import java.util.List;
 public class EnquiryView {
     public static void showEnquiryMenu(Applicant applicant) {
         List<String> options = List.of(
-                "View My Enquiries",
                 "Create New Enquiry",
                 "Edit Enquiry",
                 "Delete Enquiry",
@@ -25,11 +24,10 @@ public class EnquiryView {
             int choice = CommonView.displayMenu("Enquiry Menu", options);
             try {
                 switch (choice) {
-                    case 1 -> EnquiryController.viewApplicantEnquiries(applicant);
-                    case 2 -> EnquiryController.createNewEnquiry(applicant);
-                    case 3 -> EnquiryController.editEnquiry(applicant);
-                    case 4 -> EnquiryController.deleteEnquiry(applicant);
-                    case 5 -> {
+                    case 1 -> EnquiryController.createNewEnquiry(applicant);
+                    case 2 -> EnquiryController.editEnquiry(applicant);
+                    case 3 -> EnquiryController.deleteEnquiry(applicant);
+                    case 4 -> {
                         return;
                     }
                 }
