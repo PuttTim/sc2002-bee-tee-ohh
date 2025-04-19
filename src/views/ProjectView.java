@@ -15,12 +15,11 @@ public class ProjectView {
     public static void showProjectMenu(Applicant applicant, List<Project> projects) {
         List<String> options = List.of(
                 "View Project Details",
-                "Create New Enquiry",
-                "Back to Main Menu"
+                "Create New Enquiry"
         );
 
         while (true) {
-            int choice = CommonView.displayMenu("Project Menu", options);
+            int choice = CommonView.displayMenuWithBacking("Project Menu", options);
             try {
                 switch (choice) {
                     case 1 -> {
@@ -31,7 +30,7 @@ public class ProjectView {
                         }
                     }
                     case 2 -> EnquiryController.createNewEnquiry(applicant);
-                    case 3 -> {
+                    case 0 -> {
                         return;
                     }
                 }
@@ -60,7 +59,6 @@ public class ProjectView {
             return;
         }
 
-        CommonView.displayHeader("Available Projects");
         for (Project project : projects) {
             displayProjectDetails(project);
             CommonView.displayMessage("----------------------------------------");
@@ -74,7 +72,23 @@ public class ProjectView {
         CommonView.displayMessage("Available Flat Types:");
         List<FlatType> flatTypes = project.getFlatTypes();
         for (int i = 0; i < flatTypes.size(); i++) {
-            CommonView.displayMessage((i + 1) + ". " + flatTypes.get(i));
+            CommonView.displayMessage((i + 1) + ". " + flatTypes.get(i).getDescription());
+            CommonView.displayMessage("   Available Units: " + project.getFlatTypeUnits().get(i));
+            CommonView.displayMessage("   Price: " + project.getFlatTypeSellingPrice().get(i));
+        }
+    }
+
+    public static void displayProjectDetailsOfficerView(Project project) {
+        // TODO update this with more details for the officer to see, 
+        // maybe how many people applied for each unit type, how many officers are there, 
+        // how many officers slots are remaining and who is the manager of the project (name)
+        CommonView.displayMessage("Project Name: " + project.getProjectName());
+        CommonView.displayMessage("Location: " + project.getLocation());
+        CommonView.displayMessage("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
+        CommonView.displayMessage("Available Flat Types:");
+        List<FlatType> flatTypes = project.getFlatTypes();
+        for (int i = 0; i < flatTypes.size(); i++) {
+            CommonView.displayMessage((i + 1) + ". " + flatTypes.get(i).getDescription());
             CommonView.displayMessage("   Available Units: " + project.getFlatTypeUnits().get(i));
             CommonView.displayMessage("   Price: " + project.getFlatTypeSellingPrice().get(i));
         }

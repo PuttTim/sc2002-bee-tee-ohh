@@ -91,21 +91,40 @@ public class OfficerController {
     public static void viewHandledProjectDetails(Officer officer) {
         List<Project> projects = ProjectService.getAllOfficersProjects(officer.getUserNRIC());
         if (projects != null && !projects.isEmpty()) {
-            CommonView.displayHeader("Project Details");
-            OfficerView.displayOfficerHandledProjects(projects);
+            boolean running = true;
+            while (running) {
+                CommonView.displayHeader("Project Details");
+                OfficerView.displayOfficerHandledProjects(projects);
 
-            int projectChoice = CommonView.promptInt("Select project number to view details (or 0 to cancel): ", 0, projects.size());
+                int projectChoice = CommonView.promptInt("Select project number to view details (or 0 to cancel): ", 0, projects.size());
 
-            if (projectChoice == 0) {
-                CommonView.displayMessage("Cancelled viewing project details.");
-                return;
-            }
+                if (projectChoice == 0) {
+                    CommonView.displayMessage("Cancelled viewing project details.");
+                    return;
+                }
 
-            Project selectedProject = projects.get(projectChoice - 1);
+                Project selectedProject = projects.get(projectChoice - 1);
 
-            CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
-            ProjectView.displayProjectDetails(selectedProject);
-            
+                CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
+                ProjectView.displayProjectDetailsOfficerView(selectedProject);
+
+                int choice = OfficerView.showSelectHandledProjectMenu(selectedProject);
+
+                switch (choice) {
+                    case 1 -> {
+                        // View applications
+                        // ApplicationView.displayApplications(selectedProject);
+                    }
+                    case 2 -> {
+                        // View enquiries
+                        // manageProjectEnquiries(officer);
+                    }
+                    case 0 -> {
+                        CommonView.displayMessage("Cancelled viewing project details.");
+                        break;
+                    }
+                }
+            }         
 
         } else {
             CommonView.displayError("You do not have any projects assigned to you.");

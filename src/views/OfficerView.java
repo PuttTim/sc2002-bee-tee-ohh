@@ -10,20 +10,15 @@ import utils.DateTimeUtils;
 import java.util.List;
 
 public class OfficerView {
-    public static void showSelectHandledProject(List<Project> projects) {
-        CommonView.displayHeader("Select Project to Handle");
+    public static int showSelectHandledProjectMenu(Project projects) {
+        List<String> options = List.of(
+                "View Applications",
+                "View Enquiries"
+                );
+        
+        int choice = CommonView.displayMenuWithBacking("Select Officer Operation", options);
 
-        if (projects.isEmpty()) {
-            System.out.println("No projects available for handling.");
-            return;
-        }
-
-        for (int i = 0; i < projects.size(); i++) {
-            Project project = projects.get(i);
-            CommonView.displayMessage((i + 1) + ". " + project.getProjectName() + " (ID: " + project.getProjectID() + ")");
-        }
-
-        CommonView.displayMessage("0. Back to Main Menu");
+        return choice;
     }
 
     public static void displayOfficerHandledProjects(List<Project> projects) {

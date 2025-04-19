@@ -89,9 +89,9 @@ public class AuthView {
     }
 
     public static void showChangePasswordHeader() {
-        CommonView.displayHeader("Change Password");
+        CommonView.displayHeader("Change Password (0 to cancel)");
     }
-
+    
     public static String getProjectName() {
         return CommonView.prompt("Enter project name: ");
     }

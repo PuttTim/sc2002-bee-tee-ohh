@@ -15,6 +15,7 @@ import java.util.List;
 public class ProjectController {
     public static void viewAvailableProjects(Applicant applicant) {
         List<Project> projects = ProjectService.getVisibleProjects();
+        CommonView.displayHeader("Available Projects");
         ProjectView.displayAvailableProjects(projects);
         ProjectView.showProjectMenu(applicant, projects);
     }
@@ -76,6 +77,7 @@ public class ProjectController {
 
     public static void viewAllProjects() {
         List<Project> projects = ProjectService.getAllProjects();
+        CommonView.displayHeader("Available Projects");
         ProjectView.displayAvailableProjects(projects);
     }
 

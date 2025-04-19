@@ -45,14 +45,7 @@ public class ApplicantApplicationView {
         }
 
         CommonView.displayHeader("Eligible Projects");
-        for (int i = 0; i < eligibleProjects.size(); i++) {
-            Project project = eligibleProjects.get(i);
-            CommonView.displayMessage(String.format("%d. %s (Location: %s)", 
-                i + 1, project.getProjectName(), project.getLocation()));
-            CommonView.displayMessage("   Application Period: " + 
-                DateTimeUtils.formatDateTime(project.getApplicationOpenDate()) +
-                " to " + DateTimeUtils.formatDateTime(project.getApplicationCloseDate()));
-        }
+        ProjectView.displayAvailableProjects(eligibleProjects);
     }
 
     public static void promptApplication(Applicant applicant, List<Project> allProjects) {
@@ -70,7 +63,7 @@ public class ApplicantApplicationView {
         CommonView.displayHeader("Available Flat Types");
         List<FlatType> flatTypes = selectedProject.getFlatTypes();
         for (int i = 0; i < flatTypes.size(); i++) {
-            CommonView.displayMessage(String.format("%d. %s", i + 1, flatTypes.get(i)));
+            CommonView.displayMessage(String.format("%d. %s", i + 1, flatTypes.get(i).getDescription()));
         }
 
         int flatTypeChoice = CommonView.promptInt("Select a flat type number: ", 1, flatTypes.size());
