@@ -10,7 +10,17 @@ import utils.DateTimeUtils;
 
 import java.util.List;
 
+/**
+ * A view class responsible for handling the display and user interactions related to enquiries.
+ */
 public class EnquiryView {
+
+    /**
+     * Displays the enquiry menu for the applicant.
+     * The enquiry menu has options to create, edit, or delete enquiries.
+     *
+     * @param applicant the applicant whose enquiries are being managed
+     */
     public static void showEnquiryMenu(Applicant applicant) {
         List<String> options = List.of(
                 "Create New Enquiry",
@@ -34,6 +44,11 @@ public class EnquiryView {
         }
     }
 
+    /**
+     * Displays a list of enquiries for the applicant.
+     *
+     * @param enquiries the list of enquiries to display
+     */
     public static void displayEnquiryList(List<Enquiry> enquiries) {
         if (enquiries.isEmpty()) {
             displayEmptyMessage();
@@ -62,6 +77,11 @@ public class EnquiryView {
         }
     }
 
+    /**
+     * Displays the details of a specific enquiry.
+     *
+     * @param enquiry the enquiry to display
+     */
     public static void displayEnquiry(Enquiry enquiry) {
         CommonView.displayHeader("Enquiry Details");
         CommonView.displayMessage("Enquiry ID: " + enquiry.getEnquiryID());
@@ -76,6 +96,14 @@ public class EnquiryView {
         }
     }
 
+    /**
+     * Prompts the applicant to provide input for a new enquiry.
+     *
+     * @param applicantNric the NRIC of the applicant
+     * @param projects the list of available projects to choose from
+     * @return a new enquiry object if valid input is provided,
+     * otherwise <code>null</code>
+     */
     public static Enquiry getEnquiryInput(String applicantNric, List<Project> projects) {
         if (projects.isEmpty()) {
             CommonView.displayMessage("No projects available for enquiry.");
@@ -101,30 +129,58 @@ public class EnquiryView {
         return new Enquiry(applicantNric, selectedProject.getProjectID(), query);
     }
 
+    /**
+     * Prompts the user to select an enquiry to edit or delete.
+     *
+     * @param action the action to be performed, edit or delete
+     * @param size the total number of enquiries
+     * @return the index of the selected enquiry to edit or delete
+     */
     public static int getEnquiryToEditOrDelete(String action, int size) {
         int choice = CommonView.promptInt(
-            String.format("Enter the number of the enquiry to %s (1-%d) or 0 to cancel: ", action, size),
-            0, size);
+                String.format("Enter the number of the enquiry to %s (1-%d) or 0 to cancel: ", action, size),
+                0, size);
         return choice - 1;
     }
 
+    /**
+     * Prompts the user to enter the updated contents for an enquiry.
+     *
+     * @return the updated contents of the enquiry or <code>null</code>, if the user cancels
+     */
     public static String getUpdatedContents() {
         String content = CommonView.prompt("Enter your updated enquiry (or press Enter to cancel): ");
         return content.isEmpty() ? null : content;
     }
 
+    /**
+     * Displays a message when there are no enquiries available.
+     */
     public static void displayEmptyMessage() {
         CommonView.displayMessage("No enquiries available.");
     }
 
+    /**
+     * Displays a success message when an enquiry has been created.
+     */
     public static void displayEnquiryCreatedMessage() {
         displaySuccess("Enquiry created successfully.");
     }
 
+    /**
+     * Displays a success message.
+     *
+     * @param message the success message to display
+     */
     public static void displaySuccess(String message) {
         CommonView.displaySuccess(message);
     }
 
+    /**
+     * Displays an error message.
+     *
+     * @param message the error message to display
+     */
     public static void displayError(String message) {
         CommonView.displayError(message);
     }

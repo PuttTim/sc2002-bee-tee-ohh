@@ -9,14 +9,24 @@ import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 import java.util.List;
 
+/**
+ * A view class that handles display and interaction for an applicant's application process.
+ */
 public class ApplicantApplicationView {
+
+    /**
+     * Displays the application menu for the applicant.
+     *
+     * @param applicant the current applicant viewing the menu
+     * @param projects a list of available projects for the applicant to view
+     */
     public static void showApplicationMenu(Applicant applicant, List<Project> projects) {
         List<String> options = List.of(
-            "View Available Projects",
-            "Submit New Application",
-            "Check Application Status",
-            "Withdraw Application",
-            "Back to Main Menu"
+                "View Available Projects",
+                "Submit New Application",
+                "Check Application Status",
+                "Withdraw Application",
+                "Back to Main Menu"
         );
 
         while (true) {
@@ -37,6 +47,12 @@ public class ApplicantApplicationView {
         }
     }
 
+    /**
+     * Displays a list of projects that the applicant is eligible for.
+     *
+     * @param applicant the current applicant
+     * @param allProjects the list of all available projects
+     */
     public static void displayEligibleProjects(User applicant, List<Project> allProjects) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
         if (eligibleProjects.isEmpty()) {
@@ -48,6 +64,12 @@ public class ApplicantApplicationView {
         ProjectView.displayAvailableProjects(eligibleProjects);
     }
 
+    /**
+     * Prompts the applicant to submit a new application for a selected project.
+     *
+     * @param applicant the current applicant
+     * @param allProjects the list of all available projects
+     */
     public static void promptApplication(Applicant applicant, List<Project> allProjects) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
         if (eligibleProjects.isEmpty()) {
@@ -76,6 +98,11 @@ public class ApplicantApplicationView {
         }
     }
 
+    /**
+     * Displays the current application status for the applicant.
+     *
+     * @param applicant the current applicant
+     */
     public static void displayApplicationStatus(Applicant applicant) {
         List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
         if (applications.isEmpty()) {
@@ -100,6 +127,11 @@ public class ApplicantApplicationView {
         }
     }
 
+    /**
+     * Handles the withdrawal of an active application by the applicant.
+     *
+     * @param applicant the current applicant
+     */
     public static void handleWithdraw(Applicant applicant) {
         List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
         if (applications.isEmpty()) {
@@ -112,10 +144,10 @@ public class ApplicantApplicationView {
         for (int i = 0; i < applications.size(); i++) {
             Application app = applications.get(i);
             if (app.getApplicationStatus() == ApplicationStatus.PENDING) {
-                CommonView.displayMessage(String.format("%d. Project: %s, Flat Type: %s", 
-                    i + 1, 
-                    ProjectRepository.getById(app.getProjectId()).getProjectName(),
-                    app.getSelectedFlatType()));
+                CommonView.displayMessage(String.format("%d. Project: %s, Flat Type: %s",
+                        i + 1,
+                        ProjectRepository.getById(app.getProjectId()).getProjectName(),
+                        app.getSelectedFlatType()));
                 activeCount++;
             }
         }
@@ -133,6 +165,12 @@ public class ApplicantApplicationView {
         }
     }
 
+    /**
+     * Converts an application status to a displayable string.
+     *
+     * @param status the application status
+     * @return a string representing the application status
+     */
     private static String getStatusDisplay(ApplicationStatus status) {
         return switch (status) {
             case PENDING -> "Pending";
