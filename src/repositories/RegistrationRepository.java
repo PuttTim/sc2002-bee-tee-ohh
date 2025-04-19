@@ -35,7 +35,6 @@ public class RegistrationRepository {
         @Override
         public List<String> getHeaders() {
             return List.of("RegistrationID", "OfficerNRIC", "ProjectID", "RegistrationStatus",
-                          "RegistrationDate", "LastUpdated", "ApprovedBy");
                     "RegistrationDate", "LastUpdated", "ApprovedBy");
         }
     }
