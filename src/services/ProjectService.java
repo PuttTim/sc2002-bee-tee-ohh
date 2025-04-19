@@ -15,7 +15,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Service class various project-related services such as:
+ * <ul>
+ *     <li>Filtering</li>
+ *     <li>Visibility management</li>
+ *     <li>Creation</li>
+ *     <li>Updates</li>
+ *     <li>Officer assignment</li>
+ * </ul>
+ */
 public class ProjectService {
+    /**
+     * Returns a list of projects that match the filters.
+     *
+     * @param filters the list of filters to apply
+     * @return a list of filtered projects
+     */
     public static List<Project> getProjects(List<Filter> filters) {
         Stream<Project> projectStream = ProjectRepository.getAll().stream();
 
@@ -54,10 +70,20 @@ public class ProjectService {
         };
     }
 
+    /**
+     * Returns all projects from the repository.
+     *
+     * @return a list of all projects
+     */
     public static List<Project> getAllProjects() {
         return ProjectRepository.getAll();
     }
 
+    /**
+     * Returns a list of visible projects based on the current user's role and mode.
+     *
+     * @return the list of visible projects
+     */
     public static List<Project> getVisibleProjects() {
         User user = UserRepository.getActiveUser();
         Role userMode;
@@ -70,15 +96,15 @@ public class ProjectService {
         switch (userMode) {
             case APPLICANT:
                 return ProjectRepository.getAll().stream()
-                    .filter(Project::isVisible)
-                    .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime()) 
-                        && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
-                    .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
-                    .collect(Collectors.toList());
+                        .filter(Project::isVisible)
+                        .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime())
+                                && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
+                        .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
+                        .collect(Collectors.toList());
             case OFFICER:
                 return ProjectRepository.getAll().stream()
-                    .filter(Project::isVisible)
-                    .collect(Collectors.toList());
+                        .filter(Project::isVisible)
+                        .collect(Collectors.toList());
             default:
                 if (user.getRole() == Role.MANAGER) {
                     return ProjectRepository.getAll();
@@ -86,15 +112,24 @@ public class ProjectService {
                     return List.of();
                 }
         }
-
-
-
     }
 
+    /**
+     * Finds and returns a project by its name.
+     *
+     * @param projectName the name of the project
+     * @return the project with the given name, or <code>null</code> if not found
+     */
     public static Project getProjectByName(String projectName) {
         return ProjectRepository.getByName(projectName);
     }
 
+    /**
+     * Returns the project that an officer is currently assigned to.
+     *
+     * @param officer the officer to search by
+     * @return the assigned project, or <code>null</code> if none found
+     */
     public static Project getProjectByOfficer(Officer officer) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getOfficers().contains(officer.getUserNRIC()))
@@ -102,23 +137,48 @@ public class ProjectService {
                 .orElse(null);
     }
 
-    public static void createProject(String projectId, String managerNRIC, String projectName, 
-            String location, LocalDateTime startDate, LocalDateTime endDate, 
-            int officerSlots, boolean visible) {
+    /**
+     * Creates a new project and saves it to the repository.
+     *
+     * @param projectId the ID of the project
+     * @param managerNRIC the manager's NRIC
+     * @param projectName the name of the project
+     * @param location the location of the project
+     * @param startDate the start date for applications
+     * @param endDate the end date for applications
+     * @param officerSlots the number of officer slots
+     * @param visible if the project is visible or not
+     */
+    public static void createProject(String projectId, String managerNRIC, String projectName,
+                                     String location, LocalDateTime startDate, LocalDateTime endDate,
+                                     int officerSlots, boolean visible) {
         Project newProject = new Project(projectId, managerNRIC, projectName, location,
                 startDate, endDate, officerSlots, visible);
         ProjectRepository.add(newProject);
         ProjectRepository.saveAll();
     }
 
-    public static void updateProject(Project project, String location, 
-            LocalDateTime startDate, LocalDateTime endDate) {
+    /**
+     * Updates an existing project's location and application dates.
+     *
+     * @param project the project to update
+     * @param location the new location
+     * @param startDate the new application start date
+     * @param endDate the new application end date
+     */
+    public static void updateProject(Project project, String location,
+                                     LocalDateTime startDate, LocalDateTime endDate) {
         project.setLocation(location);
         project.setApplicationOpenDate(startDate);
         project.setApplicationCloseDate(endDate);
         ProjectRepository.saveAll();
     }
 
+    /**
+     * Deletes a project by name.
+     *
+     * @param projectName the name of the project to delete
+     */
     public static void deleteProject(String projectName) {
         Project project = getProjectByName(projectName);
         if (project != null) {
@@ -127,6 +187,12 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Toggles the visibility of a project.
+     *
+     * @param projectName the name of the project
+     * @param visible the new visibility status
+     */
     public static void toggleProjectVisibility(String projectName, boolean visible) {
         Project project = getProjectByName(projectName);
         if (project != null) {
@@ -135,10 +201,22 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Checks if a project has available officer slots.
+     *
+     * @param project the project to check for available officer slots
+     * @return <code>true</code> if there are officer slots available
+     */
     public static boolean hasOfficerSlots(Project project) {
         return project != null && project.getOfficerSlots() > 0;
     }
 
+    /**
+     * Assigns an officer to a project and reduces the available officer slots.
+     *
+     * @param project the project to assign the officer to
+     * @param officerNRIC the officer's NRIC
+     */
     public static void addOfficerToProject(Project project, String officerNRIC) {
         if (project != null && !project.getOfficers().contains(officerNRIC)) {
             project.addOfficer(officerNRIC);
@@ -147,6 +225,12 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Removes an officer from a project.
+     *
+     * @param project the project to remove the officer from
+     * @param officerNRIC the officer's NRIC
+     */
     public static void removeOfficerFromProject(Project project, String officerNRIC) {
         if (project != null && project.getOfficers().contains(officerNRIC)) {
             project.removeOfficer(officerNRIC);
@@ -154,9 +238,16 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Returns all projects that the specified officer is involved in.
+     *
+     * @param officerNRIC the officer's NRIC
+     * @return a list of projects that the officer is involved in
+     */
     public static List<Project> getAllOfficersProjects(String officerNRIC) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getOfficers().contains(officerNRIC))
                 .collect(Collectors.toList());
     }
+
 }
