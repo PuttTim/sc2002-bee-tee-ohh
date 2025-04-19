@@ -1,7 +1,7 @@
 package utils;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class DateTimeUtils {
     private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -41,7 +41,7 @@ public class DateTimeUtils {
     public static LocalDateTime getCurrentDateTime() {
         LocalDateTime now = LocalDateTime.now(
             java.time.ZoneId.of("Asia/Singapore")
-            
+
         );
         return now;
     }

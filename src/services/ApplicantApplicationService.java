@@ -1,11 +1,13 @@
 package services;
 
-import models.*;
-import models.enums.*;
-import repositories.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import models.*;
+import models.enums.*;
+
+import repositories.*;
 
 public class ApplicantApplicationService {
     public static List<Project> getEligibleProjects(User user, List<Project> allProjects) {

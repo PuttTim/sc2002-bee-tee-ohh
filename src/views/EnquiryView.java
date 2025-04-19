@@ -1,9 +1,11 @@
 package views;
 
 import controllers.EnquiryController;
+
 import models.Applicant;
 import models.Enquiry;
 import models.Project;
+
 import repositories.ProjectRepository;
 import repositories.UserRepository;
 import utils.DateTimeUtils;
@@ -26,7 +28,9 @@ public class EnquiryView {
                     case 1 -> EnquiryController.createNewEnquiry(applicant);
                     case 2 -> EnquiryController.editEnquiry(applicant);
                     case 3 -> EnquiryController.deleteEnquiry(applicant);
-                    case 4 -> {return;}
+                    case 4 -> {
+                        return;
+                    }
                 }
             } catch (Exception e) {
                 EnquiryView.displayError(e.getMessage());

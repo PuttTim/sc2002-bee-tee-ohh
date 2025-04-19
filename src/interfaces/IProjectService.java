@@ -1,9 +1,9 @@
 package interfaces;
 
+import java.util.List;
+
 import models.Officer;
 import models.Project;
-
-import java.util.List;
 
 public interface IProjectService {
     public boolean hasOfficerSlots(Project project);

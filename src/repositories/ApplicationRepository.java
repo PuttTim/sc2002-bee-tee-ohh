@@ -7,14 +7,12 @@ import models.enums.FlatType;
 import utils.CsvReader;
 import utils.CsvWriter;
 import utils.DateTimeUtils;
+import interfaces.ICsvConfig;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import interfaces.ICsvConfig;
-
 public class ApplicationRepository {
     private static class ApplicationCsvConfig implements ICsvConfig {
         @Override

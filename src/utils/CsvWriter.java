@@ -1,12 +1,12 @@
 package utils;
 
+import interfaces.ICsvConfig;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import interfaces.ICsvConfig;
 
 public class CsvWriter {
     public static void write(ICsvConfig config, List<Map<String, String>> records) throws IOException {

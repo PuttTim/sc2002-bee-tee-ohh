@@ -1,19 +1,16 @@
 package repositories;
 
-import models.Officer;
-import models.User;
-import utils.CsvReader;
-import utils.CsvWriter;
+import interfaces.ICsvConfig;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import interfaces.ICsvConfig;
+import models.Officer;
+import models.User;
+
+import utils.CsvReader;
+import utils.CsvWriter;
 
 public class OfficerRepository {
     private static class OfficerCsvConfig implements ICsvConfig {

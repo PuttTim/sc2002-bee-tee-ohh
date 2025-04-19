@@ -1,18 +1,16 @@
 package repositories;
 
+import interfaces.ICsvConfig;
+
+import java.io.IOException;
+import java.util.*;
+
 import models.User;
 import models.enums.MaritalStatus;
 import models.enums.Role;
+
 import utils.CsvReader;
 import utils.CsvWriter;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import interfaces.ICsvConfig;
 
 public class UserRepository {
     private static class UserCsvConfig implements ICsvConfig {
@@ -121,7 +119,6 @@ public class UserRepository {
         }
     }
 
-    
     public static Role getUserRole() {
         
         if (activeUser != null) {

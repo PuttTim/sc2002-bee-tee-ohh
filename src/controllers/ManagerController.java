@@ -1,13 +1,10 @@
 package controllers;
 
-import models.*;
-import models.enums.MaritalStatus;
+import models.Project;
 import repositories.OfficerRepository;
 import views.CommonView;
-import java.util.Scanner;
 
 public class ManagerController {
-    private static final Scanner scanner = new Scanner(System.in);
 
     public static void viewOfficerRegistrations() {
         ProjectController.viewOfficerRegistrations();

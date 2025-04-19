@@ -1,7 +1,6 @@
 package models;
 
 import java.util.List;
-
 import models.enums.MaritalStatus;
 import models.enums.Role;
 

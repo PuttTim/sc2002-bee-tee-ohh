@@ -1,16 +1,10 @@
 package views;
 
-import controllers.ApplicantController;
-import controllers.EnquiryController;
-import controllers.ProjectController;
-import models.Filter;
-
 import java.util.*;
 
 public class FilterView {
     private static final List<String> LOCATION_OPTIONS = List.of("Jurong West", "Tampines", "Woodlands", "Yishun", "Punggol");
     private static final List<String> FLAT_TYPE_OPTIONS = List.of("2-Room Flexi", "3-Room", "4-Room", "5-Room", "Executive");
-
 
     public Map<String, Set<String>> selectProjectFilters() {
         Map<String, Set<String>> activeFilters = new HashMap<>();

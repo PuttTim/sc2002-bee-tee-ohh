@@ -14,6 +14,11 @@ import repositories.RegistrationRepository;
 import services.*;
 import views.*;
 
+import services.OfficerService;
+import services.ProjectService;
+
+import views.CommonView;
+
 public class OfficerController {
     //register to join project as officer
     public static void registerToHandleProject(Officer officer) {

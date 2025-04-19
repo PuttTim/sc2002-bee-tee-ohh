@@ -1,19 +1,21 @@
 package services;
 
-import models.Filter;
-import models.Project;
-import models.Officer;
-import models.enums.FlatType;
-import models.User;
-import models.enums.Role;
-import repositories.ProjectRepository;
-import repositories.UserRepository;
-import utils.DateTimeUtils;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import models.Filter;
+import models.Project;
+import models.Officer;
+import models.enums.FlatType;
+import models.enums.Role;
+
+import repositories.ProjectRepository;
+import repositories.UserRepository;
+
+import utils.DateTimeUtils;
+
 
 public class ProjectService {
     public static List<Project> getProjects(List<Filter> filters) {
@@ -71,7 +73,7 @@ public class ProjectService {
             case APPLICANT:
                 return ProjectRepository.getAll().stream()
                     .filter(Project::isVisible)
-                    .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime()) 
+                    .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime())
                         && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
                     .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
                     .collect(Collectors.toList());
