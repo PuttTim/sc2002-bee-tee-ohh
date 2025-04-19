@@ -13,13 +13,34 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class to handle enquiry processes.
+ * <p>Enquiry processes include:</p>
+ * <ul>
+ *     <li>Displaying lists of existing enquiries</li>
+ *     <li>Creating new enquiries</li>
+ *     <li>Deleting existing enquiries</li>
+ *     <li>Editing existing enquiries</li>
+ *     <li>Managing enquiries, by an officer/manager</li>
+ * </ul>
+ */
 public class EnquiryController {
+    /**
+     * Displays the list of enquiries made by the applicant.
+     *
+     * @param applicant the applicant whose enquiries are to be displayed.
+     */
         public static void viewApplicantEnquiries(Applicant applicant) {
         List<Enquiry> enquiries = EnquiryService.getEnquiriesByApplicant(applicant);
         EnquiryView.displayEnquiryList(enquiries);
         EnquiryView.showEnquiryMenu(applicant);
     }
 
+    /**
+     * Allows the applicant to create a new enquiry for visible projects.
+     *
+     * @param applicant the applicant who is creating the new enquiry.
+     */
     public static void createNewEnquiry(Applicant applicant) {
         List<Project> availableProjects = ProjectRepository.getAll().stream()
                 .filter(Project::isVisible)
@@ -32,6 +53,11 @@ public class EnquiryController {
         }
     }
 
+    /**
+     * Allows the applicant to edit an existing enquiry.
+     *
+     * @param applicant the applicant whose enquiry is to be edited.
+     */
     public static void editEnquiry(Applicant applicant) {
         List<Enquiry> existingEnquiries = EnquiryService.getEnquiriesByApplicant(applicant);
         if (existingEnquiries.isEmpty()) {
@@ -54,6 +80,11 @@ public class EnquiryController {
         }
     }
 
+    /**
+     * Allows the applicant to delete an existing enquiry.
+     *
+     * @param applicant the applicant whose enquiry is to be deleted.
+     */
     public static void deleteEnquiry(Applicant applicant) {
         List<Enquiry> enquiriesToDelete = EnquiryService.getEnquiriesByApplicant(applicant);
         if (enquiriesToDelete.isEmpty()) {
@@ -72,11 +103,23 @@ public class EnquiryController {
         }
     }
 
+    /**
+     * Allows the enquiries made about a specific project to be viewed.
+     *
+     * @param project the project which enquiries are to be displayed.
+     */
     public static void viewProjectEnquiries(Project project) {
         List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
         EnquiryView.displayEnquiryList(enquiries);
     }
 
+    /**
+     * Allows an officer or a manager to manage enquiries made about a specific project.
+     *
+     * @param officer an (optional) officer managing the project.
+     * @param manager an (optional) manager managing the project.
+     * @param project the project which enquiries are being managed by an officer or a manager.
+     */
     public static void manageProjectEnquiries(Optional<Officer> officer, Optional<Manager> manager, Project project) {
         String nric = officer.map(Officer::getUserNRIC).orElse(manager.map(Manager::getUserNRIC).orElse(null));
 

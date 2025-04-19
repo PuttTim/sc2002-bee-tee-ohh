@@ -14,8 +14,22 @@ import repositories.RegistrationRepository;
 import services.*;
 import views.*;
 
+/**
+ * Controller class that is responsible to handle officer-related actions.
+ * <p>Officer-related actions include:</p>
+ * <ul>
+ *     <li>Registering to handle a project</li>
+ *     <li>Viewing an assigned project's details</li>
+ *     <li>Managing enquiries related to their assigned project</li>
+ *     <li>Checking the status of the registration to a project</li>
+ * </ul>
+ */
 public class OfficerController {
-    //register to join project as officer
+    /**
+     * Allows an officer to register to handle a specific project.
+     *
+     * @param officer the officer who is registering for a specific project.
+     */
     public static void registerToHandleProject(Officer officer) {
         List<Project> projects = ProjectService.getVisibleProjects();
         List<Registration> officerRegistrations = RegistrationRepository.getByOfficer(officer);
@@ -74,6 +88,11 @@ public class OfficerController {
         }
     }
 
+    /**
+     * Checks and displays an officer's current assigned project or current registration to a project.
+     *
+     * @param officer the officer who is checking their project or registration status.
+     */
     public static void checkHandlerRegistration(Officer officer) {
         if (OfficerRepository.hasExistingProject(officer)) {
             Project project = ProjectService.getProjectByOfficer(officer);
@@ -87,7 +106,12 @@ public class OfficerController {
         }
     }
 
-    //view details of project
+    /**
+     * Displays the details of projects an officer has been assigned to handle.
+     * An officer can view more information, or navigate to other options.
+     *
+     * @param officer the officer viewing the details of the handled project.
+     */
     public static void viewHandledProjectDetails(Officer officer) {
         List<Project> projects = ProjectService.getAllOfficersProjects(officer.getUserNRIC());
         if (projects != null && !projects.isEmpty()) {
@@ -131,7 +155,12 @@ public class OfficerController {
         }
     }
 
-    //view and reply to enquiries
+    /**
+     * Allows an officer to manage enquiries about the project they are handling.
+     * The officer can view and respond to enquiries.
+     *
+     * @param officer the officer managing enquiries for the handled project.
+     */
     public static void manageProjectEnquiries(Officer officer) {
         Project project = ProjectService.getProjectByOfficer(officer);
         if (project != null) {
@@ -141,12 +170,16 @@ public class OfficerController {
         }
     }
 
-    //help select flat
+    /**
+     * Placeholder. Handles flat selection process for applicants.
+     */
     public static void processApplication() {
         //TODO
     }
 
-    //generate receipt
+    /**
+     * Placeholder. Generates a receipt related to a project or an application.
+     */
     public static void generateReceipt() {
         //TODO
     }

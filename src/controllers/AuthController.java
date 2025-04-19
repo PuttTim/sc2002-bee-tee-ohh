@@ -13,12 +13,29 @@ import repositories.*;
 import services.ProjectService;
 import java.util.List;
 
+/**
+ * Controller class to handle authentication processes.
+ * <p>Authentication processes include:</p>
+ * <ul>
+ *     <li>User login</li>
+ *     <li>Navigation based on roles</li>
+ *     <li>Password management</li>
+ * </ul>
+ */
 public class AuthController {
     private static final String TEST_APPLICANT_NRIC = "S1234567A";
     private static final String TEST_OFFICER_NRIC = "S2345678B";
     private static final String TEST_MANAGER_NRIC = "S6789012F";
     private static final String TEST_PASSWORD = "password";
 
+    /**
+     * Runs the authentication process.
+     * <ul>
+     *     <li>Handles the login process</li>
+     *     <li>Prompts the user for login credentials like the user's NRIC and password</li>
+     *     <li>Testing mode included for predefined users</li>
+     * </ul>
+     */
     public static void runAuthentication() {
         while (true) {
             AuthView.displayLoginHeader();
@@ -49,6 +66,9 @@ public class AuthController {
         }
     }
 
+    /**
+     * Handles login for predefined users, for testing purposes.
+     */
     private static void handleTestLogin() {
         int choice = AuthView.showTestUserOptions();
         String nric;
@@ -72,6 +92,11 @@ public class AuthController {
         }
     }
 
+    /**
+     * Dispatches the user (logged-in) to the appropriate menu, based on their role.
+     *
+     * @param user the user who is shown different menus based on their role (applicant, officer or manager).
+     */
     private static void dispatchToController(User user) {
         boolean running = true;
         switch (user.getRole()) {
@@ -120,6 +145,11 @@ public class AuthController {
         CommonView.displayMessage("Logged out of: " + user.getName());
     }
 
+    /**
+     * Displays the menu for applicants and handles applicant choices.
+     *
+     * @param user an applicant for a project.
+     */
     private static void showApplicantMenu(Applicant user) {
         boolean running = true;
         while (running) {
@@ -140,6 +170,11 @@ public class AuthController {
         // System.out.println("Logging out of user: " + applicant.getName());
     }
 
+    /**
+     * Displays the menu for officers and handles officer choices.
+     *
+     * @param officer an officer for projects.
+     */
     private static void showOfficerMenu(Officer officer) {
         boolean running = true;
 
@@ -161,6 +196,11 @@ public class AuthController {
         }
     }
 
+    /**
+     * Displays the menu for managers and handles manager choices.
+     *
+     * @param manager the manager for projects.
+     */
     private static void showManagerMenu(Manager manager) {
         boolean running = true;
         while (running) {
@@ -185,6 +225,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Handles password changes for users.
+     * Allows users to change their passwords. Users have to verify their old password, and enter a new one.
+     *
+     * @param user
+     */
     private static void handleChangePassword(User user) {
         AuthView.showChangePasswordHeader();
         String oldPassword = CommonView.prompt("Enter old password: ");
@@ -235,6 +281,9 @@ public class AuthController {
         }
     }
 
+    /**
+     * Allows a manager to register officers to handle BTO projects.
+     */
     private static void handleOfficerRegistrations() {
         int choice = AuthView.showOfficerRegistrationMenu();
         switch (choice) {
