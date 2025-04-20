@@ -2,6 +2,7 @@ package models;
 
 import models.enums.MaritalStatus;
 import models.enums.Role;
+
 import utils.Hash;
 
 /**

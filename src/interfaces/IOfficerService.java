@@ -1,4 +1,5 @@
 package interfaces;
+
 import models.Officer;
 
 /**

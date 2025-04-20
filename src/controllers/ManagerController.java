@@ -1,10 +1,8 @@
 package controllers;
 
-import models.*;
-import models.enums.MaritalStatus;
+import models.Project;
 import repositories.OfficerRepository;
 import views.CommonView;
-import java.util.Scanner;
 
 /**
  * Controller class that is responsible for handling manager-related actions.
@@ -14,7 +12,6 @@ import java.util.Scanner;
  * </ul>
  */
 public class ManagerController {
-    private static final Scanner scanner = new Scanner(System.in);
 
     /**
      * Displays a list of officers that have registered for projects.

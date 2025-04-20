@@ -1,8 +1,8 @@
 package interfaces;
 
-import models.Project;
-
 import java.util.List;
+
+import models.Project;
 
 /**
  * Interface for views for displaying project information.

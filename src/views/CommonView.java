@@ -1,9 +1,11 @@
 package views;
 
+import interfaces.ICommonView;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
-import interfaces.ICommonView;
+
 import utils.DateTimeUtils;
 
 /**
@@ -144,7 +146,7 @@ public class CommonView {
 
         System.out.println("0. Back to previous menu");
 
-        return promptInt("Enter your choice: ", 0, options.size());
+        return promptInt("\nEnter your choice: ", 0, options.size());
     }
 
     /**

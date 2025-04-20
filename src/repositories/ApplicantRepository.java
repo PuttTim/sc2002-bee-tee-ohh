@@ -1,24 +1,17 @@
 package repositories;
 
+import interfaces.ICsvConfig;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import models.Applicant;
 import models.User;
+
 import utils.CsvReader;
 import utils.CsvWriter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import interfaces.ICsvConfig;
-
-/**
- * A repository class for managing applicants.
- * Handles loading from and saving to CSV and searching applicants.
- */
 public class ApplicantRepository {
 
     /**

@@ -14,6 +14,11 @@ import repositories.RegistrationRepository;
 import services.*;
 import views.*;
 
+import services.OfficerService;
+import services.ProjectService;
+
+import views.CommonView;
+
 /**
  * Controller class that is responsible to handle officer-related actions.
  * <p>Officer-related actions include:</p>

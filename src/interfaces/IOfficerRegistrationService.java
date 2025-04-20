@@ -1,9 +1,9 @@
 package interfaces;
 
+import models.enums.RegistrationStatus;
 import models.Officer;
 import models.OfficerRegistration;
 import models.Project;
-import models.enums.RegistrationStatus;
 
 /**
  * Interface for managing officer registrations.

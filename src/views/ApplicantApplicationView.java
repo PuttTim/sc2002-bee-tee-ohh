@@ -1,13 +1,16 @@
 package views;
 
+import java.util.List;
+
 import models.*;
 import models.enums.ApplicationStatus;
 import models.enums.FlatType;
+
 import repositories.ProjectRepository;
 import repositories.UserRepository;
+
 import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
-import java.util.List;
 
 /**
  * A view class that handles display and interaction for an applicant's application process.
@@ -22,11 +25,10 @@ public class ApplicantApplicationView {
      */
     public static void showApplicationMenu(Applicant applicant, List<Project> projects) {
         List<String> options = List.of(
-                "View Available Projects",
-                "Submit New Application",
-                "Check Application Status",
-                "Withdraw Application",
-                "Back to Main Menu"
+            "View Available Projects",
+            "Submit New Application",
+            "Withdraw Application",
+            "Back to Main Menu"
         );
 
         while (true) {
@@ -35,9 +37,8 @@ public class ApplicantApplicationView {
                 switch (choice) {
                     case 1 -> displayEligibleProjects(applicant, projects);
                     case 2 -> promptApplication(applicant, projects);
-                    case 3 -> displayApplicationStatus(applicant);
-                    case 4 -> handleWithdraw(applicant);
-                    case 5 -> {
+                    case 3 -> handleWithdraw(applicant);
+                    case 4 -> {
                         return;
                     }
                 }

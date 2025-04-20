@@ -1,7 +1,7 @@
 package utils;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 /**
  * Utility class for parsing and formatting date-time values.
@@ -74,7 +74,8 @@ public class DateTimeUtils {
      */
     public static LocalDateTime getCurrentDateTime() {
         LocalDateTime now = LocalDateTime.now(
-                java.time.ZoneId.of("Asia/Singapore")
+            java.time.ZoneId.of("Asia/Singapore")
+
         );
         return now;
     }
