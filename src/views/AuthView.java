@@ -43,8 +43,6 @@ public class AuthView {
             "Register to Handle Project",
             "Check Registration Status",
             "View Handled Projects",
-            "Manage Project Enquiries",
-            "Process Applications",
             "Generate Receipt"
             
         );

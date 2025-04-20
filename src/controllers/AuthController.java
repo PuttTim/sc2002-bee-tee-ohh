@@ -151,10 +151,8 @@ public class AuthController {
                 switch (choice) {
                     case 1 -> OfficerController.registerToHandleProject(officer);
                     case 2 -> OfficerController.checkHandlerRegistration(officer);
-                    case 3 -> OfficerController.viewHandledProjectDetails(officer);
-                    case 4 -> OfficerController.manageProjectEnquiries(officer);
-                    case 5 -> OfficerController.processApplication();
-                    case 6 -> OfficerController.generateReceipt();
+                    case 3 -> OfficerController.viewHandledProjectDetails(officer);                    
+                    case 4 -> OfficerController.generateReceipt();
                     case 0 -> {return;}
                 }
             } catch (NumberFormatException e) {
@@ -175,8 +173,8 @@ public class AuthController {
                     case 4 -> ProjectController.toggleProjectVisibility();
                     case 5 -> ProjectController.viewAllProjects(); 
                     case 6 -> {
-                        String projectName = ProjectView.getProjectName();
-                        ProjectController.viewProjectEnquiries(projectName);
+                        // String projectName = ProjectView.getProjectName();
+                        // ProjectController.viewProjectEnquiries(projectName);
                     }
                     case 7 -> handleOfficerRegistrations();
                     case 0 -> {return;}

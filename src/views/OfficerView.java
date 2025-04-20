@@ -12,7 +12,8 @@ import java.util.List;
 public class OfficerView {
     public static int showSelectHandledProjectMenu(Project projects) {
         List<String> options = List.of(
-                "View Applications",
+                "Manage Applications",
+                "Manage Successful Applications",
                 "View Enquiries"
                 );
         
@@ -40,5 +41,68 @@ public class OfficerView {
             CommonView.displayMessage("   " + "Visible to Applicants: " + (project.isVisible() ? "Yes" : "No"));
             CommonView.displayShortSeparator();
         }
+    }
+
+    public static void displayApplicationList(List<Application> applications, String header) {
+        if (applications.isEmpty()) {
+            CommonView.displayMessage("No applications found.");
+            return;
+        }
+
+        CommonView.displayHeader(header);
+        for (int i = 0; i < applications.size(); i++) {
+            Application app = applications.get(i);
+            Project project = ProjectRepository.getById(app.getProjectId());
+            User applicant = UserRepository.getByNRIC(app.getApplicantNRIC());
+            CommonView.displayMessage(String.format("%d. ID: %s | Applicant: %s (%s) | Project: %s | Flat: %s | Status: %s", 
+                i + 1, 
+                app.getApplicationID(),
+                applicant != null ? applicant.getName() : "N/A",
+                app.getApplicantNRIC(),
+                project != null ? project.getProjectName() : "N/A",
+                app.getSelectedFlatType(),
+                getStatusDisplay(app.getApplicationStatus())
+            ));
+        }
+        CommonView.displaySeparator();
+    }
+
+    public static void displayApplicationDetails(Application application) {
+        if (application == null) {
+            CommonView.displayMessage("Application details not available.");
+            return;
+        }
+        Project project = ProjectRepository.getById(application.getProjectId());
+        User applicant = UserRepository.getByNRIC(application.getApplicantNRIC());
+
+        CommonView.displayHeader("Application Details (ID: " + application.getApplicationID() + ")");
+        CommonView.displayMessage("Applicant NRIC: " + application.getApplicantNRIC());
+        CommonView.displayMessage("Applicant Name: " + (applicant != null ? applicant.getName() : "N/A"));
+        CommonView.displayMessage("Project Name: " + (project != null ? project.getProjectName() : "N/A"));
+        CommonView.displayMessage("Selected Flat Type: " + application.getSelectedFlatType().getDescription());
+        CommonView.displayMessage("Application Date: " + DateTimeUtils.formatDateTime(application.getApplicationDate()));
+        CommonView.displayMessage("Current Status: " + getStatusDisplay(application.getApplicationStatus()));
+        
+        if (application.getApprovedBy() != null) {
+            User approver = UserRepository.getByNRIC(application.getApprovedBy());
+            String action = (application.getApplicationStatus() == ApplicationStatus.SUCCESSFUL || application.getApplicationStatus() == ApplicationStatus.BOOKED) ? "Approved" : "Processed";
+             CommonView.displayMessage(action + " By: " + (approver != null ? approver.getName() : application.getApprovedBy()));
+        }
+
+        application.getApplicationStatusHistory().forEach((status, timestamp) -> 
+            CommonView.displayMessage(String.format("  - %s: %s", getStatusDisplay(status), DateTimeUtils.formatDateTime(timestamp)))
+        );
+        CommonView.displaySeparator();
+    }
+
+    private static String getStatusDisplay(ApplicationStatus status) {
+        return switch (status) {
+            case PENDING -> "Pending";
+            case SUCCESSFUL -> "Approved";
+            case UNSUCCESSFUL -> "Rejected";
+            case WITHDRAWN -> "Withdrawn";
+            case BOOKED -> "Booked";
+            default -> status.toString();
+        };
     }
 }

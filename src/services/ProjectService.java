@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import models.Filter;
 import models.Project;
 import models.Officer;
+import models.User;
 import models.enums.FlatType;
 import models.enums.Role;
 
@@ -79,7 +80,6 @@ public class ProjectService {
                     .collect(Collectors.toList());
             case OFFICER:
                 return ProjectRepository.getAll().stream()
-                    .filter(Project::isVisible)
                     .collect(Collectors.toList());
             default:
                 if (user.getRole() == Role.MANAGER) {

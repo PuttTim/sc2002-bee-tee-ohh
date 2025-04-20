@@ -17,20 +17,17 @@ public class ApplicantApplicationView {
         List<String> options = List.of(
             "View Available Projects",
             "Submit New Application",
-            "Withdraw Application",
-            "Back to Main Menu"
+            "Withdraw Application"
         );
 
         while (true) {
-            int choice = CommonView.displayMenu("Application Menu", options);
+            int choice = CommonView.displayMenuWithBacking("Application Menu", options);
             try {
                 switch (choice) {
                     case 1 -> displayEligibleProjects(applicant, projects);
                     case 2 -> promptApplication(applicant, projects);
                     case 3 -> handleWithdraw(applicant);
-                    case 4 -> {
-                        return;
-                    }
+                    case 0 -> {return;}
                 }
             } catch (Exception e) {
                 CommonView.displayError("Please enter a valid number!");

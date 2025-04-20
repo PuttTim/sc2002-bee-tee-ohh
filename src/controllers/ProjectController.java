@@ -4,14 +4,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import models.Applicant;
+import models.Enquiry;
 import models.Officer;
 import models.Project;
-
+import services.EnquiryService;
 import services.ProjectService;
 
 import views.ProjectView;
 import views.AuthView;
 import views.CommonView;
+import views.EnquiryView;
 
 public class ProjectController {
 
@@ -83,12 +85,12 @@ public class ProjectController {
         ProjectView.displayAvailableProjects(projects);
     }
 
-    public static void viewProjectEnquiries(String projectName) {
-        Project project = ProjectService.getProjectByName(projectName);
-        if (project != null) {
-            EnquiryController.viewProjectEnquiries(project);
+    public static void viewProjectEnquiries(Project project) {
+        List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
+        if (enquiries.isEmpty()) {
+            CommonView.displayMessage("No enquiries for this project.");
         } else {
-            ProjectView.displayProjectNotFound();
+            EnquiryView.displayEnquiryList(enquiries);
         }
     }
 

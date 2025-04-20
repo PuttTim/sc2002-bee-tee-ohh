@@ -115,4 +115,15 @@ public class EnquiryRepository {
         enquiries.remove(enquiry);
         saveAll();
     }
+
+    public static void update(Enquiry enquiry) {
+        for (int i = 0; i < enquiries.size(); i++) {
+            if (enquiries.get(i).getEnquiryID().equals(enquiry.getEnquiryID())) {
+                enquiries.set(i, enquiry);
+                break;
+            }
+            
+        }
+        saveAll();
+    }
 }

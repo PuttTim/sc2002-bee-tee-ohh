@@ -7,6 +7,8 @@ import models.Officer;
 import models.Project;
 import models.Registration;
 import models.enums.FlatType;
+import repositories.ApplicationRepository;
+import repositories.ProjectRepository;
 
 import java.util.List;
 

@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import models.Application;
+import models.Enquiry;
 import models.Officer;
 import models.Project;
 import models.Registration;
+import models.enums.ApplicationStatus;
 import models.enums.RegistrationStatus;
 import repositories.ApplicationRepository;
+import repositories.EnquiryRepository;
 import repositories.OfficerRepository;
 import repositories.RegistrationRepository;
 import services.*;
@@ -39,7 +42,7 @@ public class OfficerController {
             projectChoice = CommonView.promptInt("Select project number (or 0 to cancel): ", 0, projects.size());
 
             if (projectChoice == 0) {
-                break; // Cancel registration
+                break;
             }
 
             Project project = projects.get(projectChoice - 1);
@@ -92,20 +95,17 @@ public class OfficerController {
         }
     }
 
-    //view details of project
     public static void viewHandledProjectDetails(Officer officer) {
         List<Project> projects = ProjectService.getAllOfficersProjects(officer.getUserNRIC());
         if (projects != null && !projects.isEmpty()) {
-            boolean running = true;
-            while (running) {
-                CommonView.displayHeader("Project Details");
+            while (true) {
                 OfficerView.displayOfficerHandledProjects(projects);
 
                 int projectChoice = CommonView.promptInt("Select project number to view details (or 0 to cancel): ", 0, projects.size());
 
                 if (projectChoice == 0) {
                     CommonView.displayMessage("Cancelled viewing project details.");
-                    return;
+                    break;
                 }
 
                 Project selectedProject = projects.get(projectChoice - 1);
@@ -113,20 +113,24 @@ public class OfficerController {
                 CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
                 ProjectView.displayProjectDetailsOfficerView(selectedProject);
 
-                int choice = OfficerView.showSelectHandledProjectMenu(selectedProject);
+                boolean runningProjectMenu = true;
+                while (runningProjectMenu) {
+                    int choice = OfficerView.showSelectHandledProjectMenu(selectedProject);
 
-                switch (choice) {
-                    case 1 -> {
-                        // View applications
-                        // ApplicationView.displayApplications(selectedProject);
-                    }
-                    case 2 -> {
-                        // View enquiries
-                        // manageProjectEnquiries(officer);
-                    }
-                    case 0 -> {
-                        CommonView.displayMessage("Cancelled viewing project details.");
-                        break;
+                    switch (choice) {
+                        case 1 -> {
+                            manageProjectApplications(selectedProject, officer);
+                        }
+                        case 2 -> {
+                            manageSuccessfulApplications(selectedProject, officer);
+                        }
+                        case 3 -> {
+                            manageProjectEnquiries(selectedProject, officer);
+                        }
+                        case 0 -> {
+                            CommonView.displayMessage("Returning to project selection.");
+                            runningProjectMenu = false;
+                        }
                     }
                 }
             }         
@@ -136,19 +140,124 @@ public class OfficerController {
         }
     }
 
-    //view and reply to enquiries
-    public static void manageProjectEnquiries(Officer officer) {
-        Project project = ProjectService.getProjectByOfficer(officer);
-        if (project != null) {
-            ProjectController.viewProjectEnquiries(project.getProjectName());
-        } else {
-            CommonView.displayError("You are not handling any project.");
+    public static void manageProjectEnquiries(Project project, Officer officer) {
+        while (true) {
+            List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
+            ProjectController.viewProjectEnquiries(project);
+            int choice = CommonView.promptInt("Select an enquiry to reply to (or 0 to cancel): ", 0, enquiries.size());
+
+            if (choice == 0) {
+                CommonView.displayMessage("Cancelled replying to enquiries.");
+                break;
+            } else {
+                Enquiry selectedEnquiry = enquiries.get(choice - 1);
+                String response = CommonView.prompt("Enter your response: ");
+                if (response != null && !response.trim().isEmpty()) {
+                    selectedEnquiry.markAsResponded(officer.getUserNRIC(), response);
+                    EnquiryRepository.update(selectedEnquiry);
+                    CommonView.displayMessage("Enquiry Response sent successfully.");
+                    continue;
+                } else {
+                    CommonView.displayError("Response cannot be empty.");
+                }
+
+            }
+        }
+
+    }
+
+    public static void manageProjectApplications(Project project, Officer officer) {
+        while (true) {
+            List<Application> applications = ApplicationService.getProjectApplications(project);
+            OfficerView.displayApplicationList(applications, "Applications for Project: " + project.getProjectName());
+            
+            int choice = CommonView.promptInt("Select an application number to manage (or 0 to go back): ", 0, applications.size());
+
+            if (choice == 0) {
+                CommonView.displayMessage("Returning to officer menu.");
+                break;
+            } else {
+                Application selectedApplication = applications.get(choice - 1);
+                OfficerView.displayApplicationDetails(selectedApplication);
+
+                if (selectedApplication.getApplicationStatus() == ApplicationStatus.PENDING) {
+                    if (selectedApplication.canApprove()) {
+                        int actionChoice = CommonView.promptInt("Action: [1] Approve [2] Reject [0] Back: ", 0, 2);
+                        switch (actionChoice) {
+                            case 1 -> {
+                                if (ApplicationService.approveApplication(selectedApplication, officer)) {
+                                    CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " approved.");
+                                } else {
+                                    CommonView.displayError("Failed to approve application.");
+                                }
+                                CommonView.prompt("Press Enter to continue...");
+                            }
+                            case 2 -> {
+                                if (ApplicationService.rejectApplication(selectedApplication, officer)) {
+                                    CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " rejected.");
+                                } else {
+                                    CommonView.displayError("Failed to reject application.");
+                                }
+                                CommonView.prompt("Press Enter to continue...");
+                            }
+                            case 0 -> CommonView.displayMessage("No action taken.");
+                            default -> CommonView.displayError("Invalid action choice.");
+                        }
+                    } else if (selectedApplication.isWithdrawalRequested()) {
+                         CommonView.displayMessage("This application has a pending withdrawal request and cannot be approved/rejected.");
+                         CommonView.prompt("Press Enter to continue...");
+                    } else {
+                        CommonView.displayMessage("This application is PENDING but cannot be approved/rejected currently.");
+                        CommonView.prompt("Press Enter to continue...");
+                    }
+                } else {
+                    CommonView.prompt("Press Enter to continue...");
+                }
+            }
         }
     }
 
-    //help select flat
-    public static void processApplication() {
-        //TODO
+    public static void manageSuccessfulApplications(Project project, Officer officer) {
+        while (true) {
+            List<Application> successfulApplications = ApplicationService.getSuccessfulProjectApplications(project);
+            
+            if (successfulApplications.isEmpty()) {
+                CommonView.displayMessage("No successful applications available to book for this project.");
+                return;
+            }
+
+            OfficerView.displayApplicationList(successfulApplications, "Successful Applications for Project: " + project.getProjectName());
+            
+            int choice = CommonView.promptInt("Select an application number to book (or 0 to go back): ", 0, successfulApplications.size());
+
+            if (choice == 0) {
+                CommonView.displayMessage("Returning to officer menu.");
+                break;
+            } else {
+                Application selectedApplication = successfulApplications.get(choice - 1);
+                OfficerView.displayApplicationDetails(selectedApplication);
+
+                if (CommonView.promptYesNo("Do you want to book this application? (This will update status to BOOKED and reduce flat count)")) {
+                    boolean booked = ApplicationService.bookApplication(selectedApplication, officer);
+                    if (booked) {
+                        CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " successfully booked.");
+                    } else if (project.getAvailableUnits(selectedApplication.getSelectedFlatType()) <= 0) {
+                        CommonView.displayError("No available units left for this flat type.");
+                        if (CommonView.promptYesNo("Do you want to update the application status to UNSUCCESSFUL? ")) {
+                            ApplicationService.rejectApplication(selectedApplication, officer);
+                            CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " status updated to UNSUCCESSFUL.");
+                        } else {
+                            CommonView.displayMessage("No action taken.");
+                        }
+                    } else {
+                        CommonView.displayError("Failed to book application. Please try again.");
+                    }
+                    CommonView.prompt("Press Enter to continue...");
+                } else {
+                    CommonView.displayMessage("Booking cancelled.");
+                }
+            }
+        }
     }
 
     //generate receipt
