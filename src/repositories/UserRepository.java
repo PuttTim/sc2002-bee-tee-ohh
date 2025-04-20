@@ -5,6 +5,7 @@ import interfaces.ICsvConfig;
 import java.io.IOException;
 import java.util.*;
 
+import models.Applicant;
 import models.User;
 import models.enums.MaritalStatus;
 import models.enums.Role;
@@ -28,6 +29,7 @@ public class UserRepository {
     private static List<User> users = new ArrayList<>();
     private static User activeUser = null;
     private static Role userMode = null;
+    private static final UserCsvConfig csvConfig = new UserCsvConfig();
 
     private UserRepository() {} // private constructor
 
@@ -79,11 +81,19 @@ public class UserRepository {
     }
 
     public static void add(User user) {
-        users.add(user);
+        if (getByNRIC(user.getUserNRIC()) == null) {
+            users.add(user);
+            saveAll();
+        } else {
+            System.err.println("User with NRIC " + user.getUserNRIC() + " already exists.");
+        }
     }
 
     public static void remove(String nric) {
-        users.removeIf(user -> user.getUserNRIC().equals(nric));
+        boolean removed = users.removeIf(user -> user.getUserNRIC().equals(nric));
+        if (removed) {
+            saveAll();
+        }
     }
 
     public static User getByNRIC(String nric) {
@@ -120,14 +130,12 @@ public class UserRepository {
     }
 
     public static Role getUserRole() {
-        
         if (activeUser != null) {
             return activeUser.getRole();
         }
-        return null; // Return null if no active user is set
+        return null;
     }
 
-        
     public static Role getUserMode() {
         return userMode;
     }

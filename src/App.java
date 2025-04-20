@@ -19,24 +19,26 @@ public class App {
     }
 
     private void initRepositories() {
+        UserRepository.load();
         ProjectRepository.load();
         EnquiryRepository.load();
-        UserRepository.load();
         RegistrationRepository.load();
         ApplicantRepository.load();
         ApplicationRepository.load();
+        ReceiptRepository.load();
         OfficerRepository.load();
         ManagerRepository.load();
     }
 
     private void saveRepositories() {
+        UserRepository.saveAll();
         ProjectRepository.saveAll();
         EnquiryRepository.saveAll();
-        UserRepository.saveAll();
         RegistrationRepository.saveAll();
         ApplicantRepository.saveAll();
         ApplicationRepository.saveAll();
         OfficerRepository.saveAll();
         ManagerRepository.saveAll();
+        ReceiptRepository.saveAll();
     }
 }

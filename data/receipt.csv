@@ -1,3 +1,2 @@
-ReceiptID,ApplicantNRIC,ApplicantAge,MaritalStatus,FlatType,FlatPrice,FlatUnitNumber,ProjectID,ProjectName,ProjectLocation,ReceiptDate
-RCPT1,S1234567A,30,SINGLE,THREE_ROOM,550000,B123,P2,Tampines GreenView,Tampines,2025-04-09T10:00:00
-RCPT2,S3456789E,25,SINGLE,TWO_ROOM,450000,A212,P1,Acacia Breeze,Yishun,2025-02-19T14:00:00
+ReceiptID,ApplicantNRIC,FlatType,FlatPrice,FlatUnitNumber,ProjectID,BookingTimestamp,OfficerNRIC
+RCPT-6D4D4514,S9876543C,THREE_ROOM,650000,04-005,P2,2025-04-21T06:43:46.7681964,S2345678B

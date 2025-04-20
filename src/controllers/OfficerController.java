@@ -3,17 +3,23 @@ package controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import models.Applicant;
 import models.Application;
 import models.Enquiry;
 import models.Officer;
 import models.Project;
+import models.Receipt;
 import models.Registration;
 import models.enums.ApplicationStatus;
 import models.enums.RegistrationStatus;
+import repositories.ApplicantRepository;
 import repositories.ApplicationRepository;
 import repositories.EnquiryRepository;
 import repositories.OfficerRepository;
+import repositories.ProjectRepository;
+import repositories.ReceiptRepository;
 import repositories.RegistrationRepository;
+import repositories.UserRepository;
 import services.*;
 import views.*;
 
@@ -21,6 +27,7 @@ import services.OfficerService;
 import services.ProjectService;
 
 import views.CommonView;
+import views.ReceiptView;
 
 public class OfficerController {
     //register to join project as officer
@@ -237,20 +244,52 @@ public class OfficerController {
                 Application selectedApplication = successfulApplications.get(choice - 1);
                 OfficerView.displayApplicationDetails(selectedApplication);
 
+                if (selectedApplication.getApplicationStatus() == ApplicationStatus.BOOKED) {
+                    CommonView.displayMessage("This application has already been booked.");
+                    if (CommonView.promptYesNo("Do you want to view the receipt?")) {
+                        ReceiptRepository.getByApplicantNRIC(selectedApplication.getApplicantNRIC()).stream()
+                            .filter(r -> r.getProjectName().equals(project.getProjectName()))
+                            .findFirst()
+                            .ifPresentOrElse(
+                                ReceiptView::displayReceiptDetails,
+                                () -> CommonView.displayError("Receipt not found for this booking.")
+                            );
+                    }
+                    CommonView.prompt("Press Enter to continue...");
+                    continue;
+                }
+
+                if (selectedApplication.getApplicationStatus() != ApplicationStatus.SUCCESSFUL) {
+                     CommonView.displayError("This application is not in a state that can be booked (Status: " + selectedApplication.getApplicationStatus() + ").");
+                     CommonView.prompt("Press Enter to continue...");
+                     continue;
+                }
+
                 if (CommonView.promptYesNo("Do you want to book this application? (This will update status to BOOKED and reduce flat count)")) {
-                    boolean booked = ApplicationService.bookApplication(selectedApplication, officer);
+                    String unitNumber = CommonView.prompt("Enter the unit number assigned (e.g., 04-001): ");
+                    if (unitNumber == null || unitNumber.trim().isEmpty() || !unitNumber.matches("\\d{2}-\\d{3}")) {
+                        CommonView.displayError("Invalid unit number format (expected XX-XXX). Booking cancelled.");
+                        continue;
+                    }
+
+                    boolean booked = ApplicationService.bookApplication(selectedApplication, officer, unitNumber);
+                    
                     if (booked) {
-                        CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " successfully booked.");
+                        CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " successfully booked for unit " + unitNumber + ".");
+                        generateReceiptForBooking(selectedApplication, officer, unitNumber, project); 
                     } else if (project.getAvailableUnits(selectedApplication.getSelectedFlatType()) <= 0) {
                         CommonView.displayError("No available units left for this flat type.");
                         if (CommonView.promptYesNo("Do you want to update the application status to UNSUCCESSFUL? ")) {
-                            ApplicationService.rejectApplication(selectedApplication, officer);
-                            CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " status updated to UNSUCCESSFUL.");
+                            if (ApplicationService.rejectApplication(selectedApplication, officer)) {
+                                CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " status updated to UNSUCCESSFUL.");
+                            } else {
+                                CommonView.displayError("Failed to update application status. It might no longer be in a rejectable state.");
+                            }
                         } else {
                             CommonView.displayMessage("No action taken.");
                         }
                     } else {
-                        CommonView.displayError("Failed to book application. Please try again.");
+                         CommonView.displayError("Failed to book application. Please check application status and available units, then try again.");
                     }
                     CommonView.prompt("Press Enter to continue...");
                 } else {
@@ -260,8 +299,30 @@ public class OfficerController {
         }
     }
 
-    //generate receipt
-    public static void generateReceipt() {
-        //TODO
+    private static void generateReceiptForBooking(Application application, Officer officer, String unitNumber, Project project) {
+        Applicant applicant = ApplicantRepository.getByNRIC(application.getApplicantNRIC()); // Use ApplicantRepository
+
+        if (applicant == null) {
+            CommonView.displayError("Critical Error: Could not find applicant details for NRIC " + application.getApplicantNRIC() + ". Receipt not generated.");
+            return;
+        }
+
+        Receipt receipt = new Receipt(
+            applicant.getName(),
+            applicant.getUserNRIC(),
+            applicant.getAge(),
+            applicant.getMaritalStatus(),            
+            application.getSelectedFlatType(),
+            project.getFlatPrice(application.getSelectedFlatType()),
+            unitNumber,
+            project.getProjectName(),
+            project.getProjectID(),
+            project.getLocation(),
+            officer
+        );
+
+        ReceiptRepository.add(receipt);
+        ReceiptView.displayReceiptGeneratedSuccess(receipt.getReceiptId());
+        ReceiptView.displayReceiptDetails(receipt);
     }
 }

@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 import models.Application;
 import models.Officer;
 import models.Project;
+import models.Receipt;
 import models.enums.ApplicationStatus;
 import repositories.ApplicationRepository;
 import repositories.ProjectRepository;
+import repositories.ReceiptRepository;
+import views.CommonView;
 
 public class ApplicationService {
 
@@ -60,12 +63,18 @@ public class ApplicationService {
         }
     }
 
-    public static boolean bookApplication(Application application, Officer officer) {
+    public static boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) { // Added unitNumber parameter
         if (application == null || !application.canBook()) {
             return false;
         }
 
         Project project = ProjectRepository.getById(application.getProjectId());
+        List<Receipt> receipts = ReceiptRepository.getByProjectID(project.getProjectID());
+        if (receipts.stream().anyMatch(r -> r.getUnitNumber().equals(selectedUnitNumber))) {
+            CommonView.displayError("Unit number already booked. Please select a different unit.");
+            return false;
+        }
+
         if (project == null) {
             return false;
         }
@@ -74,11 +83,18 @@ public class ApplicationService {
             return false;
         }
 
+        if (selectedUnitNumber == null || selectedUnitNumber.trim().isEmpty()) { // Basic validation for unit number
+             System.err.println("Error booking application: Unit number cannot be empty.");
+             return false;
+        }
+
         try {
-            application.book();
             project.reduceFlatCount(application.getSelectedFlatType());
-            ApplicationRepository.saveAll();
+            application.book();
+
             ProjectRepository.saveAll();
+            ApplicationRepository.saveAll();
+
             return true;
         } catch (IllegalStateException e) {
             System.err.println("Error booking application: " + e.getMessage());

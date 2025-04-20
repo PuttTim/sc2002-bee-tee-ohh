@@ -1,7 +1,6 @@
 package controllers;
 
 import exceptions.AuthenticationException;
-import java.util.List;
 import models.*;
 import models.enums.Role;
 import repositories.*;
@@ -151,12 +150,15 @@ public class AuthController {
                 switch (choice) {
                     case 1 -> OfficerController.registerToHandleProject(officer);
                     case 2 -> OfficerController.checkHandlerRegistration(officer);
-                    case 3 -> OfficerController.viewHandledProjectDetails(officer);                    
-                    case 4 -> OfficerController.generateReceipt();
+                    case 3 -> OfficerController.viewHandledProjectDetails(officer);
                     case 0 -> {return;}
+                    default -> CommonView.displayError("Invalid choice. Please try again.");
                 }
             } catch (NumberFormatException e) {
                 CommonView.displayError("Please enter a valid number!");
+            } catch (Exception e) {
+                CommonView.displayError("An unexpected error occurred: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }

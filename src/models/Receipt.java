@@ -4,92 +4,80 @@ import java.time.LocalDateTime;
 
 import models.enums.FlatType;
 import models.enums.MaritalStatus;
+import utils.DateTimeUtils;
 
 public class Receipt {
     private static int lastReceiptID = 0;
 
-    private String receiptID;
+    private String receiptId;
     private String applicantName;
     private String applicantNRIC;
     private int applicantAge;
     private MaritalStatus maritalStatus;
     private FlatType flatType;
     private int flatPrice;
-    private String flatUnitNumber;
-    private String projectID;
+    private String unitNumber;
     private String projectName;
+    private String projectID;
     private String projectLocation;
-    private LocalDateTime receiptDate;
+    private LocalDateTime bookingTimestamp;
+    private Officer officer; 
 
-    public Receipt(Applicant applicant, FlatType flatType, int flatPrice, String flatUnitNumber, Project project) {
-        this.receiptID = "RCPT" + (++lastReceiptID);
-
-        // Applicant Info
-        this.applicantName = applicant.getName();
-        this.applicantNRIC = applicant.getUserNRIC();
-        this.applicantAge = applicant.getAge();
-        this.maritalStatus = applicant.getMaritalStatus();
-
-        // Flat Info
+    // Constructor
+    public Receipt(String applicantName, String applicantNRIC, int applicantAge, MaritalStatus applicantMaritalStatus,
+                   FlatType flatType, int flatPrice, String unitNumber, String projectName, String projectID, String projectLocation, 
+                   Officer officer) {
+        this.receiptId = generateReceiptId();
+        this.applicantName = applicantName;
+        this.applicantNRIC = applicantNRIC;
+        this.applicantAge = applicantAge;
+        this.maritalStatus = applicantMaritalStatus;
         this.flatType = flatType;
         this.flatPrice = flatPrice;
-        this.flatUnitNumber = flatUnitNumber;
-
-        // Project Info
-        this.projectID = project.getProjectID();
-        this.projectName = project.getProjectName();
-        this.projectLocation = project.getLocation();
-
-        // Timestamp
-        this.receiptDate = LocalDateTime.now();
+        this.unitNumber = unitNumber;
+        this.projectName = projectName;
+        this.projectID = projectID;
+        this.projectLocation = projectLocation;
+        this.bookingTimestamp = LocalDateTime.now();
+        this.officer = officer;
     }
+    
+    // Constructor for loading from CSV
+    public Receipt(String receiptId, String applicantName, String applicantNRIC, int applicantAge, MaritalStatus applicantMaritalStatus,
+                   FlatType flatType, int flatPrice, String unitNumber, String projectName, String projectID, String projectLocation, 
+                   LocalDateTime bookingTimestamp, Officer officer) {
+        this.receiptId = receiptId;
+        this.applicantName = applicantName;
+        this.applicantNRIC = applicantNRIC;
+        this.applicantAge = applicantAge;
+        this.maritalStatus = applicantMaritalStatus;
+        this.flatType = flatType;
+        this.flatPrice = flatPrice;
+        this.unitNumber = unitNumber;
+        this.projectName = projectName;
+        this.projectID = projectID;
+        this.projectLocation = projectLocation;
+        this.bookingTimestamp = bookingTimestamp;
+        this.officer = officer;
+    }
+
 
     // Getters
-    public String getReceiptID() {
-        return receiptID;
-    }
+    public String getReceiptId() { return receiptId; }
+    public String getApplicantName() { return applicantName; }
+    public String getApplicantNRIC() { return applicantNRIC; }
+    public int getApplicantAge() { return applicantAge; }
+    public MaritalStatus getMaritalStatus() { return maritalStatus; }
+    public FlatType getFlatType() { return flatType; }
+    public int getFlatPrice() { return flatPrice; }
+    public String getUnitNumber() { return unitNumber; }
+    public String getProjectName() { return projectName; }
+    public String getProjectID() { return projectID; }
+    public String getProjectLocation() { return projectLocation; }
+    public LocalDateTime getBookingTimestamp() { return bookingTimestamp; }
+    public Officer getOfficer() { return officer; }
 
-    public String getApplicantName() {
-        return applicantName;
-    }
-
-    public String getApplicantNRIC() {
-        return applicantNRIC;
-    }
-
-    public int getApplicantAge() {
-        return applicantAge;
-    }
-
-    public MaritalStatus getMaritalStatus() {
-        return maritalStatus;
-    }
-
-    public FlatType getFlatType() {
-        return flatType;
-    }
-
-    public int getFlatPrice() {
-        return flatPrice;
-    }
-
-    public String getFlatUnitNumber() {
-        return flatUnitNumber;
-    }
-
-    public String getProjectID() {
-        return projectID;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public String getProjectLocation() {
-        return projectLocation;
-    }
-
-    public LocalDateTime getReceiptDate() {
-        return receiptDate;
+    private String generateReceiptId() {
+        return "RCPT-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }
