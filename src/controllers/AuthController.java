@@ -17,7 +17,7 @@ import views.ProjectView;
 public class AuthController {
     private static final String TEST_APPLICANT_NRIC = "S1234567A";
     private static final String TEST_OFFICER_NRIC = "S2345678B";
-    private static final String TEST_MANAGER_NRIC = "S6789012F";
+    private static final String TEST_MANAGER_NRIC = "S6543210I";
     private static final String TEST_PASSWORD = "password";
 
     public static void runAuthentication() {
@@ -169,16 +169,10 @@ public class AuthController {
             int choice = AuthView.showManagerMenu();
             try {
                 switch (choice) {
-                    case 1 -> ProjectController.createProject();
-                    case 2 -> ProjectController.editProject();
-                    case 3 -> ProjectController.deleteProject();
-                    case 4 -> ProjectController.toggleProjectVisibility();
-                    case 5 -> ProjectController.viewAllProjects(); 
-                    case 6 -> {
-                        // String projectName = ProjectView.getProjectName();
-                        // ProjectController.viewProjectEnquiries(projectName);
-                    }
-                    case 7 -> handleOfficerRegistrations();
+                    case 1 -> ManagerController.viewAllProjects(); 
+                    case 2 -> ManagerController.viewHandledProjects(manager);
+                    case 3 -> ManagerController.viewAllEnquiries();
+                    case 4 -> ManagerController.createProject();
                     case 0 -> {return;}
                 }
             } catch (NumberFormatException e) {
@@ -234,22 +228,6 @@ public class AuthController {
             AuthView.displayPasswordChangeSuccess();
         } catch (AuthenticationException e) {
             AuthView.displayPasswordChangeError(e.getMessage());
-        }
-    }
-
-    private static void handleOfficerRegistrations() {
-        int choice = AuthView.showOfficerRegistrationMenu();
-        switch (choice) {
-            case 1 -> ManagerController.viewOfficerRegistrations();
-            case 2, 3 -> {
-                String projectName = ProjectView.getProjectName();
-                Project project = ProjectService.getProjectByName(projectName);
-                if (project != null) {
-                    ManagerController.approveOfficerRegistration(project, choice == 2);
-                } else {
-                    ProjectView.displayProjectNotFound();
-                }
-            }
         }
     }
 }

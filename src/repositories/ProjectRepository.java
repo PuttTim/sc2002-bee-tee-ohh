@@ -170,4 +170,14 @@ public class ProjectRepository {
             return new ArrayList<>();
         }
     }
+
+    public static void update(Project project) {
+        for (int i = 0; i < projects.size(); i++) {
+            if (projects.get(i).getProjectID().equals(project.getProjectID())) {
+                projects.set(i, project);
+                break;
+            }
+        }
+        saveAll();
+    }
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import models.Filter;
+import models.Manager;
 import models.Project;
 import models.Officer;
 import models.User;
@@ -102,6 +103,12 @@ public class ProjectService {
                 .filter(p -> p.getOfficers().contains(officer.getUserNRIC()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public static List<Project> getProjectsByManager(Manager manager) {
+        return ProjectRepository.getAll().stream()
+                .filter(p -> p.getManagerNRIC().equals(manager.getUserNRIC()))
+                .collect(Collectors.toList());
     }
 
     public static void createProject(String projectId, String managerNRIC, String projectName, 

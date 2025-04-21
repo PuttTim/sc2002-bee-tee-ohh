@@ -42,22 +42,17 @@ public class AuthView {
         List<String> options = List.of(
             "Register to Handle Project",
             "Check Registration Status",
-            "View Handled Projects",
-            "Generate Receipt"
-            
+            "View Handled Projects" 
         );
         return CommonView.displayMenuWithBacking("Officer Menu", options);
     }
 
     public static int showManagerMenu() {
         List<String> options = List.of(
-            "Create New Project",
-            "Edit Project",
-            "Delete Project",
-            "Toggle Project Visibility",
             "View All Projects",
-            "View Project Enquiries",
-            "Manage Officer Registrations"
+            "View All Handled Projects",
+            "View All Enquiries",
+            "Create New Project"
         );
         return CommonView.displayMenuWithBacking("Manager Menu", options);
     }

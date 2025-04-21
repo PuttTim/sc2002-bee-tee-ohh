@@ -83,7 +83,7 @@ public class OfficerController {
             Project selectedProject = projects.get(projectChoice - 1);
             Registration registration = new Registration(officer, selectedProject.getProjectID());
             RegistrationRepository.add(registration);
-            CommonView.displayMessage("You have successfully registered to handle project: " + selectedProject.getProjectName() + " Please wait for approval.");
+            CommonView.displayMessage("You have successfully registered to handle project: " + selectedProject.getProjectName() + "! Please wait for approval.");
         } else {
             CommonView.displayMessage("Registration cancelled.");
         }
@@ -300,7 +300,7 @@ public class OfficerController {
     }
 
     private static void generateReceiptForBooking(Application application, Officer officer, String unitNumber, Project project) {
-        Applicant applicant = ApplicantRepository.getByNRIC(application.getApplicantNRIC()); // Use ApplicantRepository
+        Applicant applicant = ApplicantRepository.getByNRIC(application.getApplicantNRIC());
 
         if (applicant == null) {
             CommonView.displayError("Critical Error: Could not find applicant details for NRIC " + application.getApplicantNRIC() + ". Receipt not generated.");

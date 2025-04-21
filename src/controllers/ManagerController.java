@@ -1,27 +1,158 @@
 package controllers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import models.Manager;
 import models.Project;
+import models.Registration;
+import models.enums.RegistrationStatus;
 import repositories.OfficerRepository;
+import services.ProjectService;
+import services.RegistrationService;
 import views.CommonView;
+import views.ManagerView;
+import views.ProjectView;
 
 public class ManagerController {
 
-    public static void viewOfficerRegistrations() {
-        ProjectController.viewOfficerRegistrations();
-    }
 
-    public static void approveOfficerRegistration(Project project, boolean approve) {
-        if (project == null) {
-            CommonView.displayError("Project not found.");
+    // Method to display all projects managed by the manager, then ask the user to select a project
+    public static void viewHandledProjects(Manager manager) {
+        List<Project> handledProjects = ProjectService.getProjectsByManager(manager);
+
+        if (handledProjects.isEmpty()) {
+            CommonView.displayMessage("You are not managing any projects.");
             return;
         }
 
-        String officerNRIC = CommonView.prompt("Enter officer NRIC: ").trim();
-        
-        if (approve) {
-            ProjectController.handleOfficerRegistration(OfficerRepository.getByNRIC(officerNRIC), project.getProjectName());
-        } else {
-            ProjectController.removeOfficerFromProject(project.getProjectName(), officerNRIC);
+        while (true) {
+            CommonView.displayHeader("Projects Managed by You");
+            ProjectView.displayProjectList(handledProjects);
+
+            int projectChoice = CommonView.promptInt("Select project number to manage (or 0 to go back): ", 0, handledProjects.size());
+
+            if (projectChoice == 0) {
+                break;
+            }
+
+            Project selectedProject = handledProjects.get(projectChoice - 1);
+            showProjectManagementMenu(selectedProject, manager);
         }
+
+        return;
+    }
+
+    // Shows the menu for actions on a specific project managed by the manager
+    private static void showProjectManagementMenu(Project project, Manager manager) {
+         boolean running = true;
+         while(running) {
+            int choice = ManagerView.showSelectHandledProjectMenu(project); 
+            switch (choice) {
+                case 1: // Manage Officer Registrations
+                    manageProjectOfficerRegistration(project, manager);
+                    break;
+                case 2: // Manage Applicant Applications
+                    // TODO: Implement manage applicant applications similar to OfficerController
+                    CommonView.displayMessage("Manage Applicant Applications - Not yet implemented.");
+                    break;
+                case 3: // Manage Project Details 
+                     // TODO: Implement project details editing
+                    CommonView.displayMessage("Manage Project Details - Not yet implemented.");
+                    break;
+                case 4: // View Enquiries
+                    EnquiryController.manageProjectEnquiries(java.util.Optional.empty(), java.util.Optional.of(manager), project);
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    CommonView.displayError("Invalid choice.");
+                    break;
+            }
+         }
+    }
+
+
+    // Manages officer registrations for a specific project
+    public static void manageProjectOfficerRegistration(Project project, Manager manager) {
+         while (true) {
+            List<Registration> allRegistrations = RegistrationService.getProjectRegistrations(project);
+            List<Registration> pendingRegistrations = allRegistrations.stream()
+                .filter(r -> r.getRegistrationStatus() == RegistrationStatus.PENDING)
+                .collect(Collectors.toList());
+
+            int choice = ManagerView.displayOfficerRegistrationsForApproval(allRegistrations, project);
+
+            if (choice == 0) {
+                break; 
+            }
+
+            Registration selectedRegistration = pendingRegistrations.get(choice - 1);
+
+            int action = ManagerView.promptApproveReject();
+            boolean success = false;
+            String officerName = selectedRegistration.getOfficer().getName();
+
+            switch (action) {
+                case 1: // Approve
+                    success = RegistrationService.approveRegistration(selectedRegistration, manager);
+                    if (success) {
+                        ManagerView.displayRegistrationApprovedSuccess(officerName);
+                    } else {
+                        ManagerView.displayRegistrationActionFailed("approve");
+                    }
+                    break;
+                case 2: // Reject
+                    success = RegistrationService.rejectRegistration(selectedRegistration, manager);
+                     if (success) {
+                        ManagerView.displayRegistrationRejectedSuccess(officerName);
+                    } else {
+                        ManagerView.displayRegistrationActionFailed("reject");
+                    }
+                    break;
+                case 0: // Cancel
+                    CommonView.displayMessage("Action cancelled.");
+                    break;
+                default:
+                    CommonView.displayError("Invalid action.");
+                    break;
+            }
+             if (action == 1 || action == 2) {
+                 CommonView.prompt("Press Enter to continue...");
+             }
+         }
+    }
+
+    public static void createProject() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createProject'");
+    }
+
+    public static void viewAllProjects() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'viewAllProjects'");
+    }
+
+    public static void viewAllEnquiries() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'viewAllEnquiries'");
+    }
+
+    // method to display all projects which then will ask the user to select a project
+    public static void viewHandledProjects() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'viewHandledProjects'");
+    }
+
+    // this will show a menu of actions that the manager can do on the project
+    public static void viewProjectDetails(Project project) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'viewProjectDetails'");
+    }
+
+    public static void manageProjectOfficerRegistration(Project project) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'manageProjectOfficerRegistration'");
     }
 }

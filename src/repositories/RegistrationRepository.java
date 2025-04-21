@@ -118,4 +118,14 @@ public class RegistrationRepository {
             .filter(reg -> reg.getRegistrationStatus() == status)
             .collect(Collectors.toList());
     }
+
+    public static void update(Registration registration) {
+        for (int i = 0; i < registrations.size(); i++) {
+            if (registrations.get(i).getRegistrationID().equals(registration.getRegistrationID())) {
+                registrations.set(i, registration);
+                saveAll();
+                return;
+            }
+        }
+    }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.enums.FlatType;
+import views.CommonView;
 
 public class Project {
     private static int lastProjectID = 0;
@@ -199,10 +200,12 @@ public class Project {
     }
 
     public void addOfficer(String officerNRIC) {
-        if (officers == null) {
-            officers = new ArrayList<>();
+        if (!officers.contains(officerNRIC)) {
+            officers.add(officerNRIC);
+            CommonView.displayMessage("Officer " + officerNRIC + " added to project " + projectID + ".");
+        } else {
+            CommonView.displayMessage("Officer " + officerNRIC + " already exists in project " + projectID + ".");
         }
-        officers.add(officerNRIC);
     }
 
     public void removeOfficer(String officerNRIC) {
