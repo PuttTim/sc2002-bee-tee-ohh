@@ -1,6 +1,8 @@
 package services;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,14 +22,18 @@ import utils.DateTimeUtils;
 
 
 public class ProjectService {
-    public static List<Project> getProjects(List<Filter> filters) {
+    public static List<Project> getProjects(List<Filter> filters, boolean onlyShowVisible) {
         Stream<Project> projectStream = ProjectRepository.getAll().stream();
 
-        if (!filters.isEmpty()) {
+        List<Filter> actualFilters = (filters == null) ? Collections.emptyList() : filters;
+        if (onlyShowVisible) {
+            projectStream = projectStream.filter(Project::isVisible);
+        }
+
+        if (!actualFilters.isEmpty()) {
             projectStream = projectStream.filter(project ->
-                    filters.stream().allMatch(filter ->
-                            checkPassesFilter(project, filter)
-                    )
+                    actualFilters.stream()
+                            .allMatch(filter -> checkPassesFilter(project, filter))
             );
         }
 
@@ -35,21 +41,40 @@ public class ProjectService {
     }
 
     private static boolean checkPassesFilter(Project project, Filter filter) {
-        if (project == null) {
+        if (project == null || filter == null) {
             return true;
         }
 
-        String key = filter.getKey();
-        List<String> value = filter.getValue();
+        String key = filter.getKey().trim().toLowerCase();
+        List<String> filterValues = filter.getValue();
         return switch (key) {
-            case "location" -> value.contains(project.getLocation());
+            case "location" -> {
+                String projectLocation = project.getLocation();
+                yield filterValues.stream()
+                        .anyMatch(fv -> fv.equalsIgnoreCase(projectLocation));
+            }
             case "flat_type" -> {
-                for (FlatType flattype : project.getFlatTypes()) {
-                    if (value.contains(flattype.toString())) {
-                        yield true;
-                    }
-                }
-                yield false;
+                List<FlatType> projectFlatTypes = project.getFlatTypes();
+                yield projectFlatTypes.stream()
+                        .map(FlatType::toString)
+                        .anyMatch(filterValues::contains);
+            }
+            case "price_range" -> {
+                List<Integer> projectPrices = project.getFlatTypeSellingPrice();
+
+                yield projectPrices.stream()
+                        .anyMatch(projectPrice ->
+                                filterValues.stream() // ...check against each selected range string...
+                                        .map(rangeString -> {
+                                            String[] parts = rangeString.trim().split("-");
+                                            int minPrice = Integer.parseInt(parts[0].trim().substring(0, parts[0].length()-1));
+                                            int maxPrice = Integer.parseInt(parts[1].trim().substring(0, parts[1].length()-1));
+                                            return new int[]{minPrice * 1000, maxPrice * 1000};
+                                        })
+                                        .anyMatch(bounds ->
+                                                projectPrice >= bounds[0] && projectPrice <= bounds[1]
+                                        )
+                        );
             }
             default -> {
                 System.err.println("Warning: Unknown filter key skipped: " + key);

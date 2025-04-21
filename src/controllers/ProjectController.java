@@ -1,24 +1,31 @@
 package controllers;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import models.Applicant;
-import models.Enquiry;
-import models.Officer;
-import models.Project;
+import models.*;
 import services.EnquiryService;
 import services.ProjectService;
 
-import views.ProjectView;
-import views.AuthView;
-import views.CommonView;
-import views.EnquiryView;
+import views.*;
 
 public class ProjectController {
 
-    public static void viewAvailableProjects(Applicant applicant) {
-        List<Project> projects = ProjectService.getVisibleProjects();
+    public static void viewAvailableProjects(Applicant applicant, Map<String, Set<String>> currentFilters) {
+//        List<Project> projects = ProjectService.getVisibleProjects();
+        FilterView.selectProjectFilters(currentFilters);
+        List<Filter> filtersToApply = new ArrayList<>();
+        for (Map.Entry<String, Set<String>> entry : currentFilters.entrySet()) {
+            String key = entry.getKey().toLowerCase().replace(" ", "_");
+            List<String> values = new ArrayList<>(entry.getValue());
+            if (!values.isEmpty()) {
+                filtersToApply.add(new Filter(key, values));
+            }
+        }
+        List<Project> projects = ProjectService.getProjects(filtersToApply, true);
         CommonView.displayHeader("Available Projects");
         ProjectView.displayAvailableProjects(projects);
         ProjectView.showProjectMenu(applicant, projects);

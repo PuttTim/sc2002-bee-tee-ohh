@@ -14,6 +14,10 @@ import views.AuthView;
 import views.CommonView;
 import views.ProjectView;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class AuthController {
     private static final String TEST_APPLICANT_NRIC = "S1234567A";
     private static final String TEST_OFFICER_NRIC = "S2345678B";
@@ -77,9 +81,10 @@ public class AuthController {
         boolean running = true;
         switch (user.getRole()) {
             case APPLICANT -> {
+                Map<String, Set<String>> applicantFilters = new HashMap<>();
                 while (running) {
                     switch (AuthView.showApplicantMainMenu()) {
-                        case 1 -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()));
+                        case 1 -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()), applicantFilters);
                         case 2 -> handleChangePassword(user);
                         case 3 -> { running = false; }
                         default -> CommonView.displayError("Invalid option. Please try again.");
@@ -88,11 +93,11 @@ public class AuthController {
             }
             case OFFICER -> {
                 while (running) {
-
+                    Map<String, Set<String>> officerAsApplicantFilters = new HashMap<>();
                     switch (AuthView.showOfficerMainMenu()) {
                         case 1 -> {
                             UserRepository.setUserMode(Role.APPLICANT);
-                            showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
+                            showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()), officerAsApplicantFilters);
                         }
                         case 2 -> {
                             UserRepository.setUserMode(Role.OFFICER);
@@ -121,13 +126,13 @@ public class AuthController {
         CommonView.displayMessage("Logged out of: " + user.getName());
     }
 
-    private static void showApplicantMenu(Applicant user) {
+    private static void showApplicantMenu(Applicant user, Map<String, Set<String>> applicantFilters) {
         boolean running = true;
         while (running) {
             int choice = AuthView.showApplicantMenu();
             try {
                 switch (choice) {
-                    case 1 -> ProjectController.viewAvailableProjects(user);
+                    case 1 -> ProjectController.viewAvailableProjects(user, applicantFilters);
                     case 2 -> ApplicantController.newApplication(user);
                     case 3 -> ApplicantController.viewMyApplications(user);
                     case 4 -> EnquiryController.createNewEnquiry(user);

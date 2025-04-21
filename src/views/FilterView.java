@@ -1,17 +1,20 @@
 package views;
 
+import models.Filter;
+
 import java.util.*;
 
 public class FilterView {
     private static final List<String> LOCATION_OPTIONS = List.of("Jurong West", "Tampines", "Woodlands", "Yishun", "Punggol");
-    private static final List<String> FLAT_TYPE_OPTIONS = List.of("2-Room Flexi", "3-Room", "4-Room", "5-Room", "Executive");
+    private static final List<String> FLAT_TYPE_OPTIONS = List.of("TWO_ROOM", "THREE_ROOM");
+    private static final List<String> PRICE_RANGE_OPTIONS = List.of("300k-400k", "400k-500k", "500k-600k", "600k-700k", "700k-800k", "800k-900k");
 
-    public Map<String, Set<String>> selectProjectFilters() {
-        Map<String, Set<String>> activeFilters = new HashMap<>();
+    public static void selectProjectFilters(Map<String, Set<String>> activeFilters) {
         boolean running = true;
         List<String> options = List.of(
                 "Filter By Location",
                 "Filter By Flat Type",
+                "Filter By Price Range",
                 "Apply Filters"
         );
         while (running) {
@@ -20,20 +23,29 @@ public class FilterView {
                 switch (choice) {
                     case 1:
                         Set<String> selectedLocations = activeFilters.computeIfAbsent("Location", k -> new HashSet<>());
-                        if(showFilterSubMenu("Location", LOCATION_OPTIONS, selectedLocations)) {
+                        showFilterSubMenu("Location", LOCATION_OPTIONS, selectedLocations);
+                        if (selectedLocations.isEmpty()) {
                             activeFilters.remove("Location");
-                        };
+                        }
                         break;
 
                     case 2:
                         Set<String> selectedFlatTypes = activeFilters.computeIfAbsent("Flat Type", k -> new HashSet<>());
-                        if(showFilterSubMenu("Flat Type", FLAT_TYPE_OPTIONS, selectedFlatTypes)) {
+                        showFilterSubMenu("Flat Type", FLAT_TYPE_OPTIONS, selectedFlatTypes);
+                        if (selectedFlatTypes.isEmpty()) {
                             activeFilters.remove("Flat Type");
-                        };
+                        }
                         break;
 
                     case 3:
-                        System.out.println("\nFilter selection confirmed.");
+                        Set<String> selectedPriceRange = activeFilters.computeIfAbsent("Price Range", k -> new HashSet<>());
+                        showFilterSubMenu("Price Range", PRICE_RANGE_OPTIONS, selectedPriceRange);
+                        if (selectedPriceRange.isEmpty()) {
+                            activeFilters.remove("Price Range");
+                        }
+                        break;
+                    case 4:
+                        System.out.println("\nFilter selection applied.");
                         running = false;
                         break;
                 }
@@ -41,10 +53,18 @@ public class FilterView {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
-        return activeFilters;
+
+//        List<Filter> filtersToApply = new ArrayList<>();
+//        for (Map.Entry<String, Set<String>> entry : activeFilters.entrySet()) {
+//            String key = entry.getKey().toLowerCase().replace(" ", "_");
+//            List<String> values = new ArrayList<>(entry.getValue());
+//            if (!values.isEmpty()) {
+//                filtersToApply.add(new Filter(key, values));
+//            }
+//        }
     }
 
-    public boolean showFilterSubMenu(String categoryName, List<String> availableOptions, Set<String> selectedInCategory) {
+    private static void showFilterSubMenu(String categoryName, List<String> availableOptions, Set<String> selectedInCategory) {
         while (true) {
             List<String> displayOptions = new ArrayList<>();
             for (String option : availableOptions) {
@@ -57,8 +77,6 @@ public class FilterView {
             displayOptions.add("Back");
 
             int choice = CommonView.displayMenu(categoryName + " Filter", displayOptions);
-            System.out.println(choice);
-            System.out.println(availableOptions.size());
             if (choice <= 0 || choice > availableOptions.size() + 1) {
                 continue;
             };
@@ -79,7 +97,6 @@ public class FilterView {
                 System.out.println("'" + selectedOption + "' filter ACTIVATED.");
             }
         }
-        return selectedInCategory.isEmpty();
+//        return selectedInCategory.isEmpty();
     }
-
 }

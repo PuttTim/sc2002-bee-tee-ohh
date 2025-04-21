@@ -6,8 +6,9 @@ public class Filter {
     private String key;
     private List<String> value;
 
-    public void addValue(String input) {
-        value.add(input);
+    public Filter(String key, List<String> value) {
+        this.key = key;
+        this.value = value;
     }
 
     public String getKey() {
