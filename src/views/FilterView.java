@@ -9,7 +9,7 @@ public class FilterView {
     private static final List<String> FLAT_TYPE_OPTIONS = List.of("TWO_ROOM", "THREE_ROOM");
     private static final List<String> PRICE_RANGE_OPTIONS = List.of("300k-400k", "400k-500k", "500k-600k", "600k-700k", "700k-800k", "800k-900k");
 
-    public static void selectProjectFilters(Map<String, Set<String>> activeFilters) {
+    public static List<Filter> selectProjectFilters(Map<String, Set<String>> activeFilters) {
         boolean running = true;
         List<String> options = List.of(
                 "Filter By Location",
@@ -53,6 +53,8 @@ public class FilterView {
                 CommonView.displayError("Please enter a valid number!");
             }
         }
+
+        return formatForOutput(activeFilters);
 
 //        List<Filter> filtersToApply = new ArrayList<>();
 //        for (Map.Entry<String, Set<String>> entry : activeFilters.entrySet()) {
@@ -98,5 +100,17 @@ public class FilterView {
             }
         }
 //        return selectedInCategory.isEmpty();
+    }
+
+    private static List<Filter> formatForOutput(Map<String, Set<String>> currentFilters) {
+        List<Filter> filtersToApply = new ArrayList<>();
+        for (Map.Entry<String, Set<String>> entry : currentFilters.entrySet()) {
+            String key = entry.getKey().toLowerCase().replace(" ", "_");
+            List<String> values = new ArrayList<>(entry.getValue());
+            if (!values.isEmpty()) {
+                filtersToApply.add(new Filter(key, values));
+            }
+        }
+        return filtersToApply;
     }
 }

@@ -79,12 +79,12 @@ public class AuthController {
 
     private static void dispatchToController(User user) {
         boolean running = true;
+        Map<String, Set<String>> filters = new HashMap<>();
         switch (user.getRole()) {
             case APPLICANT -> {
-                Map<String, Set<String>> applicantFilters = new HashMap<>();
                 while (running) {
                     switch (AuthView.showApplicantMainMenu()) {
-                        case 1 -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()), applicantFilters);
+                        case 1 -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()), filters);
                         case 2 -> handleChangePassword(user);
                         case 3 -> { running = false; }
                         default -> CommonView.displayError("Invalid option. Please try again.");
@@ -93,11 +93,10 @@ public class AuthController {
             }
             case OFFICER -> {
                 while (running) {
-                    Map<String, Set<String>> officerAsApplicantFilters = new HashMap<>();
                     switch (AuthView.showOfficerMainMenu()) {
                         case 1 -> {
                             UserRepository.setUserMode(Role.APPLICANT);
-                            showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()), officerAsApplicantFilters);
+                            showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()), filters);
                         }
                         case 2 -> {
                             UserRepository.setUserMode(Role.OFFICER);
@@ -174,7 +173,7 @@ public class AuthController {
             int choice = AuthView.showManagerMenu();
             try {
                 switch (choice) {
-                    case 1 -> ManagerController.viewAllProjects(); 
+                    case 1 -> ManagerController.viewAllProjects();
                     case 2 -> ManagerController.viewHandledProjects(manager);
                     case 3 -> ManagerController.viewAllEnquiries();
                     case 4 -> ManagerController.createProject();

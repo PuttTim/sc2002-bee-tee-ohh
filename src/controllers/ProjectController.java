@@ -15,16 +15,7 @@ import views.*;
 public class ProjectController {
 
     public static void viewAvailableProjects(Applicant applicant, Map<String, Set<String>> currentFilters) {
-//        List<Project> projects = ProjectService.getVisibleProjects();
-        FilterView.selectProjectFilters(currentFilters);
-        List<Filter> filtersToApply = new ArrayList<>();
-        for (Map.Entry<String, Set<String>> entry : currentFilters.entrySet()) {
-            String key = entry.getKey().toLowerCase().replace(" ", "_");
-            List<String> values = new ArrayList<>(entry.getValue());
-            if (!values.isEmpty()) {
-                filtersToApply.add(new Filter(key, values));
-            }
-        }
+        List<Filter> filtersToApply = FilterView.selectProjectFilters(currentFilters);
         List<Project> projects = ProjectService.getProjects(filtersToApply, true);
         CommonView.displayHeader("Available Projects");
         ProjectView.displayAvailableProjects(projects);
