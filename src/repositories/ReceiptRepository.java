@@ -12,14 +12,6 @@ import utils.CsvReader;
 import utils.CsvWriter;
 import utils.DateTimeUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import interfaces.ICsvConfig;
-
 /**
  * A repository class for managing receipts in the system.
  * Supports loading and saving data to CSV and searching receipts by application ID or applicant.

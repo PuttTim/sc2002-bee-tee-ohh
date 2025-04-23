@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import interfaces.ICsvConfig;
-
 /**
  * Utility class for reading CSV files into a list of key-value maps.
  */
