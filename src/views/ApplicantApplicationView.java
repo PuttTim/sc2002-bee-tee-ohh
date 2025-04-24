@@ -8,7 +8,7 @@ import models.enums.FlatType;
 
 import repositories.ProjectRepository;
 import repositories.UserRepository;
-
+import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 
 public class ApplicantApplicationView {
@@ -114,5 +114,38 @@ public class ApplicantApplicationView {
 
     public static void displayWithdrawalError(String error) {
         CommonView.displayError(error);
+    }
+
+    public static void handleWithdraw(Applicant applicant) {
+        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
+        if (applications.isEmpty()) {
+            CommonView.displayMessage("No applications available to withdraw.");
+            return;
+        }
+
+        List<Application> withdrawableApplications = applications.stream()
+            .filter(Application::canWithdraw)
+            .toList();
+
+        CommonView.displayHeader("Applications Available for Withdrawal");
+        if (withdrawableApplications.isEmpty()) {
+            CommonView.displayMessage("No applications available for withdrawal.");
+            CommonView.prompt("Press Enter to continue...");
+            return;
+        }
+
+        displayApplicationList(withdrawableApplications, "Your Applications");
+
+        int choice = CommonView.promptInt("Select an application to withdraw (or 0 to go back): ", 0, withdrawableApplications.size());
+        if (choice > 0) {
+            Application selectedApp = withdrawableApplications.get(choice - 1);
+            try {
+                ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
+                displayWithdrawalSuccess();
+            } catch (Exception e) {
+                displayWithdrawalError(e.getMessage());
+            }
+        }
+        CommonView.prompt("Press Enter to continue...");
     }
 }

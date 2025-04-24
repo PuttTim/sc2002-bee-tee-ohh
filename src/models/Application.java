@@ -123,7 +123,6 @@ public class Application {
         if (!canApprove()) {
             throw new IllegalStateException("Application cannot be approved in its current state (Status: " + applicationStatus + ", Withdrawal Requested: " + isWithdrawalRequested + ")");
         }
-        this.applicationStatus = ApplicationStatus.SUCCESSFUL;
         this.approvedBy = userNRIC; 
         recordStatusChange(ApplicationStatus.SUCCESSFUL);
     }
@@ -132,7 +131,6 @@ public class Application {
         if (!canReject()) {
             throw new IllegalStateException("Application cannot be rejected in its current state (Status: " + applicationStatus + ")");
         }
-        this.applicationStatus = ApplicationStatus.UNSUCCESSFUL;
         this.approvedBy = userNRIC;
         recordStatusChange(ApplicationStatus.UNSUCCESSFUL);
     }
@@ -141,41 +139,45 @@ public class Application {
         if (!canBook()) {
             throw new IllegalStateException("Application cannot be booked in its current state (Status: " + applicationStatus + ", Withdrawal Requested: " + isWithdrawalRequested + ")");
         }
-        this.applicationStatus = ApplicationStatus.BOOKED;
         recordStatusChange(ApplicationStatus.BOOKED);
     }
 
     public void requestWithdrawal() {
-        if (!canWithdraw()) {
-            throw new IllegalStateException("Application cannot be withdrawn in its current state (Status: " + applicationStatus + ", Withdrawal Requested: " + isWithdrawalRequested + ")");
+        if (this.isWithdrawalRequested) {
+            throw new IllegalStateException("Withdrawal already requested");
+        }
+        if (this.applicationStatus == ApplicationStatus.WITHDRAWN) {
+            throw new IllegalStateException("Application is already withdrawn");
+        }
+        if (this.applicationStatus == ApplicationStatus.UNSUCCESSFUL) {
+            throw new IllegalStateException("Cannot withdraw an unsuccessful application");
         }
         this.isWithdrawalRequested = true;
-        this.applicationStatus = ApplicationStatus.WITHDRAWAL_REQUESTED;
         recordStatusChange(ApplicationStatus.WITHDRAWAL_REQUESTED);
     }
 
     public void approveWithdrawal(String managerNRIC) {
         if (!canApproveWithdrawal()) {
-            throw new IllegalStateException("Withdrawal cannot be approved in its current state (Status: " + applicationStatus + ", Withdrawal Requested: " + isWithdrawalRequested + ")");
+            throw new IllegalStateException("Withdrawal cannot be approved in its current state");
         }
-        this.applicationStatus = ApplicationStatus.WITHDRAWN;
         this.approvedBy = managerNRIC;
-        this.isWithdrawalRequested = false; 
+        this.isWithdrawalRequested = false;
         recordStatusChange(ApplicationStatus.WITHDRAWN);
     }
 
     public void rejectWithdrawal(String managerNRIC) {
         if (!canRejectWithdrawal()) {
-            throw new IllegalStateException("Withdrawal cannot be rejected in its current state (Status: " + applicationStatus + ", Withdrawal Requested: " + isWithdrawalRequested + ")");
+            throw new IllegalStateException("Withdrawal cannot be rejected in its current state");
         }
-
         this.isWithdrawalRequested = false;
         this.approvedBy = managerNRIC;
+        recordStatusChange(this.applicationStatus);
     }
 
 
     private void recordStatusChange(ApplicationStatus status) {
         applicationStatusHistory.put(status, LocalDateTime.now());
+        this.applicationStatus = status;
     }
 
     public boolean canBook() {
@@ -183,8 +185,8 @@ public class Application {
     }
 
     public boolean canWithdraw() {
-        return !isWithdrawalRequested &&
-               applicationStatus != ApplicationStatus.WITHDRAWN &&
+        return !isWithdrawalRequested && 
+               applicationStatus != ApplicationStatus.WITHDRAWN && 
                applicationStatus != ApplicationStatus.UNSUCCESSFUL;
     }
 

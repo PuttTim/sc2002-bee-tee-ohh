@@ -75,12 +75,6 @@ public class ApplicationService {
             return false;
         }
         try {
-            if (application.getApplicationStatus() == ApplicationStatus.BOOKED) {
-                Project project = ProjectRepository.getById(application.getProjectId());
-                if (project != null) {
-                    // TODO: decrement the flat count for the booked unit
-                }
-            }
             application.approveWithdrawal(manager.getUserNRIC());
             ApplicationRepository.saveAll();
             return true;

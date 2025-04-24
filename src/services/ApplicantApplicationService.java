@@ -120,12 +120,8 @@ public class ApplicantApplicationService {
             throw new IllegalStateException("You can only withdraw your own applications");
         }
 
-        if (application.getApplicationStatus() != ApplicationStatus.PENDING) {
-            throw new IllegalStateException("Only pending applications can be withdrawn");
-        }
-
-        if (application.isWithdrawalRequested()) {
-            throw new IllegalStateException("Withdrawal has already been requested for this application");
+        if (!application.canWithdraw()) {
+            throw new IllegalStateException("This application cannot be withdrawn in its current state");
         }
 
         return application;

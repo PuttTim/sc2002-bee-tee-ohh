@@ -9,6 +9,7 @@ import models.Registration;
 import models.User;
 import models.enums.ApplicationStatus;
 import models.enums.RegistrationStatus;
+import repositories.ProjectRepository;
 import repositories.UserRepository;
 import services.ApplicationService;
 import services.ProjectService;
@@ -143,32 +144,32 @@ public class ManagerController {
                 String applicantName = (applicant != null) ? applicant.getName() : selectedApplication.getApplicantNRIC();
                 ManagerView.displayApplicationDetails(selectedApplication);
 
-                if (selectedApplication.getApplicationStatus() == ApplicationStatus.WITHDRAWAL_REQUESTED) {
+                if (selectedApplication.isWithdrawalRequested()) {
                     int actionChoice = ManagerView.promptApproveRejectWithdrawal();
                     boolean success = false;
                     switch (actionChoice) {
-                        case 1: // Approve Withdrawal
+                        case 1 -> { // Approve Withdrawal
                             success = ApplicationService.approveWithdrawal(selectedApplication, manager);
                             if (success) {
+                                if (selectedApplication.getApplicationStatus() == ApplicationStatus.BOOKED) {
+                                    project.incrementFlatCount(selectedApplication.getSelectedFlatType());
+                                    ProjectRepository.saveAll();
+                                }
                                 ManagerView.displayWithdrawalApprovedSuccess(applicantName);
                             } else {
                                 ManagerView.displayWithdrawalActionFailed("approve");
                             }
-                            break;
-                        case 2: // Reject Withdrawal
+                        }
+                        case 2 -> { // Reject Withdrawal
                             success = ApplicationService.rejectWithdrawal(selectedApplication, manager);
                             if (success) {
                                 ManagerView.displayWithdrawalRejectedSuccess(applicantName);
                             } else {
                                 ManagerView.displayWithdrawalActionFailed("reject");
                             }
-                            break;
-                        case 0: // Cancel
-                            CommonView.displayMessage("Action cancelled.");
-                            break;
-                        default:
-                            CommonView.displayError("Invalid action choice.");
-                            break;
+                        }
+                        case 0 -> CommonView.displayMessage("Action cancelled.");
+                        default -> CommonView.displayError("Invalid action choice.");
                     }
                     if (actionChoice == 1 || actionChoice == 2) {
                         CommonView.prompt("Press Enter to continue...");
@@ -178,7 +179,7 @@ public class ManagerController {
                         int actionChoice = ManagerView.promptApproveReject();
                         boolean success = false;
                         switch (actionChoice) {
-                            case 1: // Approve Application
+                            case 1 -> { // Approve Application
                                 success = ApplicationService.approveApplication(selectedApplication, manager);
                                 if (success) {
                                     CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " approved.");
@@ -188,31 +189,28 @@ public class ManagerController {
                                          CommonView.displayError("Failed to approve application.");
                                     }
                                 }
-                                break;
-                            case 2: // Reject Application
+                            }
+                            case 2 -> { // Reject Application
                                 success = ApplicationService.rejectApplication(selectedApplication, manager);
                                 if (success) {
                                     CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " rejected.");
                                 } else {
                                     CommonView.displayError("Failed to reject application.");
                                 }
-                                break;
-                            case 0: // Cancel
-                                CommonView.displayMessage("No action taken.");
-                                break;
-                            default:
-                                CommonView.displayError("Invalid action choice.");
-                                break;
+                            }
+                            case 0 -> CommonView.displayMessage("No action taken.");
+                            default -> CommonView.displayError("Invalid action choice.");
                         }
-                         if (actionChoice == 1 || actionChoice == 2) {
+                        if (actionChoice == 1 || actionChoice == 2) {
                             CommonView.prompt("Press Enter to continue...");
                         }
                     } else {
-                        CommonView.displayMessage("This application is PENDING but cannot be approved/rejected currently (e.g., withdrawal requested).");
+                        CommonView.displayMessage("This application cannot be approved/rejected as it has an active withdrawal request");
                         CommonView.prompt("Press Enter to continue...");
                     }
                 } else {
-                    CommonView.displayMessage("This application is not in a state that requires manager action (Status: " + selectedApplication.getApplicationStatus() + ").");
+                    CommonView.displayMessage("This application is in state: " + selectedApplication.getApplicationStatus().getDescription() + 
+                        " and has no actions available.");
                     CommonView.prompt("Press Enter to continue...");
                 }
             }
