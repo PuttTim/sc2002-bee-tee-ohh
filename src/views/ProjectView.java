@@ -3,11 +3,13 @@ package views;
 import controllers.EnquiryController;
 
 import models.Applicant;
+import models.Manager;
 import models.Officer;
 import models.Project;
 import models.Registration;
 import models.enums.FlatType;
 import repositories.ApplicationRepository;
+import repositories.ManagerRepository;
 import repositories.ProjectRepository;
 
 import java.util.List;
@@ -84,6 +86,25 @@ public class ProjectView {
         // how many officers slots are remaining and who is the manager of the project (name)
         CommonView.displayMessage("Project Name: " + project.getProjectName());
         CommonView.displayMessage("Location: " + project.getLocation());
+        Manager manager = ManagerRepository.getByNRIC(project.getManagerNRIC());
+        CommonView.displayMessage("Manager: " + (manager != null ? String.format("%s (%s)", manager.getName(), manager.getUserNRIC()) : "N/A"));
+        CommonView.displayMessage("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
+        CommonView.displayMessage("Available Flat Types:");
+        List<FlatType> flatTypes = project.getFlatTypes();
+        for (int i = 0; i < flatTypes.size(); i++) {
+            CommonView.displayMessage((i + 1) + ". " + flatTypes.get(i).getDescription());
+            CommonView.displayMessage("   Available Units: " + project.getFlatTypeUnits().get(i));
+            CommonView.displayMessage("   Price: " + project.getFlatTypeSellingPrice().get(i));
+        }
+    }
+
+    public static void displayProjectDetailsManagerView(Project project) {
+        CommonView.displayShortSeparator();
+
+        CommonView.displayMessage("Project Name: " + project.getProjectName());
+        CommonView.displayMessage("Location: " + project.getLocation());
+        Manager manager = ManagerRepository.getByNRIC(project.getManagerNRIC());
+        CommonView.displayMessage("Manager: " + (manager != null ? String.format("%s (%s)", manager.getName(), manager.getUserNRIC()) : "N/A"));
         CommonView.displayMessage("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
         CommonView.displayMessage("Available Flat Types:");
         List<FlatType> flatTypes = project.getFlatTypes();

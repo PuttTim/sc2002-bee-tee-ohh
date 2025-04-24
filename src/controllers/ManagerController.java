@@ -1,10 +1,5 @@
 package controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import models.Application;
 import models.Enquiry;
 import models.Manager;
 import models.Project;
@@ -23,6 +18,11 @@ import views.CommonView;
 import views.EnquiryView;
 import views.ManagerView;
 import views.ProjectView;
+import models.Application;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ManagerController {
 
@@ -228,8 +228,26 @@ public class ManagerController {
     }
 
     public static void viewAllProjects() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'viewAllProjects'");
+        List<Project> allProjects = ProjectService.getVisibleProjects();
+
+        if (allProjects.isEmpty()) {
+            CommonView.displayMessage("There are no projects in the system.");
+            return;
+        }
+
+        while (true) {
+            CommonView.displayHeader("All Projects in System");
+            ProjectView.displayProjectList(allProjects);
+            int choice = CommonView.promptInt("Enter the number of the project to view details (or 0 to go back): ", 0, allProjects.size());
+
+            if (choice == 0) {
+                break;
+            }
+
+            Project selectedProject = allProjects.get(choice - 1);
+            ProjectView.displayProjectDetailsManagerView(selectedProject);
+            CommonView.prompt("Press Enter to return to the project list...");
+        }
     }
 
     public static void viewAllEnquiries(Manager manager) {
