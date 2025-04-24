@@ -14,10 +14,30 @@ import views.CommonView;
 import views.ManagerView;
 import views.ProjectView;
 
+/**
+ * Controller for handling all actions available to a Manager user.
+ * <p>
+ * This includes functionality for:
+ * <ul>
+ *   <li>Viewing and managing projects assigned to the manager</li>
+ *   <li>Managing officer registrations for projects</li>
+ *   <li>Accessing project-related enquiries</li>
+ * </ul>
+ */
 public class ManagerController {
 
-
-    // Method to display all projects managed by the manager, then ask the user to select a project
+    /**
+     * Displays all projects handled by a given manager and lets them manage selected projects.
+     * <p>
+     * For each selected project, the manager can:
+     * <ul>
+     *   <li>Manage officer registrations</li>
+     *   <li>View and manage enquiries</li>
+     *   <li>Access other project management features</li>
+     * </ul>
+     *
+     * @param manager the manager whose projects are to be displayed and managed
+     */
     public static void viewHandledProjects(Manager manager) {
         List<Project> handledProjects = ProjectService.getProjectsByManager(manager);
 
@@ -39,28 +59,37 @@ public class ManagerController {
             Project selectedProject = handledProjects.get(projectChoice - 1);
             showProjectManagementMenu(selectedProject, manager);
         }
-
-        return;
     }
 
-    // Shows the menu for actions on a specific project managed by the manager
+    /**
+     * Displays a project management menu for a selected project and manager.
+     * <p>
+     * The menu allows the manager to:
+     * <ul>
+     *   <li>Approve or reject officer registrations</li>
+     *   <li>Manage applicant applications (not yet implemented)</li>
+     *   <li>Edit project details (not yet implemented)</li>
+     *   <li>View and reply to project-related enquiries</li>
+     * </ul>
+     *
+     * @param project the project to manage
+     * @param manager the manager handling the project
+     */
     private static void showProjectManagementMenu(Project project, Manager manager) {
-         boolean running = true;
-         while(running) {
-            int choice = ManagerView.showSelectHandledProjectMenu(project); 
+        boolean running = true;
+        while (running) {
+            int choice = ManagerView.showSelectHandledProjectMenu(project);
             switch (choice) {
-                case 1: // Manage Officer Registrations
+                case 1:
                     manageProjectOfficerRegistration(project, manager);
                     break;
-                case 2: // Manage Applicant Applications
-                    // TODO: Implement manage applicant applications similar to OfficerController
+                case 2:
                     CommonView.displayMessage("Manage Applicant Applications - Not yet implemented.");
                     break;
-                case 3: // Manage Project Details 
-                     // TODO: Implement project details editing
+                case 3:
                     CommonView.displayMessage("Manage Project Details - Not yet implemented.");
                     break;
-                case 4: // View Enquiries
+                case 4:
                     EnquiryController.manageProjectEnquiries(java.util.Optional.empty(), java.util.Optional.of(manager), project);
                     break;
                 case 0:
@@ -70,22 +99,32 @@ public class ManagerController {
                     CommonView.displayError("Invalid choice.");
                     break;
             }
-         }
+        }
     }
 
-
-    // Manages officer registrations for a specific project
+    /**
+     * Allows a manager to manage officer registrations for a specific project.
+     * <p>
+     * Includes:
+     * <ul>
+     *   <li>Viewing pending and all registrations</li>
+     *   <li>Approving or rejecting officer registration requests</li>
+     * </ul>
+     *
+     * @param project the project for which officer registrations are managed
+     * @param manager the manager approving or rejecting registrations
+     */
     public static void manageProjectOfficerRegistration(Project project, Manager manager) {
-         while (true) {
+        while (true) {
             List<Registration> allRegistrations = RegistrationService.getProjectRegistrations(project);
             List<Registration> pendingRegistrations = allRegistrations.stream()
-                .filter(r -> r.getRegistrationStatus() == RegistrationStatus.PENDING)
-                .collect(Collectors.toList());
+                    .filter(r -> r.getRegistrationStatus() == RegistrationStatus.PENDING)
+                    .collect(Collectors.toList());
 
             int choice = ManagerView.displayOfficerRegistrationsForApproval(allRegistrations, project);
 
             if (choice == 0) {
-                break; 
+                break;
             }
 
             Registration selectedRegistration = pendingRegistrations.get(choice - 1);
@@ -95,7 +134,7 @@ public class ManagerController {
             String officerName = selectedRegistration.getOfficer().getName();
 
             switch (action) {
-                case 1: // Approve
+                case 1:
                     success = RegistrationService.approveRegistration(selectedRegistration, manager);
                     if (success) {
                         ManagerView.displayRegistrationApprovedSuccess(officerName);
@@ -103,56 +142,72 @@ public class ManagerController {
                         ManagerView.displayRegistrationActionFailed("approve");
                     }
                     break;
-                case 2: // Reject
+                case 2:
                     success = RegistrationService.rejectRegistration(selectedRegistration, manager);
-                     if (success) {
+                    if (success) {
                         ManagerView.displayRegistrationRejectedSuccess(officerName);
                     } else {
                         ManagerView.displayRegistrationActionFailed("reject");
                     }
                     break;
-                case 0: // Cancel
+                case 0:
                     CommonView.displayMessage("Action cancelled.");
                     break;
                 default:
                     CommonView.displayError("Invalid action.");
                     break;
             }
-             if (action == 1 || action == 2) {
-                 CommonView.prompt("Press Enter to continue...");
-             }
-         }
+
+            if (action == 1 || action == 2) {
+                CommonView.prompt("Press Enter to continue...");
+            }
+        }
     }
 
+    /**
+     * Allows the manager to create and save a new project.
+     */
+
     public static void createProject() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createProject'");
     }
 
+    /**
+     * Displays all projects and lets the manager view their details.
+     */
+
     public static void viewAllProjects() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'viewAllProjects'");
     }
 
+    /**
+     * Allows the manager to view enquiries for any project.
+     */
     public static void viewAllEnquiries() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'viewAllEnquiries'");
     }
 
-    // method to display all projects which then will ask the user to select a project
+    /**
+     * Placeholder method. Use the version that accepts a Manager object.
+     */
     public static void viewHandledProjects() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'viewHandledProjects'");
     }
 
-    // this will show a menu of actions that the manager can do on the project
+    /**
+     * Displays detailed information for a specific project.
+     *
+     * @param project the project to display
+     */
     public static void viewProjectDetails(Project project) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'viewProjectDetails'");
     }
 
+    /**
+     * Placeholder method. Use the version that accepts both Project and Manager objects.
+     */
     public static void manageProjectOfficerRegistration(Project project) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'manageProjectOfficerRegistration'");
     }
 }
+

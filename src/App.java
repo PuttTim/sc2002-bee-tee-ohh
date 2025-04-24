@@ -1,6 +1,10 @@
 import controllers.*;
 import repositories.*;
 
+/**
+ * The main entry point of the housing project management application.
+ * Initializes the repositories, runs the authentication process, and handles exceptions.
+ */
 // This is the main entrypoint of our application.
 public class App {
     private App() {}

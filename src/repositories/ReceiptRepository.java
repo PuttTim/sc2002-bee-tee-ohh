@@ -6,7 +6,6 @@ import models.Project;
 import models.Receipt;
 import models.User;
 import models.enums.FlatType;
-import models.enums.MaritalStatus;
 import utils.CsvReader;
 import utils.CsvWriter;
 import utils.DateTimeUtils;
@@ -18,7 +17,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Repository for managing receipts, including loading from and saving to CSV files.
+ * <p>
+ * This class provides functionality to load receipts from a CSV file, save them back to the file,
+ * and perform CRUD operations such as retrieving receipts by their ID or applicant NRIC.
+ * </p>
+ */
 public class ReceiptRepository {
+
+    /**
+     * Configuration for reading and writing the receipt CSV file.
+     */
     private static class ReceiptCsvConfig implements ICsvConfig {
         @Override
         public String getFilePath() {
@@ -27,8 +37,7 @@ public class ReceiptRepository {
 
         @Override
         public List<String> getHeaders() {
-            return List.of("ReceiptID", "ApplicantNRIC", "FlatType", "FlatPrice", "FlatUnitNumber", "ProjectID", "BookingTimestamp", "OfficerNRIC"
-            );
+            return List.of("ReceiptID", "ApplicantNRIC", "FlatType", "FlatPrice", "FlatUnitNumber", "ProjectID", "BookingTimestamp", "OfficerNRIC");
         }
     }
 
@@ -36,6 +45,13 @@ public class ReceiptRepository {
 
     private ReceiptRepository() {}
 
+    /**
+     * Saves all receipts to the CSV file.
+     * <p>
+     * The method iterates over all receipts, converts them to a map representation, and writes them
+     * to the CSV file using the configured CSV writer.
+     * </p>
+     */
     public static void saveAll() {
         List<Map<String, String>> records = new ArrayList<>();
         for (Receipt receipt : receipts) {
@@ -58,6 +74,13 @@ public class ReceiptRepository {
         }
     }
 
+    /**
+     * Loads receipts from the CSV file.
+     * <p>
+     * This method reads the CSV file, parses each record, and converts it into a `Receipt` object.
+     * If any errors occur during parsing, they are logged.
+     * </p>
+     */
     public static void load() {
         try {
             List<Map<String, String>> records = CsvReader.read(new ReceiptCsvConfig());
@@ -70,20 +93,20 @@ public class ReceiptRepository {
                     Project project = ProjectRepository.getById(record.get("ProjectID"));
 
                     Receipt receipt = new Receipt(
-                        record.get("ReceiptID"),
-                        user.getName(),
-                        user.getUserNRIC(),
-                        user.getAge(),
-                        user.getMaritalStatus(),
-                        FlatType.valueOf(record.get("FlatType")),
-                        Integer.parseInt(record.get("FlatPrice")),
-                        record.get("FlatUnitNumber"),
-                        project.getProjectName(),
-                        record.get("ProjectID"),
-                        project.getLocation(),
-                        DateTimeUtils.parseDateTime(record.get("BookingTimestamp")),
-                        officer
-                        );
+                            record.get("ReceiptID"),
+                            user.getName(),
+                            user.getUserNRIC(),
+                            user.getAge(),
+                            user.getMaritalStatus(),
+                            FlatType.valueOf(record.get("FlatType")),
+                            Integer.parseInt(record.get("FlatPrice")),
+                            record.get("FlatUnitNumber"),
+                            project.getProjectName(),
+                            record.get("ProjectID"),
+                            project.getLocation(),
+                            DateTimeUtils.parseDateTime(record.get("BookingTimestamp")),
+                            officer
+                    );
                     receipts.add(receipt);
                 } catch (NumberFormatException e) {
                     System.err.println("Error parsing age for receipt " + record.get("ReceiptID") + ": " + e.getMessage());
@@ -100,10 +123,24 @@ public class ReceiptRepository {
         }
     }
 
+    /**
+     * Retrieves all receipts.
+     *
+     * @return a list of all receipts
+     */
     public static List<Receipt> getAll() {
         return new ArrayList<>(receipts);
     }
 
+    /**
+     * Adds a new receipt to the repository.
+     * <p>
+     * The method first checks if the receipt already exists in the repository using its ID. If it does not
+     * exist, the receipt is added to the list and saved to the CSV file.
+     * </p>
+     *
+     * @param receipt the receipt to add
+     */
     public static void add(Receipt receipt) {
         if (getById(receipt.getReceiptId()) == null) {
             receipts.add(receipt);
@@ -113,22 +150,40 @@ public class ReceiptRepository {
         }
     }
 
+    /**
+     * Retrieves a receipt by its ID.
+     *
+     * @param receiptId the ID of the receipt
+     * @return the receipt with the specified ID, or null if no such receipt exists
+     */
     public static Receipt getById(String receiptId) {
         return receipts.stream()
-            .filter(receipt -> receipt.getReceiptId().equals(receiptId))
-            .findFirst()
-            .orElse(null);
+                .filter(receipt -> receipt.getReceiptId().equals(receiptId))
+                .findFirst()
+                .orElse(null);
     }
 
+    /**
+     * Retrieves all receipts associated with a specific applicant.
+     *
+     * @param applicantNRIC the NRIC of the applicant
+     * @return a list of receipts for the specified applicant
+     */
     public static List<Receipt> getByApplicantNRIC(String applicantNRIC) {
         return receipts.stream()
-            .filter(receipt -> receipt.getApplicantNRIC().equals(applicantNRIC))
-            .collect(Collectors.toList());
+                .filter(receipt -> receipt.getApplicantNRIC().equals(applicantNRIC))
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves all receipts associated with a specific project.
+     *
+     * @param projectID the ID of the project
+     * @return a list of receipts for the specified project
+     */
     public static List<Receipt> getByProjectID(String projectID) {
         return receipts.stream()
-            .filter(receipt -> receipt.getProjectID().equals(projectID))
-            .collect(Collectors.toList());
+                .filter(receipt -> receipt.getProjectID().equals(projectID))
+                .collect(Collectors.toList());
     }
 }

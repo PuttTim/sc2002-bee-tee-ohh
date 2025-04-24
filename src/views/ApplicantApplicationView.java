@@ -12,12 +12,23 @@ import repositories.UserRepository;
 import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 
+/**
+ * View class for handling applicant-related application interactions.
+ * Allows users to view projects, submit applications, withdraw applications, and view application status.
+ */
 public class ApplicantApplicationView {
+
+    /**
+     * Displays the application menu for an applicant.
+     *
+     * @param applicant the logged-in applicant
+     * @param projects the list of all projects
+     */
     public static void showApplicationMenu(Applicant applicant, List<Project> projects) {
         List<String> options = List.of(
-            "View Available Projects",
-            "Submit New Application",
-            "Withdraw Application"
+                "View Available Projects",
+                "Submit New Application",
+                "Withdraw Application"
         );
 
         while (true) {
@@ -27,7 +38,7 @@ public class ApplicantApplicationView {
                     case 1 -> displayEligibleProjects(applicant, projects);
                     case 2 -> promptApplication(applicant, projects);
                     case 3 -> handleWithdraw(applicant);
-                    case 0 -> {return;}
+                    case 0 -> { return; }
                 }
             } catch (Exception e) {
                 CommonView.displayError("Please enter a valid number!");
@@ -35,6 +46,12 @@ public class ApplicantApplicationView {
         }
     }
 
+    /**
+     * Displays projects that the applicant is currently eligible to apply for.
+     *
+     * @param applicant the applicant user
+     * @param allProjects the list of all available projects
+     */
     public static void displayEligibleProjects(User applicant, List<Project> allProjects) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
         if (eligibleProjects.isEmpty()) {
@@ -46,6 +63,12 @@ public class ApplicantApplicationView {
         ProjectView.displayAvailableProjects(eligibleProjects);
     }
 
+    /**
+     * Prompts the applicant to submit a new application for an eligible project.
+     *
+     * @param applicant the applicant submitting the application
+     * @param allProjects the list of all available projects
+     */
     public static void promptApplication(Applicant applicant, List<Project> allProjects) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant, allProjects);
         if (eligibleProjects.isEmpty()) {
@@ -70,10 +93,14 @@ public class ApplicantApplicationView {
             CommonView.displaySuccess("Application submitted successfully.");
         } else {
             CommonView.displayError("You have an existing BTO application. Please try again later.");
-            return;
         }
     }
 
+    /**
+     * Displays all applications made by the applicant along with their statuses.
+     *
+     * @param applicant the applicant user
+     */
     public static void displayApplicationStatus(Applicant applicant) {
         List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
         if (applications.isEmpty()) {
@@ -88,16 +115,19 @@ public class ApplicantApplicationView {
             CommonView.displayMessage("Status: " + getStatusDisplay(app.getApplicationStatus()));
             CommonView.displayMessage("Application Date: " + DateTimeUtils.formatDateTime(app.getApplicationDate()));
             if (app.getApprovedBy() != null) {
-                if (app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL) {
-                    CommonView.displayMessage("Approved By: " + UserRepository.getByNRIC(app.getApprovedBy()).getName());
-                } else {
-                    CommonView.displayMessage("Rejected By: " + UserRepository.getByNRIC(app.getApprovedBy()).getName());
-                }
+                String approver = UserRepository.getByNRIC(app.getApprovedBy()).getName();
+                String label = app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL ? "Approved By" : "Rejected By";
+                CommonView.displayMessage(label + ": " + approver);
             }
             CommonView.displaySeparator();
         }
     }
 
+    /**
+     * Handles withdrawal of a pending application by the applicant.
+     *
+     * @param applicant the applicant who wishes to withdraw
+     */
     public static void handleWithdraw(Applicant applicant) {
         List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
         if (applications.isEmpty()) {
@@ -110,10 +140,10 @@ public class ApplicantApplicationView {
         for (int i = 0; i < applications.size(); i++) {
             Application app = applications.get(i);
             if (app.getApplicationStatus() == ApplicationStatus.PENDING) {
-                CommonView.displayMessage(String.format("%d. Project: %s, Flat Type: %s", 
-                    i + 1, 
-                    ProjectRepository.getById(app.getProjectId()).getProjectName(),
-                    app.getSelectedFlatType()));
+                CommonView.displayMessage(String.format("%d. Project: %s, Flat Type: %s",
+                        i + 1,
+                        ProjectRepository.getById(app.getProjectId()).getProjectName(),
+                        app.getSelectedFlatType()));
                 activeCount++;
             }
         }
@@ -131,6 +161,12 @@ public class ApplicantApplicationView {
         }
     }
 
+    /**
+     * Returns a display-friendly label for a given application status.
+     *
+     * @param status the application status
+     * @return the status label
+     */
     private static String getStatusDisplay(ApplicationStatus status) {
         return switch (status) {
             case PENDING -> "Pending";

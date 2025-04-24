@@ -13,20 +13,47 @@ import repositories.ProjectRepository;
 import repositories.ReceiptRepository;
 import views.CommonView;
 
+/**
+ * Service class for managing housing application operations.
+ * <p>
+ * Provides functionality for retrieving, approving, rejecting, and booking housing applications.
+ * Interacts with repositories to persist changes and enforce business rules.
+ * </p>
+ */
 public class ApplicationService {
 
+    /**
+     * Retrieves all applications for a specific project.
+     *
+     * @param project The project to filter applications by
+     * @return List of {@code Application} objects for the given project
+     */
     public static List<Application> getProjectApplications(Project project) {
         return ApplicationRepository.getAll().stream()
                 .filter(app -> app.getProjectId().equals(project.getProjectID()))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves all applications for a specific project.
+     *
+     * @param project The project to filter applications by
+     * @return List of {@code Application} objects for the given project
+     */
     public static List<Application> getSuccessfulProjectApplications(Project project) {
         return getProjectApplications(project).stream()
                 .filter(app -> app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Approves an application if it meets approval criteria.
+     * The officer's NRIC is recorded
+     *
+     * @param application The application to approve
+     * @param officer The officer approving the application
+     * @return {@code true} if approval was successful, {@code false} otherwise
+     */
     public static boolean approveApplication(Application application, Officer officer) {
         if (application == null || !application.canApprove()) {
             return false;
@@ -45,6 +72,14 @@ public class ApplicationService {
         }
     }
 
+    /**
+     * Rejects an application if it meets rejection criteria.
+     * The officer's NRIC is recorded.
+     *
+     * @param application The application to reject
+     * @param officer The officer rejecting the application
+     * @return {@code true} if rejection was successful, {@code false} otherwise
+     */
     public static boolean rejectApplication(Application application, Officer officer) {
         if (application == null || !application.canReject()) {
             return false;
@@ -63,6 +98,21 @@ public class ApplicationService {
         }
     }
 
+    /**
+     * Books a unit for an approved application.
+     * <p>
+     * Performs several validations before booking:
+     * <ul>
+     *   <li>Checks if the application is in a bookable state</li>
+     *   <li>Verifies the unit number isn't already taken</li>
+     *   <li>Ensures the project has available units</li>
+     * </ul>
+     *
+     * @param application The application to book
+     * @param officer The officer processing the booking
+     * @param selectedUnitNumber The unit number being assigned
+     * @return {@code true} if booking was successful, {@code false} otherwise
+     */
     public static boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) { // Added unitNumber parameter
         if (application == null || !application.canBook()) {
             return false;

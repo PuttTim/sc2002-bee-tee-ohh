@@ -3,9 +3,22 @@ package utils;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
+/**
+ * Utility class for parsing and formatting {@link LocalDateTime} objects.
+ * <p>
+ * Uses ISO_LOCAL_DATE_TIME format by default. Supports null-safe operations.
+ * </p>
+ */
 public class DateTimeUtils {
     private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    
+
+    /**
+     * Parses a date-time string into a {@link LocalDateTime} using the specified formatter.
+     *
+     * @param dateTimeStr the string to parse
+     * @param formatter the formatter to use, or null to use default
+     * @return the parsed LocalDateTime, or null if input is invalid
+     */
     public static LocalDateTime parseDateTime(String dateTimeStr, DateTimeFormatter formatter) {
         if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
             return null;
@@ -18,10 +31,23 @@ public class DateTimeUtils {
         }
     }
 
+    /**
+     * Parses a date-time string using the default formatter.
+     *
+     * @param dateTimeStr the string to parse
+     * @return the parsed LocalDateTime, or null if input is invalid
+     */
     public static LocalDateTime parseDateTime(String dateTimeStr) {
         return parseDateTime(dateTimeStr, DEFAULT_FORMATTER);
     }
-    
+
+    /**
+     * Formats a {@link LocalDateTime} as a string using the specified formatter.
+     *
+     * @param dateTime the date-time to format
+     * @param formatter the formatter to use, or null to use default
+     * @return the formatted string, or empty string if dateTime is null
+     */
     public static String formatDateTime(LocalDateTime dateTime, DateTimeFormatter formatter) {
         if (dateTime == null) {
             return "";
@@ -34,15 +60,22 @@ public class DateTimeUtils {
         }
     }
 
+    /**
+     * Formats a {@link LocalDateTime} using the default formatter.
+     *
+     * @param dateTime the date-time to format
+     * @return the formatted string, or empty string if dateTime is null
+     */
     public static String formatDateTime(LocalDateTime dateTime) {
         return formatDateTime(dateTime, DEFAULT_FORMATTER);
     }
 
+    /**
+     * Returns the current date and time in the Asia/Singapore time zone.
+     *
+     * @return the current LocalDateTime
+     */
     public static LocalDateTime getCurrentDateTime() {
-        LocalDateTime now = LocalDateTime.now(
-            java.time.ZoneId.of("Asia/Singapore")
-
-        );
-        return now;
+        return LocalDateTime.now(java.time.ZoneId.of("Asia/Singapore"));
     }
 }

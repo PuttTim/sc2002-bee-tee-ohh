@@ -18,8 +18,33 @@ import repositories.UserRepository;
 
 import utils.DateTimeUtils;
 
-
+/**
+ * Service class for managing project-related operations.
+ * <p>
+ * Provides comprehensive functionality for project management including:
+ * <ul>
+ *   <li>Project creation, update, and deletion</li>
+ *   <li>Project filtering and visibility management</li>
+ *   <li>Officer assignment and slot management</li>
+ *   <li>Project retrieval by various criteria</li>
+ * </ul>
+ * </p>
+ */
 public class ProjectService {
+
+    /**
+     * Retrieves projects matching specified filters.
+     * <p>
+     * Applies all provided filters to the project list. Supported filter keys:
+     * <ul>
+     *   <li>"location" - Filters by project location</li>
+     *   <li>"flat_type" - Filters by available flat types</li>
+     * </ul>
+     * </p>
+     *
+     * @param filters List of filters to apply
+     * @return List of projects matching all filters
+     */
     public static List<Project> getProjects(List<Filter> filters) {
         Stream<Project> projectStream = ProjectRepository.getAll().stream();
 
@@ -34,6 +59,13 @@ public class ProjectService {
         return projectStream.collect(Collectors.toList());
     }
 
+    /**
+     * Checks if a project passes a single filter criteria.
+     *
+     * @param project The project to check
+     * @param filter The filter to apply
+     * @return {@code true} if project matches filter, {@code false} otherwise
+     */
     private static boolean checkPassesFilter(Project project, Filter filter) {
         if (project == null) {
             return true;
@@ -58,10 +90,28 @@ public class ProjectService {
         };
     }
 
+    /**
+     * Retrieves all projects in the system.
+     *
+     * @return List of all projects
+     */
     public static List<Project> getAllProjects() {
         return ProjectRepository.getAll();
     }
 
+    /**
+     * Retrieves projects visible to the current user based on their role.
+     * <p>
+     * Visibility rules:
+     * <ul>
+     *   <li>Applicants: Only visible projects within application period</li>
+     *   <li>Officers: All projects</li>
+     *   <li>Managers: All projects</li>
+     * </ul>
+     * </p>
+     *
+     * @return List of visible projects
+     */
     public static List<Project> getVisibleProjects() {
         User user = UserRepository.getActiveUser();
         Role userMode;
@@ -74,14 +124,14 @@ public class ProjectService {
         switch (userMode) {
             case APPLICANT:
                 return ProjectRepository.getAll().stream()
-                    .filter(Project::isVisible)
-                    .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime())
-                        && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
-                    .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
-                    .collect(Collectors.toList());
+                        .filter(Project::isVisible)
+                        .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime())
+                                && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
+                        .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
+                        .collect(Collectors.toList());
             case OFFICER:
                 return ProjectRepository.getAll().stream()
-                    .collect(Collectors.toList());
+                        .collect(Collectors.toList());
             default:
                 if (user.getRole() == Role.MANAGER) {
                     return ProjectRepository.getAll();
@@ -89,15 +139,24 @@ public class ProjectService {
                     return List.of();
                 }
         }
-
-
-
     }
 
+    /**
+     * Retrieves a project by its name.
+     *
+     * @param projectName Name of the project to find
+     * @return The matching project or {@code null} if not found
+     */
     public static Project getProjectByName(String projectName) {
         return ProjectRepository.getByName(projectName);
     }
 
+    /**
+     * Retrieves the project assigned to a specific officer.
+     *
+     * @param officer The officer to find project for
+     * @return The officer's assigned project or {@code null} if none
+     */
     public static Project getProjectByOfficer(Officer officer) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getOfficers().contains(officer.getUserNRIC()))
@@ -105,29 +164,60 @@ public class ProjectService {
                 .orElse(null);
     }
 
+    /**
+     * Retrieves all projects managed by a specific manager.
+     *
+     * @param manager The manager to find projects for
+     * @return List of projects managed by the specified manager
+     */
     public static List<Project> getProjectsByManager(Manager manager) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getManagerNRIC().equals(manager.getUserNRIC()))
                 .collect(Collectors.toList());
     }
 
-    public static void createProject(String projectId, String managerNRIC, String projectName, 
-            String location, LocalDateTime startDate, LocalDateTime endDate, 
-            int officerSlots, boolean visible) {
+    /**
+     * Creates a new project with the specified details.
+     *
+     * @param projectId Unique project identifier
+     * @param managerNRIC NRIC of the managing manager
+     * @param projectName Name of the project
+     * @param location Project location
+     * @param startDate Application opening date
+     * @param endDate Application closing date
+     * @param officerSlots Number of available officer slots
+     * @param visible Visibility status
+     */
+    public static void createProject(String projectId, String managerNRIC, String projectName,
+                                     String location, LocalDateTime startDate, LocalDateTime endDate,
+                                     int officerSlots, boolean visible) {
         Project newProject = new Project(projectId, managerNRIC, projectName, location,
                 startDate, endDate, officerSlots, visible);
         ProjectRepository.add(newProject);
         ProjectRepository.saveAll();
     }
 
-    public static void updateProject(Project project, String location, 
-            LocalDateTime startDate, LocalDateTime endDate) {
+    /**
+     * Updates basic project information.
+     *
+     * @param project The project to update
+     * @param location the new location
+     * @param startDate the new application opening date
+     * @param endDate the new application closing date
+     */
+    public static void updateProject(Project project, String location,
+                                     LocalDateTime startDate, LocalDateTime endDate) {
         project.setLocation(location);
         project.setApplicationOpenDate(startDate);
         project.setApplicationCloseDate(endDate);
         ProjectRepository.saveAll();
     }
 
+    /**
+     * Deletes a project by name.
+     *
+     * @param projectName name of the project to delete
+     */
     public static void deleteProject(String projectName) {
         Project project = getProjectByName(projectName);
         if (project != null) {
@@ -136,6 +226,12 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Toggles a project's visibility status.
+     *
+     * @param projectName the name of the project to update
+     * @param visible the new visibility status
+     */
     public static void toggleProjectVisibility(String projectName, boolean visible) {
         Project project = getProjectByName(projectName);
         if (project != null) {
@@ -144,10 +240,25 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Checks if a project has available officer slots.
+     *
+     * @param project the project to check
+     * @return {@code true} if officer slots are available, {@code false} otherwise
+     */
     public static boolean hasOfficerSlots(Project project) {
         return project != null && project.getOfficerSlots() > 0;
     }
 
+    /**
+     * Assigns an officer to a project.
+     * <p>
+     * Reduces available officer slots when successful.
+     * </p>
+     *
+     * @param project the project to assign to
+     * @param officerNRIC NRIC of the officer to assign
+     */
     public static void addOfficerToProject(Project project, String officerNRIC) {
         if (project != null && !project.getOfficers().contains(officerNRIC)) {
             project.addOfficer(officerNRIC);
@@ -156,6 +267,12 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Removes an officer from a project.
+     *
+     * @param project The project to remove from
+     * @param officerNRIC NRIC of the officer to remove
+     */
     public static void removeOfficerFromProject(Project project, String officerNRIC) {
         if (project != null && project.getOfficers().contains(officerNRIC)) {
             project.removeOfficer(officerNRIC);
@@ -163,6 +280,12 @@ public class ProjectService {
         }
     }
 
+    /**
+     * Retrieves all projects assigned to a specific officer.
+     *
+     * @param officerNRIC NRIC of the officer
+     * @return List of projects the officer is assigned to
+     */
     public static List<Project> getAllOfficersProjects(String officerNRIC) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getOfficers().contains(officerNRIC))
