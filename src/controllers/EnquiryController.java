@@ -106,8 +106,11 @@ public class EnquiryController {
 
         if (CommonView.promptYesNo("Do you want to reply to this enquiry?")) {
             String reply = CommonView.prompt("Enter your reply: ");
-            EnquiryService.replyToEnquiry(selectedEnquiry, reply, nric);
-            EnquiryView.displaySuccess("Reply submitted successfully");
+            if (EnquiryService.replyToEnquiry(selectedEnquiry, reply, nric)) {
+                EnquiryView.displaySuccess("Reply submitted successfully");
+            } else {
+                EnquiryView.displayError("Failed to submit reply. Please try again.");
+            }
         }
     }
 }

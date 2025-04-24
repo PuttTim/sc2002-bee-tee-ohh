@@ -9,6 +9,7 @@ import models.Project;
 import models.enums.EnquiryStatus;
 
 import repositories.EnquiryRepository;
+import views.CommonView;
 
 public class EnquiryService {
     public static List<Enquiry> getProjectEnquiries(Project project) {
@@ -77,20 +78,23 @@ public class EnquiryService {
         EnquiryRepository.saveAll();
     }
 
-    public static void replyToEnquiry(Enquiry enquiry, String response, String responderNRIC) {
+    public static boolean replyToEnquiry(Enquiry enquiry, String response, String responderNRIC) {
         if (enquiry == null) {
-            throw new IllegalArgumentException("Enquiry cannot be null");
+            return false;
         }
         
         if (response == null || response.trim().isEmpty()) {
-            throw new IllegalArgumentException("Response cannot be empty");
+            CommonView.displayError("Response cannot be empty");
+            return false;
         }
 
         if (enquiry.getEnquiryStatus() == EnquiryStatus.RESPONDED) {
-            throw new IllegalStateException("Enquiry has already been responded to");
+            CommonView.displayError("Enquiry has already been responded to");
+            return false;
         }
 
         enquiry.markAsResponded(responderNRIC, response);
         EnquiryRepository.saveAll();
+        return true;
     }
 }

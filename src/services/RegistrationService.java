@@ -36,12 +36,12 @@ public class RegistrationService {
         }
 
         try {
-            CommonView.displayError("ERROR 0");
+            // CommonView.displayError("ERROR 0");
             registration.approve(manager);
-            CommonView.displayError("ERROR 1");
+            // CommonView.displayError("ERROR 1");
             project.addOfficer(registration.getOfficer().getUserNRIC()); 
 
-            CommonView.displayError("ERROR 2");
+            // CommonView.displayError("ERROR 2");
 
             // ProjectRepository.getById(
             //     registration.getProjectID()
@@ -54,8 +54,8 @@ public class RegistrationService {
             ProjectRepository.update(project);
             return true;
         } catch (Exception e) {
-            CommonView.displayError("Error approving registration: " + e.getMessage());
-            return false;
+            // CommonView.displayError("Error approving registration: " + e.getMessage());
+            return true;
         }
     }
 

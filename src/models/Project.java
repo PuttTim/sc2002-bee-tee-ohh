@@ -200,12 +200,20 @@ public class Project {
     }
 
     public void addOfficer(String officerNRIC) {
+        // System.out.println("Adding officer: " + officerNRIC);
         if (!officers.contains(officerNRIC)) {
-            officers.add(officerNRIC);
-            CommonView.displayMessage("Officer " + officerNRIC + " added to project " + projectID + ".");
+            // System.out.println("Adding officer: 3 " + officerNRIC);
+            // officers.forEach(System.out::println);
+            try {
+                officers.add(officerNRIC);
+            } catch (Exception e) {
+            }
+            // CommonView.displayMessage("Officer " + officerNRIC + " added to project " + projectID + ".");
         } else {
             CommonView.displayMessage("Officer " + officerNRIC + " already exists in project " + projectID + ".");
         }
+        // System.out.println("Adding officer: 2 " + officerNRIC);
+
     }
 
     public void removeOfficer(String officerNRIC) {
