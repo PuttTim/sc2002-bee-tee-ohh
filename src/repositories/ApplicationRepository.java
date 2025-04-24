@@ -49,14 +49,13 @@ public class ApplicationRepository {
             record.put("ApplicantNRIC", application.getApplicantNRIC());
             record.put("ProjectID", application.getProjectId());
             record.put("SelectedFlatType", application.getSelectedFlatType().toString());
-            record.put("ApplicationStatus", application.getApplicationStatus().toString());
+            record.put("ApplicationStatus", application.getApplicationStatus().getKey());
             record.put("IsWithdrawalRequested", String.valueOf(application.isWithdrawalRequested()));
             record.put("ApplicationDate", DateTimeUtils.formatDateTime(application.getApplicationDate()));
             record.put("ApprovedBy", application.getApprovedBy() != null ? application.getApprovedBy() : "");
             
-            // Convert status history to string
             String statusHistory = application.getApplicationStatusHistory().entrySet().stream()
-                .map(entry -> entry.getKey() + ";" + DateTimeUtils.formatDateTime(entry.getValue()))
+                .map(entry -> entry.getKey().getKey() + ";" + DateTimeUtils.formatDateTime(entry.getValue()))
                 .collect(Collectors.joining("/"));
             record.put("ApplicationStatusHistory", statusHistory);
             
@@ -76,7 +75,6 @@ public class ApplicationRepository {
             applications = new ArrayList<>();
 
             for (Map<String, String> record : records) {
-                // Parse status history
                 Map<ApplicationStatus, LocalDateTime> statusHistory = new HashMap<>();
                 if (record.get("ApplicationStatusHistory") != null && !record.get("ApplicationStatusHistory").isEmpty()) {
                     Arrays.stream(record.get("ApplicationStatusHistory").split("/"))

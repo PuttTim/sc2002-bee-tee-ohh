@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import models.Application;
+import models.Manager; 
 import models.Officer;
 import models.Project;
 import models.Receipt;
@@ -27,12 +28,18 @@ public class ApplicationService {
                 .collect(Collectors.toList());
     }
 
-    public static boolean approveApplication(Application application, Officer officer) {
+    public static boolean approveApplication(Application application, Manager manager) {
         if (application == null || !application.canApprove()) {
             return false;
         }
+        Project project = ProjectRepository.getById(application.getProjectId());
+        if (project == null || project.getAvailableUnits(application.getSelectedFlatType()) <= 0) {
+            CommonView.displayError("No available units left for this flat type.");
+            return false;
+        }
+
         try {
-            application.approve(officer.getUserNRIC());
+            application.approve(manager.getUserNRIC());
             ApplicationRepository.saveAll();
             return true;
         } catch (IllegalStateException e) {
@@ -45,12 +52,12 @@ public class ApplicationService {
         }
     }
 
-    public static boolean rejectApplication(Application application, Officer officer) {
+    public static boolean rejectApplication(Application application, Manager manager) {
         if (application == null || !application.canReject()) {
             return false;
         }
         try {
-            application.reject(officer.getUserNRIC());
+            application.reject(manager.getUserNRIC());
             ApplicationRepository.saveAll();
             return true;
         } catch (IllegalStateException e) {
@@ -63,7 +70,49 @@ public class ApplicationService {
         }
     }
 
-    public static boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) { // Added unitNumber parameter
+    public static boolean approveWithdrawal(Application application, Manager manager) {
+        if (application == null || !application.canApproveWithdrawal()) {
+            return false;
+        }
+        try {
+            if (application.getApplicationStatus() == ApplicationStatus.BOOKED) {
+                Project project = ProjectRepository.getById(application.getProjectId());
+                if (project != null) {
+                    // TODO: decrement the flat count for the booked unit
+                }
+            }
+            application.approveWithdrawal(manager.getUserNRIC());
+            ApplicationRepository.saveAll();
+            return true;
+        } catch (IllegalStateException e) {
+            System.err.println("Error approving withdrawal: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred during withdrawal approval: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean rejectWithdrawal(Application application, Manager manager) {
+        if (application == null || !application.canRejectWithdrawal()) {
+            return false;
+        }
+        try {
+            application.rejectWithdrawal(manager.getUserNRIC());
+            ApplicationRepository.saveAll();
+            return true;
+        } catch (IllegalStateException e) {
+            System.err.println("Error rejecting withdrawal: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred during withdrawal rejection: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) { 
         if (application == null || !application.canBook()) {
             return false;
         }
@@ -75,15 +124,11 @@ public class ApplicationService {
             return false;
         }
 
-        if (project == null) {
-            return false;
-        }
-
         if (project.getAvailableUnits(application.getSelectedFlatType()) <= 0) {
             return false;
         }
 
-        if (selectedUnitNumber == null || selectedUnitNumber.trim().isEmpty()) { // Basic validation for unit number
+        if (selectedUnitNumber == null || selectedUnitNumber.trim().isEmpty()) { 
              System.err.println("Error booking application: Unit number cannot be empty.");
              return false;
         }

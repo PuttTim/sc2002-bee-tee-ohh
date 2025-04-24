@@ -30,10 +30,9 @@ public class AuthView {
     public static int showApplicantMenu() {
         List<String> options = List.of(
             "View Available Projects",
-            "Submit Project Application",
-            "View My Applications",
-            "Create New Enquiry",
-            "View My Enquiries"
+            "Manage My Applications",
+            "View My Enquiries",
+            "Create New Enquiry"
         );
         return CommonView.displayMenuWithBacking("Applicant Menu", options);
     }
@@ -42,7 +41,7 @@ public class AuthView {
         List<String> options = List.of(
             "Register to Handle Project",
             "Check Registration Status",
-            "View Handled Projects" 
+            "View All Handled Projects" 
         );
         return CommonView.displayMenuWithBacking("Officer Menu", options);
     }
@@ -50,7 +49,7 @@ public class AuthView {
     public static int showManagerMenu() {
         List<String> options = List.of(
             "View All Projects",
-            "View All Handled Projects",
+            "View All Managed Projects",
             "View All Enquiries",
             "Create New Project"
         );

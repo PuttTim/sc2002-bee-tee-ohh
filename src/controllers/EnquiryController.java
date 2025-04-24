@@ -17,7 +17,7 @@ import views.CommonView;
 import views.EnquiryView;
 
 public class EnquiryController {
-        public static void viewApplicantEnquiries(Applicant applicant) {
+    public static void viewApplicantEnquiries(Applicant applicant) {
         List<Enquiry> enquiries = EnquiryService.getEnquiriesByApplicant(applicant);
         EnquiryView.displayEnquiryList(enquiries);
         EnquiryView.showEnquiryMenu(applicant);

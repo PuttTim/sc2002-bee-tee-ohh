@@ -112,4 +112,28 @@ public class ManagerView {
         // and add/remove flat types, etc.
         return 0;
     }
+
+    public static int promptApproveRejectWithdrawal() {
+        return CommonView.promptInt("Action: [1] Approve Withdrawal [2] Reject Withdrawal [0] Cancel: ", 0, 2);
+    }
+
+    public static void displayWithdrawalApprovedSuccess(String applicantName) {
+        CommonView.displaySuccess("Withdrawal request for " + applicantName + " approved successfully.");
+    }
+
+    public static void displayWithdrawalRejectedSuccess(String applicantName) {
+        CommonView.displaySuccess("Withdrawal request for " + applicantName + " rejected successfully.");
+    }
+
+    public static void displayWithdrawalActionFailed(String action) {
+         CommonView.displayError("Failed to " + action + " withdrawal request.");
+    }
+
+    public static void displayApplicationList(List<Application> applications, String header) {
+        OfficerView.displayApplicationList(applications, header); 
+    }
+
+    public static void displayApplicationDetails(Application application) {
+        OfficerView.displayApplicationDetails(application);
+    }
 }

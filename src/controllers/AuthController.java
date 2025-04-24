@@ -6,13 +6,10 @@ import models.enums.Role;
 import repositories.*;
 
 import services.AuthService;
-import services.ProjectService;
-
 import utils.Hash;
 
 import views.AuthView;
 import views.CommonView;
-import views.ProjectView;
 
 public class AuthController {
     private static final String TEST_APPLICANT_NRIC = "S1234567A";
@@ -128,17 +125,16 @@ public class AuthController {
             try {
                 switch (choice) {
                     case 1 -> ProjectController.viewAvailableProjects(user);
-                    case 2 -> ApplicantController.newApplication(user);
-                    case 3 -> ApplicantController.viewMyApplications(user);
+                    case 2 -> ApplicantController.manageApplications(user);
+                    case 3 -> EnquiryController.viewApplicantEnquiries(user);
                     case 4 -> EnquiryController.createNewEnquiry(user);
-                    case 5 -> EnquiryController.viewApplicantEnquiries(user);
                     case 0 -> {return;}
+                    default -> CommonView.displayError("Invalid option. Please try again.");
                 }
-            } catch (NumberFormatException e) {
-                CommonView.displayError("Please enter a valid number!");
+            } catch (Exception e) {
+                CommonView.displayError("An error occurred: " + e.getMessage());
             }
         }
-        // System.out.println("Logging out of user: " + applicant.getName());
     }
 
     private static void showOfficerMenu(Officer officer) {

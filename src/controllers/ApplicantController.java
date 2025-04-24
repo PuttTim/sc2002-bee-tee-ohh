@@ -3,21 +3,112 @@ package controllers;
 import java.util.List;
 
 import models.Applicant;
+import models.Application;
 import models.Project;
+import models.enums.ApplicationStatus;
 
-import repositories.ProjectRepository;
-import services.ProjectService;
+import services.ApplicantApplicationService;
 import views.ApplicantApplicationView;
+import views.CommonView;
 
 public class ApplicantController {
 
-    public static void newApplication(Applicant applicant) {
-        ApplicantApplicationView.promptApplication(applicant, ProjectService.getVisibleProjects());
+    public static void manageApplications(Applicant applicant) {
+        boolean running = true;
+        while (running) {
+            int choice = ApplicantApplicationView.showMainMenu();
+            try {
+                switch (choice) {
+                    case 1 -> viewApplications(applicant);
+                    case 2 -> viewAvailableProjects(applicant);
+                    case 3 -> submitNewApplication(applicant);
+                    case 4 -> handleWithdrawal(applicant);
+                    case 0 -> running = false;
+                    default -> CommonView.displayError("Invalid choice!");
+                }
+            } catch (Exception e) {
+                CommonView.displayError("An error occurred: " + e.getMessage());
+            }
+        }
     }
 
-    public static void viewMyApplications(Applicant applicant) {
-        List<Project> projects = ProjectService.getVisibleProjects();
-        ApplicantApplicationView.displayApplicationStatus(applicant);
-        ApplicantApplicationView.showApplicationMenu(applicant, projects);
+    private static void viewApplications(Applicant applicant) {
+        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
+        ApplicantApplicationView.displayApplicationList(applications, "Your Applications");
+        
+        if (!applications.isEmpty()) {
+            int choice = CommonView.promptInt("Select an application to view details (or 0 to go back): ", 0, applications.size());
+            if (choice > 0) {
+                Application selectedApp = applications.get(choice - 1);
+                ApplicantApplicationView.displayApplicationDetails(selectedApp);
+                CommonView.prompt("Press Enter to continue...");
+            }
+        } else {
+            CommonView.prompt("Press Enter to continue...");
+        }
+    }
+
+    private static void viewAvailableProjects(Applicant applicant) {
+        List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant);
+        ApplicantApplicationView.displayEligibleProjects(eligibleProjects);
+        CommonView.prompt("Press Enter to continue...");
+    }
+
+    private static void submitNewApplication(Applicant applicant) {
+        List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant);
+        if (eligibleProjects.isEmpty()) {
+            CommonView.displayMessage("No eligible projects available for application.");
+            return;
+        }
+
+        int projectChoice = ApplicantApplicationView.promptProjectSelection(eligibleProjects);
+        if (projectChoice == 0) return;
+
+        Project selectedProject = eligibleProjects.get(projectChoice - 1);
+        int flatTypeChoice = ApplicantApplicationView.promptFlatTypeSelection(selectedProject);
+        
+        try {
+            boolean success = ApplicantApplicationService.submitApplication(
+                applicant, 
+                selectedProject, 
+                selectedProject.getFlatTypes().get(flatTypeChoice - 1)
+            );
+            
+            if (success) {
+                ApplicantApplicationView.displaySubmissionSuccess();
+            } else {
+                ApplicantApplicationView.displaySubmissionError("You have an existing BTO application. Please try again later.");
+            }
+        } catch (Exception e) {
+            ApplicantApplicationView.displaySubmissionError(e.getMessage());
+        }
+        CommonView.prompt("Press Enter to continue...");
+    }
+
+    private static void handleWithdrawal(Applicant applicant) {
+        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant)
+            .stream()
+            .filter(app -> app.getApplicationStatus() == ApplicationStatus.PENDING && !app.isWithdrawalRequested())
+            .toList();
+
+        ApplicantApplicationView.displayApplicationList(applications, "Applications Available for Withdrawal");
+        
+        if (applications.isEmpty()) {
+            CommonView.displayMessage("No applications available for withdrawal.");
+            CommonView.prompt("Press Enter to continue...");
+            return;
+        }
+
+        int choice = CommonView.promptInt("Select an application to withdraw (or 0 to go back): ", 0, applications.size());
+        if (choice > 0) {
+            Application selectedApp = applications.get(choice - 1);
+            try {
+                ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
+                ApplicantApplicationView.displayWithdrawalSuccess();
+            } catch (Exception e) {
+                ApplicantApplicationView.displayWithdrawalError(e.getMessage());
+            }
+        }
+        CommonView.prompt("Press Enter to continue...");
     }
 }

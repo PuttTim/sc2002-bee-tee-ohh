@@ -2,17 +2,15 @@ package views;
 
 import models.*;
 import models.enums.ApplicationStatus;
-import models.enums.FlatType;
 import repositories.ProjectRepository;
 import repositories.UserRepository;
-import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 import java.util.List;
 
 public class OfficerView {
-    public static int showSelectHandledProjectMenu(Project projects) {
+    public static int showSelectHandledProjectMenu(Project projects) { 
         List<String> options = List.of(
-                "Manage Applications",
+                "View All Applications",
                 "Manage Successful Applications",
                 "View Enquiries"
                 );
@@ -60,8 +58,8 @@ public class OfficerView {
                 applicant != null ? applicant.getName() : "N/A",
                 app.getApplicantNRIC(),
                 project != null ? project.getProjectName() : "N/A",
-                app.getSelectedFlatType(),
-                getStatusDisplay(app.getApplicationStatus())
+                app.getSelectedFlatType().getDescription(), 
+                app.getApplicationStatus().getDescription()
             ));
         }
         CommonView.displaySeparator();
@@ -81,7 +79,7 @@ public class OfficerView {
         CommonView.displayMessage("Project Name: " + (project != null ? project.getProjectName() : "N/A"));
         CommonView.displayMessage("Selected Flat Type: " + application.getSelectedFlatType().getDescription());
         CommonView.displayMessage("Application Date: " + DateTimeUtils.formatDateTime(application.getApplicationDate()));
-        CommonView.displayMessage("Current Status: " + getStatusDisplay(application.getApplicationStatus()));
+        CommonView.displayMessage("Current Status: " + application.getApplicationStatus().getDescription());
         
         if (application.getApprovedBy() != null) {
             User approver = UserRepository.getByNRIC(application.getApprovedBy());
@@ -90,19 +88,8 @@ public class OfficerView {
         }
 
         application.getApplicationStatusHistory().forEach((status, timestamp) -> 
-            CommonView.displayMessage(String.format("  - %s: %s", getStatusDisplay(status), DateTimeUtils.formatDateTime(timestamp)))
+            CommonView.displayMessage(String.format("  - %s: %s", status.getDescription(), DateTimeUtils.formatDateTime(timestamp)))
         );
         CommonView.displaySeparator();
-    }
-
-    private static String getStatusDisplay(ApplicationStatus status) {
-        return switch (status) {
-            case PENDING -> "Pending";
-            case SUCCESSFUL -> "Approved";
-            case UNSUCCESSFUL -> "Rejected";
-            case WITHDRAWN -> "Withdrawn";
-            case BOOKED -> "Booked";
-            default -> status.toString();
-        };
     }
 }
