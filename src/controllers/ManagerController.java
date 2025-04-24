@@ -1,23 +1,28 @@
 package controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import models.Application;
+import models.Enquiry;
 import models.Manager;
 import models.Project;
 import models.Registration;
 import models.User;
 import models.enums.ApplicationStatus;
+import models.enums.EnquiryStatus;
 import models.enums.RegistrationStatus;
 import repositories.ProjectRepository;
 import repositories.UserRepository;
 import services.ApplicationService;
+import services.EnquiryService;
 import services.ProjectService;
 import services.RegistrationService;
 import views.CommonView;
+import views.EnquiryView;
 import views.ManagerView;
 import views.ProjectView;
-import models.Application;
 
 public class ManagerController {
 
@@ -227,9 +232,55 @@ public class ManagerController {
         throw new UnsupportedOperationException("Unimplemented method 'viewAllProjects'");
     }
 
-    public static void viewAllEnquiries() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'viewAllEnquiries'");
+    public static void viewAllEnquiries(Manager manager) {
+        List<Project> allProjects = ProjectService.getAllProjects(); 
+        List<Enquiry> allEnquiries = new ArrayList<>();
+
+        if (allProjects.isEmpty()) {
+            CommonView.displayMessage("There are no projects in the system.");
+            return;
+        }
+
+        for (Project project : allProjects) {
+            allEnquiries.addAll(EnquiryService.getProjectEnquiries(project));
+        }
+
+        if (allEnquiries.isEmpty()) {
+            EnquiryView.displayEmptyMessage(); 
+            return;
+        }
+
+        while (true) {
+            CommonView.displayHeader("All Enquiries Across All Projects");
+
+            EnquiryView.displayEnquiryList(allEnquiries);
+            int choice = CommonView.promptInt("Enter the number of the enquiry to view/reply (or 0 to go back): ", 0, allEnquiries.size());
+
+            if (choice == 0) {
+                break;
+            }
+
+            Enquiry selectedEnquiry = allEnquiries.get(choice - 1);
+            EnquiryView.displayEnquiry(selectedEnquiry);
+
+            if (selectedEnquiry.getEnquiryStatus() == EnquiryStatus.RESPONDED) {
+                CommonView.displayMessage("This enquiry has already been replied to.");
+            } else if (selectedEnquiry.getEnquiryStatus() == EnquiryStatus.PENDING) {
+                if (CommonView.promptYesNo("Do you want to reply to this enquiry?")) {
+                    String reply = CommonView.prompt("Enter your reply: ");
+                    if (reply != null && !reply.trim().isEmpty()) {
+                        EnquiryService.replyToEnquiry(selectedEnquiry, reply, manager.getUserNRIC());
+                        EnquiryView.displaySuccess("Reply submitted successfully.");
+                        CommonView.prompt("Press Enter to continue...");
+
+                        break; 
+                    } else {
+                        EnquiryView.displayError("Reply cannot be empty.");
+                    }
+                }
+            }
+            CommonView.prompt("Press Enter to return to the enquiry list...");
+        }
     }
 
     // method to display all projects which then will ask the user to select a project
