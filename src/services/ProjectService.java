@@ -20,7 +20,6 @@ import utils.DateTimeUtils;
 
 /**
  * Service class for managing project-related operations.
- * <p>
  * Provides comprehensive functionality for project management including:
  * <ul>
  *   <li>Project creation, update, and deletion</li>
@@ -28,19 +27,16 @@ import utils.DateTimeUtils;
  *   <li>Officer assignment and slot management</li>
  *   <li>Project retrieval by various criteria</li>
  * </ul>
- * </p>
  */
 public class ProjectService {
 
     /**
      * Retrieves projects matching specified filters.
-     * <p>
      * Applies all provided filters to the project list. Supported filter keys:
      * <ul>
      *   <li>"location" - Filters by project location</li>
      *   <li>"flat_type" - Filters by available flat types</li>
      * </ul>
-     * </p>
      *
      * @param filters List of filters to apply
      * @return List of projects matching all filters
@@ -101,14 +97,12 @@ public class ProjectService {
 
     /**
      * Retrieves projects visible to the current user based on their role.
-     * <p>
      * Visibility rules:
      * <ul>
      *   <li>Applicants: Only visible projects within application period</li>
      *   <li>Officers: All projects</li>
      *   <li>Managers: All projects</li>
      * </ul>
-     * </p>
      *
      * @return List of visible projects
      */
@@ -252,9 +246,7 @@ public class ProjectService {
 
     /**
      * Assigns an officer to a project.
-     * <p>
      * Reduces available officer slots when successful.
-     * </p>
      *
      * @param project the project to assign to
      * @param officerNRIC NRIC of the officer to assign

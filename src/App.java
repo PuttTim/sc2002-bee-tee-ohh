@@ -9,6 +9,12 @@ import repositories.*;
 public class App {
     private App() {}
 
+    /**
+     * The main method that starts the application.
+     * Initializes repositories and triggers the authentication process.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         App app = new App();
         try {

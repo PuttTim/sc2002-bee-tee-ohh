@@ -13,10 +13,8 @@ import views.CommonView;
 
 /**
  * Service class for managing property enquiry operations.
- * <p>
  * Provides functionality for creating, retrieving, editing, and responding to property enquiries.
  * Enforces business rules regarding enquiry ownership and status transitions.
- * </p>
  */
 public class EnquiryService {
 
@@ -32,9 +30,7 @@ public class EnquiryService {
 
     /**
      * Retrieves all enquiries submitted by a specific applicant.
-     * <p>
      * Filters enquiries based on the applicant's NRIC.
-     * </p>
      *
      * @param applicant the applicant whose enquiries to retrieve
      * @return list of enquiries submitted by the applicant
@@ -54,9 +50,7 @@ public class EnquiryService {
 
     /**
      * Creates a new enquiry.
-     * <p>
-     * Validates the enquiry object before persisting it.
-     * </p>
+     * Validates the enquiry object.
      *
      * @param enquiry the enquiry to create
      * @throws IllegalArgumentException if enquiry is null
@@ -71,7 +65,6 @@ public class EnquiryService {
 
     /**
      * Edits an existing enquiry's content.
-     * <p>
      * Validates that:
      * <ul>
      *   <li>The enquiry exists</li>
@@ -79,7 +72,6 @@ public class EnquiryService {
      *   <li>The enquiry hasn't been responded to</li>
      *   <li>The new content is valid</li>
      * </ul>
-     * </p>
      *
      * @param applicant the applicant editing the enquiry
      * @param enquiryId ID of the enquiry to edit
@@ -110,13 +102,11 @@ public class EnquiryService {
 
     /**
      * Deletes an existing enquiry.
-     * <p>
      * Validates that:
      * <ul>
      *   <li>The enquiry exists</li>
      *   <li>The applicant owns the enquiry</li>
      * </ul>
-     * </p>
      *
      * @param applicant the applicant deleting the enquiry
      * @param enquiryId ID of the enquiry to delete
@@ -138,14 +128,12 @@ public class EnquiryService {
 
     /**
      * Adds a response to an enquiry and marks it as responded.
-     * <p>
      * Validates that:
      * <ul>
      *   <li>The enquiry exists</li>
      *   <li>The response content is valid</li>
      *   <li>The enquiry hasn't already been responded to</li>
      * </ul>
-     * </p>
      *
      * @param enquiry the enquiry to respond to
      * @param response the response content

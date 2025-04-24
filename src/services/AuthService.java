@@ -16,13 +16,11 @@ public class AuthService {
 
     /**
      * Authenticates a user with their NRIC and password.
-     * <p>
      * Successful authentication will:
      * <ul>
      *   <li>Set the user as the active session user</li>
      *   <li>Return the authenticated user object</li>
      * </ul>
-     * </p>
      *
      * @param nric the user's NRIC identifier
      * @param password the user's password
@@ -43,9 +41,7 @@ public class AuthService {
 
     /**
      * Terminates the current user session.
-     * <p>
      * Clears the active user from the {@code UserRepository}.
-     * </p>
      */
     public static void logout() {
         UserRepository.clearActiveUser();
@@ -53,13 +49,11 @@ public class AuthService {
 
     /**
      * Changes a user's password after verifying current credentials.
-     * <p>
      * Validates that:
      * <ul>
      *   <li>The current password matches</li>
      *   <li>The new password meets length requirements</li>
      * </ul>
-     * </p>
      *
      * @param user the user changing their password
      * @param oldPassword the current password for verification
