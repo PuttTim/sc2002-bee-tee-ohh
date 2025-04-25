@@ -8,29 +8,25 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import repositories.UserRepository;
 import services.AuthService;
 import utils.Hash;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
 
 class AuthTest {
 
     MockedStatic<UserRepository> mockedUserRepo;
     MockedStatic<Hash> mockedHash;
+    AuthService authService;
 
     @BeforeEach
     void setUp() {
+        authService = AuthService.getInstance();
         mockedUserRepo = Mockito.mockStatic(UserRepository.class, Mockito.withSettings().lenient());
         mockedHash = Mockito.mockStatic(Hash.class, Mockito.withSettings().lenient());
     }
@@ -56,7 +52,7 @@ class AuthTest {
 
         mockedUserRepo.when(() -> UserRepository.setActiveUser(any(User.class))).thenAnswer(invocation -> null);
 
-        User loggedInUser = AuthService.login(nric, password);
+        User loggedInUser = authService.login(nric, password);
 
         assertNotNull(loggedInUser, "Logged in user should not be null on success");
         assertEquals(nric, loggedInUser.getUserNRIC(), "NRIC should match");
@@ -83,7 +79,7 @@ class AuthTest {
         mockedHash.when(() -> Hash.verifyPassword(wrongPassword, expectedCorrectHash)).thenReturn(false);
 
         AuthenticationException exception = assertThrows(AuthenticationException.class, () -> {
-            AuthService.login(nric, wrongPassword);
+            authService.login(nric, wrongPassword);
         }, "AuthenticationException should be thrown for incorrect password");
 
         assertEquals("Invalid NRIC or password", exception.getMessage(), "Exception message should indicate invalid password");
@@ -105,7 +101,7 @@ class AuthTest {
         mockedUserRepo.when(() -> UserRepository.getByNRIC(nric)).thenReturn(null);
 
         AuthenticationException exception = assertThrows(AuthenticationException.class, () -> {
-            AuthService.login(nric, password);
+            authService.login(nric, password);
         }, "AuthenticationException should be thrown for incorrect NRIC");
 
         assertEquals("Invalid NRIC or password", exception.getMessage(), "Exception message should indicate incorrect NRIC");
