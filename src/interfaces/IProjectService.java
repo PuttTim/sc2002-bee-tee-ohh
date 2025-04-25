@@ -12,14 +12,6 @@ import models.Project;
  */
 public interface IProjectService {
     /**
-     * Returns a list of projects that match the given filters.
-     *
-     * @param filters List of filters to apply.
-     * @return Filtered list of projects.
-     */
-    List<Project> getProjects(List<Filter> filters);
-
-    /**
      * Returns all projects in the system.
      *
      * @return List of all projects.

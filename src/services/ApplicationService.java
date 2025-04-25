@@ -124,7 +124,6 @@ public class ApplicationService implements IApplicationService {
      * @param manager The manager performing the approval action.
      * @return boolean Returns true if the withdrawal was successfully approved, false otherwise.
      * @throws IllegalStateException if the application cannot approve the withdrawal due to its current state.
-     * @throws Exception if any unexpected error occurs during the approval process.
      */
 
     @Override
@@ -157,7 +156,6 @@ public class ApplicationService implements IApplicationService {
      * @param manager The manager performing the rejection action.
      * @return boolean Returns true if the withdrawal was successfully rejected, false otherwise.
      * @throws IllegalStateException if the application cannot reject the withdrawal due to its current state.
-     * @throws Exception if any unexpected error occurs during the rejection process.
      */
 
     @Override
