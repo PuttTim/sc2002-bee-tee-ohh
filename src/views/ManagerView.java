@@ -142,30 +142,66 @@ public class ManagerView {
         CommonView.displayError("Failed to " + action + " registration.");
     }
 
+    /**
+     * Prompts the user to approve, reject, or cancel a withdrawal request.
+     *
+     * @return The user's choice: 1 for approve, 2 for reject, 0 for cancel.
+     */
     public static int promptApproveRejectWithdrawal() {
         return CommonView.promptInt("Action: [1] Approve Withdrawal [2] Reject Withdrawal [0] Cancel: ", 0, 2);
     }
 
+    /**
+     * Displays a success message when a withdrawal request is approved.
+     *
+     * @param applicantName The name of the applicant whose withdrawal is approved.
+     */
     public static void displayWithdrawalApprovedSuccess(String applicantName) {
         CommonView.displaySuccess("Withdrawal request for " + applicantName + " approved successfully.");
     }
 
+    /**
+     * Displays a success message when a withdrawal request is rejected.
+     *
+     * @param applicantName The name of the applicant whose withdrawal is rejected.
+     */
     public static void displayWithdrawalRejectedSuccess(String applicantName) {
         CommonView.displaySuccess("Withdrawal request for " + applicantName + " rejected successfully.");
     }
 
+    /**
+     * Displays an error message when a withdrawal request action fails.
+     *
+     * @param action The action that failed (approve or reject).
+     */
     public static void displayWithdrawalActionFailed(String action) {
          CommonView.displayError("Failed to " + action + " withdrawal request.");
     }
 
+    /**
+     * Displays a list of applications with a header.
+     *
+     * @param applications The list of applications to display.
+     * @param header The header to display above the application list.
+     */
     public static void displayApplicationList(List<Application> applications, String header) {
         OfficerView.displayApplicationList(applications, header); 
     }
 
+    /**
+     * Displays the details of a specific application.
+     *
+     * @param application The application whose details are to be displayed.
+     */
     public static void displayApplicationDetails(Application application) {
         OfficerView.displayApplicationDetails(application);
     }
 
+    /**
+     * Prompts the user to select filter options for generating a report.
+     *
+     * @return A map containing selected filter options (e.g., marital status, flat type).
+     */
     public static Map<String, String> promptFilterOptions() { 
         CommonView.displayHeader("Report Filters");
         Map<String, String> filters = new HashMap<>();
@@ -201,6 +237,11 @@ public class ManagerView {
         return filters;
     }
 
+    /**
+     * Displays the applicant booking report with the provided data.
+     *
+     * @param reportData A list of maps representing the report data.
+     */
     public static void displayReport(List<Map<String, String>> reportData) {
         CommonView.displayHeader("Applicant Booking Report");
         if (reportData.isEmpty()) {
@@ -225,18 +266,39 @@ public class ManagerView {
         CommonView.displaySeparator();
     }
 
+    /**
+     * Prompts the user whether they want to export the report to a CSV file.
+     *
+     * @return true if the user wants to export to CSV, false otherwise.
+     */
     public static boolean promptExportToCsv() {
         return CommonView.promptYesNo("\nDo you want to export this report to a CSV file?");
     }
 
+    /**
+     * Prompts the user to enter a filename for the CSV export.
+     *
+     * @return The filename entered by the user.
+     */
     public static String promptCsvFileName() {
         return CommonView.prompt("Enter the desired CSV filename (e.g., report.csv): ");
     }
 
+    /**
+     * Displays a success message when the report is successfully exported to a CSV file.
+     *
+     * @param filename The name of the CSV file to which the report was exported.
+     */
      public static void displayExportSuccess(String filename) {
         CommonView.displaySuccess("Report successfully exported to " + filename);
     }
 
+    /**
+     * Displays an error message when there is an issue exporting the report to a CSV file.
+     *
+     * @param filename The name of the CSV file.
+     * @param message The error message.
+     */
     public static void displayExportError(String filename, String message) {
         CommonView.displayError("Error exporting report to " + filename + ": " + message);
     }

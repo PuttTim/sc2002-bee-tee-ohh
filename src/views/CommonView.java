@@ -14,24 +14,40 @@ public class CommonView {
     private static final String SEPARATOR = "=====================================================================";
     private static final String SEPARATOR_SHORT = "---------------------------------------------------------------------";
 
-    /** Displays a formatted header with the given title. */
+    /**
+     * Displays a formatted header with the given title.
+     *
+     * @param title the title of the header.
+     */
     public static void displayHeader(String title) {
         System.out.println("\n" + SEPARATOR);
         System.out.println("       " + title);
         System.out.println(SEPARATOR + "\n");
     }
 
-    /** Displays a plain message. */
+    /**
+     * Displays a plain message.
+     *
+     * @param message the plain message to be displayed.
+     */
     public static void displayMessage(String message) {
         System.out.println(message);
     }
 
-    /** Displays an error message. */
+    /**
+     * Displays an error message.
+     *
+     * @param errorMessage the error message to be displayed.
+     */
     public static void displayError(String errorMessage) {
         System.out.println("ERROR: " + errorMessage);
     }
 
-    /** Displays a success message. */
+    /**
+     * Displays a success message.
+     *
+     * @param successMessage the success message to be displayed.
+     */
     public static void displaySuccess(String successMessage) {
         System.out.println("SUCCESS: " + successMessage);
     }
@@ -191,6 +207,16 @@ public class CommonView {
         }
     }
 
+    /**
+     * Prompts the user to confirm an action by typing a specific confirmation word.
+     * If the user types the confirmation word: the method returns true.
+     * If the user types '0' or 'cancel': the action is cancelled, method returns false.
+     * If the user enters an incorrect confirmation word, prompt is repeated.
+     *
+     * @param message The message to display to the user, prompting them to confirm the action.
+     * @param confirmationWord The word that the user must type to confirm the action.
+     * @return {@code true} if the user typed the confirmation word; {@code false} if the action was cancelled.
+     */
     public static boolean promptWordConfirmation(String message, String confirmationWord) {
         while (true) {
             String input = prompt(message + " (Type '" + confirmationWord + "' to confirm, or '0'/'cancel' to cancel): ");
@@ -204,4 +230,5 @@ public class CommonView {
             displayError("Incorrect confirmation word. Please type '" + confirmationWord + "' exactly, or '0'/'cancel' to cancel.");
         }
     }
+
 }

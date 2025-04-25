@@ -212,9 +212,8 @@ public class Application {
     // Helpers
 
     /**
-     * <p>Approves the application.</p>
-     * @param manager The name of the manager approving the application.
-     * @throws IllegalStateException if the application is not pending.
+     * Approves the application.
+     * @param userNRIC the NRIC of the user whose application is to be approved.
      */
     public void approve(String userNRIC) {
         if (!canApprove()) {
@@ -225,9 +224,8 @@ public class Application {
     }
 
     /**
-     * <p>Rejects the application.</p>
-     * @param manager The name of the manager rejecting the application.
-     * @throws IllegalStateException if the application is not pending.
+     * Rejects the application.
+     * @param userNRIC the NRIC of the user whose application is to be rejected.
      */
     public void reject(String userNRIC) { 
         if (!canReject()) {
@@ -238,7 +236,7 @@ public class Application {
     }
 
     /**
-     * <p>Books the application.</p>
+     * Books the application
      * @throws IllegalStateException if the application is not successful.
      */
     public void book() {
@@ -249,7 +247,7 @@ public class Application {
     }
 
     /**
-     * <p>Requests withdrawal of the application.</p>
+     * Requests withdrawal of the application.
      * @throws IllegalStateException if withdrawal has already been requested or if the application cannot be withdrawn.
      */
     public void requestWithdrawal() {
@@ -266,6 +264,11 @@ public class Application {
         recordStatusChange(ApplicationStatus.WITHDRAWAL_REQUESTED);
     }
 
+    /**
+     * Approves withdrawal of an application.
+     *
+     * @param managerNRIC The NRIC of the manager who is to approve of the withdrawal.
+     */
     public void approveWithdrawal(String managerNRIC) {
         if (!canApproveWithdrawal()) {
             throw new IllegalStateException("Withdrawal cannot be approved in its current state");
@@ -275,6 +278,11 @@ public class Application {
         recordStatusChange(ApplicationStatus.WITHDRAWN);
     }
 
+    /**
+     * Rejects withdrawal of an application.
+     *
+     * @param managerNRIC The NRIC of the manager who is to reject the withdrawal.
+     */
     public void rejectWithdrawal(String managerNRIC) {
         if (!canRejectWithdrawal()) {
             throw new IllegalStateException("Withdrawal cannot be rejected in its current state");
@@ -284,7 +292,11 @@ public class Application {
         recordStatusChange(this.applicationStatus);
     }
 
-
+    /**
+     * Record the time of application status change and update status.
+     *
+     * @param status The application status.
+     */
     private void recordStatusChange(ApplicationStatus status) {
         applicationStatusHistory.put(status, LocalDateTime.now());
         this.applicationStatus = status;
@@ -330,10 +342,20 @@ public class Application {
         return applicationStatus == ApplicationStatus.PENDING && !isWithdrawalRequested;
     }
 
+    /**
+     * Checks if an application withdrawal can be approved.
+     *
+     * @return <code>true</code> if application withdrawal has been requested.
+     */
     public boolean canApproveWithdrawal() {
         return isWithdrawalRequested;
     }
 
+    /**
+     * Checks if an application withdrawal can be rejected.
+     *
+     * @return <code>true</code> if application withdrawal has been requested.
+     */
     public boolean canRejectWithdrawal() {
         return isWithdrawalRequested;
     }

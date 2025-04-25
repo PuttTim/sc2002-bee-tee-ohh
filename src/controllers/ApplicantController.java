@@ -26,12 +26,35 @@ public class ApplicantController {
     private final ApplicationService applicationService;
     private final ApplicantApplicationService applicantApplicationService;
 
+    /**
+     * Initializes a new instance of the Applicant.
+     *
+     * This constructor sets up the necessary services and controllers
+     * for handling applicant-related operations, such as applying to projects.
+     */
     public ApplicantController() {
         this.projectService = ProjectService.getInstance();
         this.applicationService = ApplicationService.getInstance();
         this.applicantApplicationService = ApplicantApplicationService.getInstance();
     }
 
+    /**
+     * Manages the main application menu for an applicant.
+     * This method repeatedly displays the main menu
+     * and processes the user's choice
+     * until the user decides to exit (by choosing option 0).
+     * Each option corresponds to a specific action:
+     * <ul>
+     *     <li>Viewing applications</li>
+     *     <li>Viewing available projects</li>
+     *     <li>Submitting a new application</li>
+     *     <li>Handling withdrawals</li>
+     * </ul>
+     * Any exceptions that occur during processing
+     * are caught and displayed as error messages.
+     *
+     * @param applicant The applicant whose applications are being managed.
+     */
     public void manageApplications(Applicant applicant) {
         boolean running = true;
         while (running) {
@@ -72,6 +95,13 @@ public class ApplicantController {
         }
     }
 
+    /**
+     * Displays the list of projects that the given applicant is eligible to apply for.
+     * Retrieves the eligible projects using the applicant's details and the associated service,
+     * and displays the list of these projects for the applicant to view.
+     *
+     * @param applicant The applicant who wants to view eligible projects for application.
+     */
     public void viewAvailableProjects(Applicant applicant) {
         List<Project> eligibleProjects = applicantApplicationService.getEligibleProjects(applicant);
         ApplicantApplicationView.displayEligibleProjects(eligibleProjects);

@@ -26,7 +26,13 @@ public class ApplicationService implements IApplicationService {
     private static ApplicationService instance;
     
     private ApplicationService() {}
-    
+
+    /**
+     * Returns the singleton instance of the ApplicationService class.
+     * If an instance of ApplicationService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of ApplicationService.
+     */
     public static ApplicationService getInstance() {
         if (instance == null) {
             instance = new ApplicationService();

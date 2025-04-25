@@ -11,8 +11,15 @@ import java.time.LocalDateTime;
  */
 public class DateTimeUtils {
     private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+    /**
+     * A DateTimeFormatter for formatting and parsing date-time strings in this
+     * pattern: date (day, month, year) followed by a 'T' separator,
+     * then the time (hour, minute, second).
+     *
+     * Example: "25-04-2025T14:30:00"
+     */
     public static final DateTimeFormatter DD_MM_YYYY_T_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
-    
 
     /**
      * Parses a date-time string into a {@link LocalDateTime} using the specified formatter.

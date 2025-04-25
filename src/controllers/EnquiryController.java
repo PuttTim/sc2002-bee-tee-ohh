@@ -31,6 +31,12 @@ public class EnquiryController {
 
     private final EnquiryService enquiryService;
 
+    /**
+     * Initializes an instance of the EnquiryController, setting up the EnquiryService.
+     *
+     * This constructor ensures that the EnquiryService is available for handling
+     * enquiries by initializing the singleton instance of the service.
+     */
     public EnquiryController() {
         this.enquiryService = EnquiryService.getInstance();
     }

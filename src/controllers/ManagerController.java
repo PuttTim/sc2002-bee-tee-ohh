@@ -45,6 +45,13 @@ public class ManagerController {
     private final EnquiryService enquiryService;
     private final EnquiryController enquiryController;
 
+    /**
+     * Initializes a new instance of the ManagerController.
+     *
+     * This constructor sets up the necessary services and controllers
+     * for handling manager-related operations, such as managing projects,
+     * officer registrations, and enquiries.
+     */
     public ManagerController() {
         this.managerService = ManagerService.getInstance();
         this.projectService = ProjectService.getInstance();

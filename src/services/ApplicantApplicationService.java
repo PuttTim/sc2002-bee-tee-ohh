@@ -24,6 +24,12 @@ public class ApplicantApplicationService implements IApplicantApplicationService
         this.projectService = ProjectService.getInstance();
     }
 
+    /**
+     * Returns the singleton instance of the ApplicantApplicationService class.
+     * If an instance of ApplicantApplicationService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of ApplicantApplicationService.
+     */
     public static ApplicantApplicationService getInstance() {
         if (instance == null) {
             instance = new ApplicantApplicationService();

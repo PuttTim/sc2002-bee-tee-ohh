@@ -23,7 +23,13 @@ public class OfficerService implements IOfficerService {
     private static OfficerService instance;
     
     private OfficerService() {}
-    
+
+    /**
+     * Returns the singleton instance of the OfficerService class.
+     * If an instance of OfficerService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of OfficerService.
+     */
     public static OfficerService getInstance() {
         if (instance == null) {
             instance = new OfficerService();

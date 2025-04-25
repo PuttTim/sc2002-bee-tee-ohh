@@ -40,7 +40,14 @@ public class OfficerController {
     private final OfficerService officerService;
     private final EnquiryController enquiryController;
     private final ApplicationService applicationService;
-    
+
+    /**
+     * Initializes a new instance of the OfficerController.
+     *
+     * This constructor sets up the necessary services and controllers
+     * for handling officer-related operations, such as managing projects,
+     * applications, and enquiries.
+     */
     public OfficerController() {
         this.projectService = ProjectService.getInstance();
         this.officerService = OfficerService.getInstance();

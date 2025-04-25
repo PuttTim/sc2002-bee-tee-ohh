@@ -35,13 +35,20 @@ public class ProjectService implements IProjectService {
     private static ProjectService instance;
 
     private ProjectService() {}
-    
+
+    /**
+     * Returns the singleton instance of the ProjectService class.
+     * If an instance of ProjectService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of ProjectService.
+     */
     public static ProjectService getInstance() {
         if (instance == null) {
             instance = new ProjectService();
         }
         return instance;
     }
+
 
     /**
      * Retrieves projects matching specified filters.

@@ -412,6 +412,13 @@ public class Project {
         }
     }
 
+    /**
+     * Adds a flat type.
+     *
+     * @param type the flat type to be added.
+     * @param units the number of units of flats of that type.
+     * @param price the price of flats of that type.
+     */
     public void addFlatType(FlatType type, int units, int price) {
         if (flatTypeToUnit == null) {
             flatTypeToUnit = new HashMap<>();
@@ -475,6 +482,12 @@ public class Project {
         flatTypeToUnit.put(type, flatTypeToUnit.get(type) - 1);
     }
 
+    /**
+     * Increments the unit count for the specified flat type in the project.
+     *
+     * @param flatType The flat type which unit count is to be incremented.
+     * @throws IllegalArgumentException If the specified flat type is not found in the project.
+     */
     public void incrementFlatCount(FlatType flatType) {
         if (!flatTypeToUnit.containsKey(flatType)) {
             throw new IllegalArgumentException("Flat type not found in project");

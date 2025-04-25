@@ -28,10 +28,17 @@ public class ProjectController {
     private final ProjectService projectService;
     private final EnquiryService enquiryService;
 
+    /**
+     * Initializes a new instance of the ProjectController class.
+     *
+     * This constructor sets up the services required for managing projects and handling enquiries.
+     * It initializes the ProjectService and EnquiryService as instances for use within the controller.
+     */
     public ProjectController() {
         this.projectService = ProjectService.getInstance();
         this.enquiryService = EnquiryService.getInstance();
     }
+
 
     /**
      * <p>Displays the list of available projects for an applicant to view.</p>

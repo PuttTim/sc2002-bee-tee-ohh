@@ -25,11 +25,21 @@ import utils.CsvWriter;
 import utils.DateTimeUtils;
 import views.ManagerView;
 
+/**
+ * Service class for managing operations related to managers,
+ * such as generating reports and exporting data to CSV files.
+ */
 public class ManagerService implements IManagerService {
     private static ManagerService instance;
     
     private ManagerService() {}
-    
+
+    /**
+     * Returns the singleton instance of the ManagerService class.
+     * If an instance of ManagerService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of ManagerService.
+     */
     public static ManagerService getInstance() {
         if (instance == null) {
             instance = new ManagerService();
@@ -37,6 +47,14 @@ public class ManagerService implements IManagerService {
         return instance;
     }
 
+
+    /**
+     * Generates a report of applicants for the specified project with optional filters.
+     *
+     * @param project The project for which the applicant report is generated.
+     * @param filters A map of filter criteria for filtering the applicants (e.g., marital status, flat type).
+     * @return A list of maps, where each map represents a row of the applicant report.
+     */
     @Override
     public List<Map<String, String>> generateApplicantReport(Project project, Map<String, String> filters) {
         List<Application> bookedApplications = ApplicationRepository.getAll().stream()
@@ -78,6 +96,12 @@ public class ManagerService implements IManagerService {
         return reportData;
     }
 
+    /**
+     * Exports the provided report data to a CSV file.
+     *
+     * @param reportData The data to be exported to a CSV file.
+     * @param filename The name of the file to save the report to.
+     */
     @Override
     public void exportReportToCsv(List<Map<String, String>> reportData, String filename) {
         ICsvConfig config = new ICsvConfig() {

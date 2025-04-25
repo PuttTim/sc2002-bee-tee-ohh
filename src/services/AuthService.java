@@ -19,6 +19,12 @@ public class AuthService implements IAuthService {
 
     private AuthService() {}
 
+    /**
+     * Returns the singleton instance of the AuthService class.
+     * If an instance of AuthService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of AuthService.
+     */
     public static AuthService getInstance() {
         if (instance == null) {
             instance = new AuthService();

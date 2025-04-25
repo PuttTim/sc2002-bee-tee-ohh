@@ -2,13 +2,16 @@ package models.enums;
 
 /**
  * <p>Represents the types of flats available.</p>
- * <ul>
- * <li><strong>TWO_ROOM:</strong> A 2-room flat.</li>
- * <li><strong>THREE_ROOM:</strong> A 3-room flat.</li>
- * </ul>
  */
 public enum FlatType {
+    /**
+     * A 2-room flat.
+     */
     TWO_ROOM ("2 Room"),
+
+    /**
+     * A 3-room flat.
+     */
     THREE_ROOM ("3 Room");
 
     private final String description;

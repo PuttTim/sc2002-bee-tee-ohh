@@ -20,7 +20,13 @@ public class EnquiryService implements IEnquiryService {
     private static EnquiryService instance;
     
     private EnquiryService() {}
-    
+
+    /**
+     * Returns the singleton instance of the EnquiryService class.
+     * If an instance of EnquiryService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of EnquiryService.
+     */
     public static EnquiryService getInstance() {
         if (instance == null) {
             instance = new EnquiryService();

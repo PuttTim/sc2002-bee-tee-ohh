@@ -26,6 +26,12 @@ public class RegistrationService implements IRegistrationService {
 
     private RegistrationService() {}
 
+    /**
+     * Returns the singleton instance of the RegistrationService class.
+     * If an instance of RegistrationService does not already exist, it creates a new instance.
+     *
+     * @return The singleton instance of RegistrationService.
+     */
     public static RegistrationService getInstance() {
         if (instance == null) {
             instance = new RegistrationService();

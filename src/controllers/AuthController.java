@@ -32,7 +32,13 @@ public class AuthController {
     private final ManagerController managerController;
     private final ProjectController projectController;
     private final EnquiryController enquiryController;
-    
+
+    /**
+     * Initializes a new instance of the AuthController.
+     *
+     * This constructor sets up the necessary services and controllers
+     * for handling authentication-related operations.
+     */
     public AuthController() {
         this.authService = AuthService.getInstance();
         this.applicantController = new ApplicantController();

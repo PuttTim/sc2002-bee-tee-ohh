@@ -130,6 +130,15 @@ public class ProjectView {
         }
     }
 
+
+    /**
+     * Displays detailed information about a specific project in the Manager view.
+     *
+     * This method prints the project name, location, manager details, application period,
+     * available flat types, and their corresponding unit counts and prices.
+     *
+     * @param project The project which details are to be displayed.
+     */
     public static void displayProjectDetailsManagerView(Project project) {
         CommonView.displayShortSeparator();
 
@@ -146,6 +155,7 @@ public class ProjectView {
             CommonView.displayMessage("   Price: " + project.getFlatTypeSellingPrice().get(i));
         }
     }
+
 
     /**
      * Displays officer registration status for projects handled by the officer.
