@@ -4,12 +4,23 @@ import models.Filter;
 
 import java.util.*;
 
+/**
+ * View class for displaying and managing project filter options.
+ */
 public class FilterView {
+
     private static final List<String> LOCATION_OPTIONS = List.of("Jurong West", "Tampines", "Woodlands", "Yishun", "Punggol");
     private static final List<String> FLAT_TYPE_OPTIONS = List.of("TWO_ROOM", "THREE_ROOM");
     private static final List<String> PRICE_RANGE_OPTIONS = List.of("300k-400k", "400k-500k", "500k-600k", "600k-700k", "700k-800k", "800k-900k");
 
     public static List<Filter> selectProjectFilters(Map<String, Set<String>> activeFilters) {
+    /**
+     * Displays the filter menu and allows the user to select filters for projects.
+     *
+     * @return a map containing the selected filters by category (e.g., Location, Flat Type)
+     */
+    public Map<String, Set<String>> selectProjectFilters() {
+        Map<String, Set<String>> activeFilters = new HashMap<>();
         boolean running = true;
         List<String> options = List.of(
                 "Filter By Location",
@@ -67,6 +78,15 @@ public class FilterView {
     }
 
     private static void showFilterSubMenu(String categoryName, List<String> availableOptions, Set<String> selectedInCategory) {
+    /**
+     * Displays a sub-menu for selecting or deactivating a filter category.
+     *
+     * @param categoryName the name of the filter category (e.g., "Location")
+     * @param availableOptions the list of available options for the category
+     * @param selectedInCategory the set of selected options for the category
+     * @return true if the category has no selected options left, false otherwise
+     */
+    public boolean showFilterSubMenu(String categoryName, List<String> availableOptions, Set<String> selectedInCategory) {
         while (true) {
             List<String> displayOptions = new ArrayList<>();
             for (String option : availableOptions) {
@@ -81,7 +101,7 @@ public class FilterView {
             int choice = CommonView.displayMenu(categoryName + " Filter", displayOptions);
             if (choice <= 0 || choice > availableOptions.size() + 1) {
                 continue;
-            };
+            }
 
             if (choice == availableOptions.size() + 1) {
                 break;

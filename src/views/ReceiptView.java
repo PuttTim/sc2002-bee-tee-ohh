@@ -3,8 +3,17 @@ package views;
 import models.Receipt;
 import utils.DateTimeUtils;
 
+/**
+ * View class responsible for displaying receipt-related details and success messages.
+ * It provides methods to display booking receipt details and success messages when a receipt is generated.
+ */
 public class ReceiptView {
 
+    /**
+     * Displays the details of a booking receipt, including applicant details, booking details, and officer information.
+     *
+     * @param receipt The receipt whose details are to be displayed
+     */
     public static void displayReceiptDetails(Receipt receipt) {
         if (receipt == null) {
             CommonView.displayError("Receipt not found.");
@@ -30,6 +39,11 @@ public class ReceiptView {
         CommonView.displaySeparator();
     }
 
+    /**
+     * Displays a success message when a receipt is successfully generated.
+     *
+     * @param receiptId The ID of the receipt that was successfully generated
+     */
     public static void displayReceiptGeneratedSuccess(String receiptId) {
         CommonView.displaySuccess("Receipt " + receiptId + " generated successfully!");
     }
