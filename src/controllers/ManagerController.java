@@ -159,23 +159,29 @@ public class ManagerController {
                     boolean success = false;
                     switch (actionChoice) {
                         case 1 -> { // Approve Withdrawal
-                            success = ApplicationService.approveWithdrawal(selectedApplication, manager);
-                            if (success) {
-                                if (selectedApplication.getApplicationStatus() == ApplicationStatus.BOOKED) {
-                                    project.incrementFlatCount(selectedApplication.getSelectedFlatType());
-                                    ProjectRepository.saveAll();
+                            if (CommonView.promptWordConfirmation(
+                                    "Confirm APPROVAL of withdrawal request for application ID " + selectedApplication.getApplicationID() + "?", "APPROVE")) {
+                                success = ApplicationService.approveWithdrawal(selectedApplication, manager);
+                                if (success) {
+                                    if (selectedApplication.getApplicationStatus() == ApplicationStatus.BOOKED) {
+                                        project.incrementFlatCount(selectedApplication.getSelectedFlatType());
+                                        ProjectRepository.saveAll();
+                                    }
+                                    ManagerView.displayWithdrawalApprovedSuccess(applicantName);
+                                } else {
+                                    ManagerView.displayWithdrawalActionFailed("approve");
                                 }
-                                ManagerView.displayWithdrawalApprovedSuccess(applicantName);
-                            } else {
-                                ManagerView.displayWithdrawalActionFailed("approve");
                             }
                         }
                         case 2 -> { // Reject Withdrawal
-                            success = ApplicationService.rejectWithdrawal(selectedApplication, manager);
-                            if (success) {
-                                ManagerView.displayWithdrawalRejectedSuccess(applicantName);
-                            } else {
-                                ManagerView.displayWithdrawalActionFailed("reject");
+                            if (CommonView.promptWordConfirmation(
+                                    "Confirm REJECTION of withdrawal request for application ID " + selectedApplication.getApplicationID() + "?", "REJECT")) {
+                                success = ApplicationService.rejectWithdrawal(selectedApplication, manager);
+                                if (success) {
+                                    ManagerView.displayWithdrawalRejectedSuccess(applicantName);
+                                } else {
+                                    ManagerView.displayWithdrawalActionFailed("reject");
+                                }
                             }
                         }
                         case 0 -> CommonView.displayMessage("Action cancelled.");
@@ -358,7 +364,8 @@ public class ManagerController {
 
     public static boolean deleteProject(Project project, Manager manager) {
         CommonView.displayHeader("Delete Project: " + project.getProjectName());
-        if (CommonView.promptYesNo("Are you sure you want to delete this project? This action cannot be undone.")) {
+        if (CommonView.promptWordConfirmation(
+                "Are you sure you want to permanently delete project '" + project.getProjectName() + "'? This action cannot be undone.", "DELETE")) {
             try {
                 ProjectService.deleteProject(project.getProjectName());
                 ProjectView.displayProjectDeleteSuccess();
@@ -366,8 +373,6 @@ public class ManagerController {
             } catch (Exception e) {
                 CommonView.displayError("Error deleting project: " + e.getMessage());
             }
-        } else {
-            CommonView.displayMessage("Project deletion cancelled.");
         }
         return false;
     }
@@ -393,8 +398,6 @@ public class ManagerController {
             ProjectView.displayProjectDetailsManagerView(selectedProject);
             CommonView.prompt("Press Enter to return to the project list...");
         }
-        ProjectView.displayProjectList(allProjects);
-        CommonView.prompt("Press Enter to return to the main menu...");
     }
 
     public static void viewAllEnquiries(Manager manager) {

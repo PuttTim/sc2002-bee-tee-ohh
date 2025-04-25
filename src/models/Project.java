@@ -218,8 +218,12 @@ public class Project {
     }
 
     public void addFlatType(FlatType type, int units, int price) {
-        this.flatTypeToUnit.put(type, this.flatTypeToUnit.getOrDefault(type, 0) + units);
-        this.flatTypeToSellingPrice.put(type, price);
+        if (flatTypeToUnit == null) {
+            flatTypeToUnit = new HashMap<>();
+            flatTypeToSellingPrice = new HashMap<>();
+        }
+        flatTypeToUnit.put(type, units);
+        flatTypeToSellingPrice.put(type, price);
     }
 
     public void addOfficer(String officerNRIC) {

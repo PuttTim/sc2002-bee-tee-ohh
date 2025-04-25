@@ -139,11 +139,14 @@ public class ApplicantApplicationView {
         int choice = CommonView.promptInt("Select an application to withdraw (or 0 to go back): ", 0, withdrawableApplications.size());
         if (choice > 0) {
             Application selectedApp = withdrawableApplications.get(choice - 1);
-            try {
-                ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
-                displayWithdrawalSuccess();
-            } catch (Exception e) {
-                displayWithdrawalError(e.getMessage());
+            if (CommonView.promptWordConfirmation(
+                    "Are you sure you want to request withdrawal for application ID " + selectedApp.getApplicationID() + "?", "WITHDRAW")) {
+                try {
+                    ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
+                    displayWithdrawalSuccess();
+                } catch (Exception e) {
+                    displayWithdrawalError(e.getMessage());
+                }
             }
         }
         CommonView.prompt("Press Enter to continue...");

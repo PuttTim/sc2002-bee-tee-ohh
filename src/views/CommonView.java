@@ -128,4 +128,18 @@ public class CommonView {
             }
         }
     }
+
+    public static boolean promptWordConfirmation(String message, String confirmationWord) {
+        while (true) {
+            String input = prompt(message + " (Type '" + confirmationWord + "' to confirm, or '0'/'cancel' to cancel): ");
+            if (input.equalsIgnoreCase(confirmationWord)) {
+                return true;
+            }
+            if (input.equals("0") || input.equalsIgnoreCase("cancel")) {
+                displayMessage("Action cancelled.");
+                return false;
+            }
+            displayError("Incorrect confirmation word. Please type '" + confirmationWord + "' exactly, or '0'/'cancel' to cancel.");
+        }
+    }
 }
