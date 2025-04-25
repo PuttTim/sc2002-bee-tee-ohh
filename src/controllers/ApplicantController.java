@@ -12,6 +12,7 @@ import services.ApplicationService;
 import services.ProjectService;
 import views.ApplicantApplicationView;
 import views.CommonView;
+import views.ProjectView; // Added import
 
 /**
  * Controller class that is responsible for handling applicant-related actions.
@@ -104,8 +105,7 @@ public class ApplicantController {
      */
     public void viewAvailableProjects(Applicant applicant) {
         List<Project> eligibleProjects = applicantApplicationService.getEligibleProjects(applicant);
-        ApplicantApplicationView.displayEligibleProjects(eligibleProjects);
-        CommonView.prompt("Press Enter to continue...");
+        ProjectView.displayAndFilterProjects(eligibleProjects, "Available Projects"); // Use the new filter view
     }
 
     /**

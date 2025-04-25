@@ -125,38 +125,7 @@ public class OfficerController {
      */
     public void viewHandledProjectDetails(Officer officer) {
         List<Project> projects = officerService.getHandledProjects(officer);
-        if (projects == null || projects.isEmpty()) {
-            CommonView.displayError("You do not have any projects assigned to you.");
-            return;
-        }
-
-        while (true) {
-            OfficerView.displayOfficerHandledProjects(projects);
-            int projectChoice = CommonView.promptInt("Select project number to view details (or 0 to cancel): ", 0, projects.size());
-
-            if (projectChoice == 0) {
-                CommonView.displayMessage("Cancelled viewing project details.");
-                break;
-            }
-
-            Project selectedProject = projects.get(projectChoice - 1);
-            CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
-            ProjectView.displayProjectDetailsOfficerView(selectedProject);
-
-            boolean runningProjectMenu = true;
-            while (runningProjectMenu) {
-                int choice = OfficerView.showSelectHandledProjectMenu(selectedProject);
-                switch (choice) {
-                    case 1 -> manageProjectApplications(selectedProject, officer);
-                    case 2 -> manageSuccessfulApplications(selectedProject, officer);
-                    case 3 -> manageProjectEnquiries(selectedProject, officer);
-                    case 0 -> {
-                        CommonView.displayMessage("Returning to project selection.");
-                        runningProjectMenu = false;
-                    }
-                }
-            }
-        }
+        ProjectView.displayAndFilterProjects(projects, "Handled Projects");
     }
 
     /**

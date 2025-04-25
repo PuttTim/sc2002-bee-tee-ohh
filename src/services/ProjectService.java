@@ -1,11 +1,13 @@
 package services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import interfaces.IProjectService;
-import models.Filter;
 import models.Manager;
 import models.Project;
 import models.Officer;
@@ -51,52 +53,6 @@ public class ProjectService implements IProjectService {
 
 
     /**
-     * Retrieves projects matching specified filters.
-     * Applies all provided filters to the project list. Supported filter keys:
-     * <ul>
-     *   <li>"location" - Filters by project location</li>
-     *   <li>"flat_type" - Filters by available flat types</li>
-     * </ul>
-     *
-     * @param filters List of filters to apply
-     * @return List of projects matching all filters
-     */
-    @Override
-    public List<Project> getProjects(List<Filter> filters) {
-        if (filters == null || filters.isEmpty()) {
-            return ProjectRepository.getAll();
-        }
-
-        return ProjectRepository.getAll().stream()
-            .filter(project -> filters.stream().allMatch(filter -> checkPassesFilter(project, filter)))
-            .collect(Collectors.toList());
-    }
-
-    private boolean checkPassesFilter(Project project, Filter filter) {
-        if (project == null) {
-            return true;
-        }
-
-        String key = filter.getKey();
-        List<String> value = filter.getValue();
-        return switch (key) {
-            case "location" -> value.contains(project.getLocation());
-            case "flat_type" -> {
-                for (FlatType flattype : project.getFlatTypes()) {
-                    if (value.contains(flattype.toString())) {
-                        yield true;
-                    }
-                }
-                yield false;
-            }
-            default -> {
-                System.err.println("Warning: Unknown filter key skipped: " + key);
-                yield true;
-            }
-        };
-    }
-
-    /**
      * Retrieves all projects in the system.
      *
      * @return List of all projects
@@ -119,12 +75,20 @@ public class ProjectService implements IProjectService {
      */
     @Override
     public List<Project> getVisibleProjects() {
-        List<Project> projects = ProjectRepository.getAll();
         User user = UserRepository.getActiveUser();
+        Role userMode;
+        if (user.getRole() == Role.OFFICER) {
+            userMode = UserRepository.getUserMode();
+        } else {
+            userMode = user.getRole();
+        }
 
-        if (user.getRole() == Role.APPLICANT) {
-            return projects.stream()
+        switch (userMode) {
+            case APPLICANT:
+                return ProjectRepository.getAll().stream()
                         .filter(Project::isVisible)
+                        .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime())
+                                && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
                         .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
                         .filter(p -> {
                             List<FlatType> flatTypes = p.getFlatTypes();
@@ -133,13 +97,19 @@ public class ProjectService implements IProjectService {
                                 return true;
                             } else if ((user.getMaritalStatus() == MaritalStatus.SINGLE || user.getMaritalStatus() == MaritalStatus.DIVORCED) && user.getAge() >= 35) {
                                 return flatTypes.contains(FlatType.TWO_ROOM);
-                            } else {
-                                return false;
                             }
+                            return false;
                         })
                         .collect(Collectors.toList());
+            case OFFICER:
+                return new ArrayList<>(ProjectRepository.getAll());
+            default:
+                if (user.getRole() == Role.MANAGER) {
+                    return ProjectRepository.getAll();
+                } else {
+                    return List.of();
+                }
         }
-        return projects;
     }
 
     /**
@@ -181,6 +151,34 @@ public class ProjectService implements IProjectService {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getManagerNRIC().equals(manager.getUserNRIC()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves a list of projects filtered by the given criteria.
+     * Only visible projects are considered.
+     *
+     * @param filters A map containing filter criteria (e.g., "location", "flatType").
+     * @return A list of filtered, visible projects.
+     */
+    public List<Project> getFilteredProjects(Map<String, String> filters) {
+        Stream<Project> projectStream = getVisibleProjects().stream();
+
+        String locationFilter = filters.get("location");
+        if (locationFilter != null && !locationFilter.isEmpty()) {
+            projectStream = projectStream.filter(p -> p.getLocation().equalsIgnoreCase(locationFilter));
+        }
+
+        String flatTypeFilter = filters.get("flatType");
+        if (flatTypeFilter != null && !flatTypeFilter.isEmpty()) {
+            try {
+                FlatType filterType = FlatType.valueOf(flatTypeFilter);
+                projectStream = projectStream.filter(p -> p.getFlatTypes().contains(filterType));
+            } catch (IllegalArgumentException e) {
+                System.err.println("Warning: Invalid flat type filter value: " + flatTypeFilter);
+            }
+        }
+
+        return projectStream.collect(Collectors.toList());
     }
 
     /**

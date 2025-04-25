@@ -10,8 +10,11 @@ import models.enums.FlatType;
 import repositories.ApplicationRepository;
 import repositories.ManagerRepository;
 import repositories.ProjectRepository;
+import services.ProjectService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * View class responsible for displaying project-related functionalities.
@@ -20,6 +23,7 @@ import java.util.List;
  */
 public class ProjectView {
     private static final EnquiryController enquiryController = new EnquiryController();
+    private static final ProjectService projectService = ProjectService.getInstance();
 
     /**
      * Displays the project menu for an applicant, allowing them to view project details or create an enquiry.
@@ -56,7 +60,7 @@ public class ProjectView {
     }
 
     /**
-     * Displays a list of available projects to the user.
+     * Displays a list of available projects to the user, including basic details.
      *
      * @param projects The list of available projects to be displayed
      */
@@ -68,7 +72,24 @@ public class ProjectView {
 
         for (int i = 0; i < projects.size(); i++) {
             Project project = projects.get(i);
-            CommonView.displayMessage((i + 1) + ". " + project.getProjectName());
+
+            CommonView.displayMessage(String.format("%d. %s", i + 1, project.getProjectName()));
+            CommonView.displayMessage(String.format("   Location: %s", project.getLocation()));
+            CommonView.displayMessage(String.format("   Application Period: %s to %s",
+                project.getApplicationOpenDate(), project.getApplicationCloseDate()));
+
+            List<FlatType> flatTypes = project.getFlatTypes();
+            List<Integer> units = project.getFlatTypeUnits();
+            StringBuilder flatTypesBuilder = new StringBuilder();
+            for (int j = 0; j < flatTypes.size(); j++) {
+                flatTypesBuilder.append(flatTypes.get(j).getDescription())
+                                .append(" (").append(units.get(j)).append(" units)");
+                if (j < flatTypes.size() - 1) {
+                    flatTypesBuilder.append(", ");
+                }
+            }
+            String flatTypesString = flatTypesBuilder.length() > 0 ? flatTypesBuilder.toString() : "N/A";
+            CommonView.displayMessage(String.format("   Available Flat Types: %s", flatTypesString));
         }
     }
 
@@ -79,13 +100,87 @@ public class ProjectView {
      */
     public static void displayAvailableProjects(List<Project> projects) {
         if (projects.isEmpty()) {
-            CommonView.displayMessage("No projects available at the moment.");
+            CommonView.displayMessage("No projects available matching the current filters.");
             return;
         }
 
-        for (Project project : projects) {
-            displayProjectDetails(project);
-            CommonView.displayMessage("----------------------------------------");
+        // Display list first
+        displayProjectList(projects);
+        CommonView.displayShortSeparator();
+    }
+
+    /**
+     * Displays a list of projects and provides filtering options.
+     * Allows users to view details, filter by location/flat type, or clear filters.
+     *
+     * @param initialProjects The initial list of projects to display and filter.
+     * @param title The title to display for the view.
+     */
+    public static void displayAndFilterProjects(List<Project> initialProjects, String title) {
+        Map<String, String> activeFilters = new HashMap<>();
+        List<Project> currentProjects = initialProjects;
+        boolean running = true;
+
+        while (running) {
+            CommonView.displayHeader(title);
+            FilterView.displayActiveFilters(activeFilters);
+            displayAvailableProjects(currentProjects);
+
+            int choice = FilterView.displayFilterMenu(activeFilters);
+
+            try {
+                switch (choice) {
+                    case 1: // View Project Details
+                        if (currentProjects.isEmpty()) {
+                            CommonView.displayError("No projects to view details for.");
+                            CommonView.prompt("Press Enter to continue...");
+                            break;
+                        }
+                        int projectChoice = getProjectChoice(currentProjects);
+                        if (projectChoice != -1) {
+                            Project selectedProject = currentProjects.get(projectChoice - 1);
+                            displayProjectDetails(selectedProject);
+                            CommonView.prompt("Press Enter to continue...");
+                        }
+                        break;
+                    case 2: // Filter by Location
+                        String location = FilterView.promptLocationFilter(currentProjects);
+                        if (location == null) { // User chose 'ANY' or left blank in fallback
+                            activeFilters.remove("location");
+                        } else {
+                            activeFilters.put("location", location.trim());
+                        }
+                        currentProjects = projectService.getFilteredProjects(activeFilters);
+                        break;
+                    case 3: // Filter by Flat Type
+                        String flatType = FilterView.promptFlatTypeFilter();
+                        if (flatType == null) {
+                            activeFilters.remove("flatType");
+                        } else {
+                            activeFilters.put("flatType", flatType);
+                        }
+                        currentProjects = projectService.getFilteredProjects(activeFilters);
+                        break;
+                    case 4: // This case is only valid if 'Clear All Filters' was displayed
+                        if (!activeFilters.isEmpty()) { // Check if the option was actually available
+                            activeFilters.clear();
+                            currentProjects = projectService.getFilteredProjects(activeFilters);
+                            CommonView.displaySuccess("All filters cleared.");
+                        } else {
+                            CommonView.displayError("Invalid choice!");
+                        }
+                        break;
+                    case 0: // Back
+                        running = false;
+                        break;
+                    default:
+                        CommonView.displayError("Invalid choice!");
+                        break;
+                }
+            } catch (Exception e) {
+                CommonView.displayError("An error occurred: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -113,9 +208,6 @@ public class ProjectView {
      * @param project The project whose details are to be displayed
      */
     public static void displayProjectDetailsOfficerView(Project project) {
-        // TODO update this with more details for the officer to see,
-        // maybe how many people applied for each unit type, how many officers are there,
-        // how many officer slots are remaining and who is the manager of the project (name)
         CommonView.displayMessage("Project Name: " + project.getProjectName());
         CommonView.displayMessage("Location: " + project.getLocation());
         Manager manager = ManagerRepository.getByNRIC(project.getManagerNRIC());

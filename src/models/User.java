@@ -37,8 +37,6 @@ public class User {
     public User(String userNRIC, String name, String password, int age) {
         this.userNRIC = userNRIC;
         this.name = name;
-        this.age = age;
-        this.maritalStatus = maritalStatus;
         this.password = password;
         this.age = age;
     }

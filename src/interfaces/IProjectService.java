@@ -3,7 +3,6 @@ package interfaces;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import models.Filter;
 import models.Manager;
 import models.Officer;
 import models.Project;
