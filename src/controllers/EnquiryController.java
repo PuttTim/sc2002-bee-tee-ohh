@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import models.Applicant;
 import models.Project;
+import models.enums.EnquiryStatus;
 import models.Enquiry;
 import models.Manager;
 import models.Officer;
@@ -172,6 +173,14 @@ public class EnquiryController {
         EnquiryView.displayEnquiry(selectedEnquiry);
 
         if (CommonView.promptYesNo("Do you want to reply to this enquiry?")) {
+            if (selectedEnquiry.getEnquiryStatus() == EnquiryStatus.RESPONDED) {
+                EnquiryView.displayError("This enquiry has already been replied to.");
+                if (CommonView.promptYesNo("Do you still want to reply to this enquiry?")) {
+                } else {
+                    return;
+                }
+            }
+    
             String reply = CommonView.prompt("Enter your reply: ");
             if (enquiryService.replyToEnquiry(selectedEnquiry, reply, nric)) {
                 EnquiryView.displaySuccess("Reply submitted successfully");
@@ -179,5 +188,10 @@ public class EnquiryController {
                 EnquiryView.displayError("Failed to submit reply. Please try again.");
             }
         }
+        else {
+            return;
+        }
+
+
     }
 }

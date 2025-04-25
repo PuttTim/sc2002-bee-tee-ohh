@@ -23,6 +23,7 @@ import repositories.RegistrationRepository;
 import repositories.UserRepository;
 import services.*;
 import views.*;
+import interfaces.IOfficerService;
 
 /**
  * <p>Handles all operations related to Officer actions in the housing project management system.</p>
@@ -36,11 +37,13 @@ import views.*;
  */
 public class OfficerController {
     private final ProjectService projectService;
+    private final OfficerService officerService;
     private final EnquiryController enquiryController;
     private final ApplicationService applicationService;
     
     public OfficerController() {
         this.projectService = ProjectService.getInstance();
+        this.officerService = OfficerService.getInstance();
         this.enquiryController = new EnquiryController();
         this.applicationService = ApplicationService.getInstance();
     }
@@ -55,60 +58,30 @@ public class OfficerController {
      * @param officer The officer attempting to register for a project.
      */
     public void registerToHandleProject(Officer officer) {
-        List<Project> projects = projectService.getVisibleProjects();
-        List<Registration> officerRegistrations = RegistrationRepository.getByOfficer(officer);
-        List<Project> registeredProjects = projects.stream()
-                .filter(p -> officerRegistrations.stream().filter(r -> r.getRegistrationStatus() != RegistrationStatus.REJECTED).anyMatch(r -> r.getProjectID().equals(p.getProjectID())))
-                .collect(Collectors.toList());
+        List<Project> projects = officerService.getAvailableProjects();
         if (projects.isEmpty()) {
             CommonView.displayMessage("No projects available for registration.");
             return;
         }
 
-        int projectChoice = -1;
-
         while (true) {
-            ProjectView.displayOfficerRegistrations(projects, officerRegistrations, officer);
-            projectChoice = CommonView.promptInt("Select project number (or 0 to cancel): ", 0, projects.size());
+            ProjectView.displayOfficerRegistrations(projects, RegistrationRepository.getByOfficer(officer), officer);
+            int projectChoice = CommonView.promptInt("Select project number (or 0 to cancel): ", 0, projects.size());
 
             if (projectChoice == 0) {
+                CommonView.displayMessage("Registration cancelled.");
                 break;
             }
 
-            Project project = projects.get(projectChoice - 1);
-            if (project.getOfficerSlots() <= project.getOfficers().size()) {
-                CommonView.displayError("No available slots for this project.");
-                continue;
-            }
-
-            if (ApplicationRepository.hasApplication(officer, project.getProjectID())) {
-                CommonView.displayError("You have an existing BTO application for this project.");
-                continue;
-            }
-
-            if (officerRegistrations.stream().anyMatch(r -> r.getProjectID().equals(project.getProjectID()))) {
-                CommonView.displayError("You have an existing registration for this project.");
-                continue;
-            }
-
-            if (registeredProjects.stream().anyMatch(r -> r.getApplicationOpenDate().isBefore(project.getApplicationCloseDate()) &&
-                    r.getApplicationCloseDate().isAfter(project.getApplicationOpenDate()))) {
-                CommonView.displayError("You have an existing registration that overlaps with this project's timeline.");
-                continue;
-            }
-
-            break;
-        }
-
-        System.out.println("Selected project: " + (projectChoice != 0 ? projects.get(projectChoice - 1).getProjectName() : "None"));
-
-        if (projectChoice != 0) {
             Project selectedProject = projects.get(projectChoice - 1);
-            Registration registration = new Registration(officer, selectedProject.getProjectID());
-            RegistrationRepository.add(registration);
+            if (!officerService.isProjectEligibleForRegistration(selectedProject, officer)) {
+                CommonView.displayError("You are not eligible to register for this project.");
+                continue;
+            }
+
+            officerService.registerOfficerForProject(officer, selectedProject);
             CommonView.displayMessage("You have successfully registered to handle project: " + selectedProject.getProjectName() + "! Please wait for approval.");
-        } else {
-            CommonView.displayMessage("Registration cancelled.");
+            break;
         }
     }
 
@@ -122,11 +95,15 @@ public class OfficerController {
      * @param officer The officer whose registration status is being checked.
      */
     public void checkHandlerRegistration(Officer officer) {
-        if (OfficerRepository.hasExistingProject(officer)) {
-            Project project = projectService.getProjectByOfficer(officer);
+        if (officerService.hasExistingProject(officer)) {
+            Project project = officerService.getProjectByOfficer(officer);
             if (project != null) {
                 CommonView.displayMessage("You are currently handling project: " + project.getProjectName());
             }
+        } else if (officerService.hasExistingRegistration(officer)) {
+            CommonView.displayMessage("You have a pending registration request.");
+        } else {
+            CommonView.displayMessage("You have no active registrations.");
         }
     }
 
@@ -140,48 +117,38 @@ public class OfficerController {
      * @param officer The officer viewing the project details.
      */
     public void viewHandledProjectDetails(Officer officer) {
-        List<Project> projects = projectService.getAllOfficersProjects(officer.getUserNRIC());
-        if (projects != null && !projects.isEmpty()) {
-            while (true) {
-                OfficerView.displayOfficerHandledProjects(projects);
+        List<Project> projects = officerService.getHandledProjects(officer);
+        if (projects == null || projects.isEmpty()) {
+            CommonView.displayError("You do not have any projects assigned to you.");
+            return;
+        }
 
-                int projectChoice = CommonView.promptInt("Select project number to view details (or 0 to cancel): ", 0, projects.size());
+        while (true) {
+            OfficerView.displayOfficerHandledProjects(projects);
+            int projectChoice = CommonView.promptInt("Select project number to view details (or 0 to cancel): ", 0, projects.size());
 
-                if (projectChoice == 0) {
-                    CommonView.displayMessage("Cancelled viewing project details.");
-                    break;
-                }
+            if (projectChoice == 0) {
+                CommonView.displayMessage("Cancelled viewing project details.");
+                break;
+            }
 
-                Project selectedProject = projects.get(projectChoice - 1);
+            Project selectedProject = projects.get(projectChoice - 1);
+            CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
+            ProjectView.displayProjectDetailsOfficerView(selectedProject);
 
-                CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
-                ProjectView.displayProjectDetailsOfficerView(selectedProject);
-
-                boolean runningProjectMenu = true;
-                while (runningProjectMenu) {
-                    int choice = OfficerView.showSelectHandledProjectMenu(selectedProject);
-
-                    switch (choice) {
-                        case 1 -> { // Manage Applications
-                            manageProjectApplications(selectedProject, officer);
-                        }
-                        case 2 -> { // Manage Successful Applications
-                            manageSuccessfulApplications(selectedProject, officer);
-                        }
-                        case 3 -> { // View Enquiries
-                            manageProjectEnquiries(selectedProject, officer);
-                        }
-                        case 0 -> {
-                            CommonView.displayMessage("Returning to project selection.");
-                            runningProjectMenu = false;
-                        }
-                        default -> CommonView.displayError("Invalid choice.");
+            boolean runningProjectMenu = true;
+            while (runningProjectMenu) {
+                int choice = OfficerView.showSelectHandledProjectMenu(selectedProject);
+                switch (choice) {
+                    case 1 -> manageProjectApplications(selectedProject, officer);
+                    case 2 -> manageSuccessfulApplications(selectedProject, officer);
+                    case 3 -> manageProjectEnquiries(selectedProject, officer);
+                    case 0 -> {
+                        CommonView.displayMessage("Returning to project selection.");
+                        runningProjectMenu = false;
                     }
                 }
             }
-
-        } else {
-            CommonView.displayError("You do not have any projects assigned to you.");
         }
     }
 

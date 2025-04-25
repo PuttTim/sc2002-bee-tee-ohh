@@ -9,6 +9,7 @@ import models.Project;
 import models.enums.EnquiryStatus;
 
 import repositories.EnquiryRepository;
+import views.CommonView;
 
 /**
  * Service class for managing property enquiry operations.
@@ -148,7 +149,7 @@ public class EnquiryService implements IEnquiryService {
         }
 
         if (enquiry.getEnquiryStatus() == EnquiryStatus.RESPONDED) {
-            throw new IllegalStateException("This enquiry has already been responded to");
+            CommonView.displayError("Enquiry has already been responded to.");
         }
 
         try {
