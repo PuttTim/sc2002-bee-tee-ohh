@@ -39,3 +39,13 @@ mvn test
 
 ## Login Credentials
 All users by default have a password of "password".
+
+## Directories to know
+ - /reports: Contains the generated reports for the project.
+ - /report: Contains two files, our test case report and our assignment report writeup.
+ - /uml class diagram: Contains the UML class diagram for the project.
+ - /uml sequence diagram: Contains the UML sequence diagram for the project.
+ - /data: Contains the data files used in the project that is loaded into the application on startup
+ - /docs: Contains the generated javadoc HTML for the project.
+ - /src/main/java: Contains the source code for the project.
+ - /src/test/java: Contains the test code for the project.

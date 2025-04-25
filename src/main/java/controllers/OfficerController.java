@@ -116,7 +116,40 @@ public class OfficerController {
      */
     public void viewHandledProjectDetails(Officer officer) {
         List<Project> projects = officerService.getHandledProjects(officer);
-        ProjectView.displayAndFilterProjects(projects, "Handled Projects");
+        int projectChoice = ProjectView.displayAndFilterProjects(projects, "Handled Projects");
+
+        if (projectChoice == 0) {
+            CommonView.displayMessage("Returning to project selection.");
+            return;
+        }
+
+        Project selectedProject = projects.get(projectChoice - 1);
+
+
+        CommonView.displayHeader("Project Details for " + selectedProject.getProjectName());
+        ProjectView.displayProjectDetailsOfficerView(selectedProject);
+
+        boolean runningProjectMenu = true;
+        while (runningProjectMenu) {
+            int choice = OfficerView.showSelectHandledProjectMenu(selectedProject);
+
+            switch (choice) {
+                case 1 -> { // Manage Applications
+                    manageProjectApplications(selectedProject, officer);
+                }
+                case 2 -> { // Manage Successful Applications
+                    manageSuccessfulApplications(selectedProject, officer);
+                }
+                case 3 -> { // View Enquiries
+                    manageProjectEnquiries(selectedProject, officer);
+                }
+                case 0 -> {
+                    CommonView.displayMessage("Returning to project selection.");
+                    runningProjectMenu = false;
+                }
+                default -> CommonView.displayError("Invalid choice.");
+            }
+        }
     }
 
     /**

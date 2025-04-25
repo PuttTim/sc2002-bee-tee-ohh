@@ -144,4 +144,13 @@ public class ApplicantRepository {
                 .filter(applicant -> applicant.getAppliedProjects().contains(projectId))
                 .collect(Collectors.toList());
     }
+
+    public static void update(Applicant applicant) {
+        int index = applicants.indexOf(applicant);
+        if (index != -1) {
+            applicants.set(index, applicant);
+        }
+
+        saveAll();
+    }
 }

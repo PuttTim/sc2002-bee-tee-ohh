@@ -116,7 +116,7 @@ public class ProjectView {
      * @param initialProjects The initial list of projects to display and filter.
      * @param title The title to display for the view.
      */
-    public static void displayAndFilterProjects(List<Project> initialProjects, String title) {
+    public static int displayAndFilterProjects(List<Project> initialProjects, String title) {
         Map<String, String> activeFilters = new HashMap<>();
         List<Project> currentProjects = initialProjects;
         boolean running = true;
@@ -137,10 +137,13 @@ public class ProjectView {
                             break;
                         }
                         int projectChoice = getProjectChoice(currentProjects);
+                        System.out.println();
+                        CommonView.displaySeparator();
                         if (projectChoice != -1) {
                             Project selectedProject = currentProjects.get(projectChoice - 1);
                             displayProjectDetails(selectedProject);
-                            CommonView.prompt("Press Enter to continue...");
+                            // CommonView.prompt("Press Enter to continue...");
+                            return projectChoice;
                         }
                         break;
                     case 2: // Filter by Location
@@ -182,6 +185,7 @@ public class ProjectView {
                 e.printStackTrace();
             }
         }
+        return 0;
     }
 
     /**

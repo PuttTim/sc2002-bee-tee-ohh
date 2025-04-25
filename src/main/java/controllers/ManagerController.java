@@ -74,7 +74,13 @@ public class ManagerController {
             return;
         }
 
-        ProjectView.displayAndFilterProjects(handledProjects, "Projects Handled By You");
+        int projectChoice = ProjectView.displayAndFilterProjects(handledProjects, "Projects Handled By You");
+
+        if (projectChoice == 0) {
+            return; // User chose to go back
+        }
+
+        showProjectManagementMenu(handledProjects.get(projectChoice - 1), manager);
     }
 
     /**

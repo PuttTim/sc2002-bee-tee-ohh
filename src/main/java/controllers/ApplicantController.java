@@ -101,15 +101,15 @@ public class ApplicantController {
                 applicant, 
                 selectedProject, 
                 selectedProject.getFlatTypes().get(flatTypeChoice - 1)
-            );
-            
+                );
+                
             if (success) {
                 ApplicantApplicationView.displaySubmissionSuccess();
             } else {
                 ApplicantApplicationView.displaySubmissionError("You have an existing BTO application. Please try again later.");
             }
-        } catch (Exception e) {
-            ApplicantApplicationView.displaySubmissionError(e.getMessage());
+        } catch (IllegalStateException e) {
+            CommonView.displayError("Application submission failed: " + e.getLocalizedMessage());
         }
         CommonView.prompt("Press Enter to continue...");
     }

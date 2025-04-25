@@ -101,9 +101,15 @@ public class Applicant extends User {
      * @param projectId The project ID to add.
      */
     public void addAppliedProject(String projectId) {
-        if (projectId != null && !appliedProjects.contains(projectId)) {
-            appliedProjects.add(projectId);
+        if (appliedProjects == null) {
+            appliedProjects = new ArrayList<>();
         }
+        if (projectId != null && !appliedProjects.contains(projectId)) {
+            List<String> appliedProjectsCopy = new ArrayList<>(this.appliedProjects);
+            appliedProjectsCopy.add(projectId);
+            setAppliedProjects(appliedProjectsCopy);
+        }
+
     }
 
     /**

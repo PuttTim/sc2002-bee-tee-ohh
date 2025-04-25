@@ -107,7 +107,7 @@ public class ApplicantApplicationService implements IApplicantApplicationService
         }
 
         if (project.getAvailableUnits(flatType) <= 0) {
-            throw new IllegalStateException("No units available for selected flat type");
+            throw new IllegalStateException("No available units left for this flat type");
         }
 
         if (applicant.getMaritalStatus() != MaritalStatus.MARRIED && flatType != FlatType.TWO_ROOM) {
@@ -119,7 +119,7 @@ public class ApplicantApplicationService implements IApplicantApplicationService
         ApplicationRepository.saveAll();
         
         applicant.addAppliedProject(project.getProjectID());
-        ApplicantRepository.saveAll();
+        ApplicantRepository.update(applicant);
         
         return true;
     }
