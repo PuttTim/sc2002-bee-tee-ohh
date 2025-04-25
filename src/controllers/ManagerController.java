@@ -2,7 +2,9 @@ package controllers;
 
 import models.Enquiry;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import models.Manager;
@@ -16,22 +18,16 @@ import repositories.ProjectRepository;
 import repositories.UserRepository;
 import services.ApplicationService;
 import services.EnquiryService;
-import repositories.OfficerRepository;
-import repositories.ProjectRepository;
 import services.ProjectService;
 import services.RegistrationService;
+import services.ManagerService; 
 import views.CommonView;
 import views.EnquiryView;
 import views.ManagerView;
 import views.ProjectView;
 import models.Application;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class ManagerController {
-
 
     // Method to display all projects managed by the manager, then ask the user to select a project
     public static void viewHandledProjects(Manager manager) {
@@ -77,6 +73,9 @@ public class ManagerController {
                 case 4: // View Enquiries
                     EnquiryController.manageProjectEnquiries(java.util.Optional.empty(), java.util.Optional.of(manager), project);
                     break;
+                case 5: // Generate Report
+                    generateReport(project, manager);
+                    break;
                 case 0:
                     running = false;
                     break;
@@ -86,7 +85,6 @@ public class ManagerController {
             }
          }
     }
-
 
     // Manages officer registrations for a specific project
     public static void manageProjectOfficerRegistration(Project project, Manager manager) {
@@ -448,6 +446,30 @@ public class ManagerController {
                 }
             }
             CommonView.prompt("Press Enter to return to the enquiry list...");
+        }
+    }
+
+    public static void generateReport(Project project, Manager manager) {
+        CommonView.displayHeader("Generate Booked Applications Report for Project: " + project.getProjectName());
+
+        Map<String, String> filters = ManagerView.promptFilterOptions();
+
+        List<Map<String, String>> reportData = ManagerService.generateApplicantReport(project, filters);
+
+        ManagerView.displayReport(reportData);
+
+        if (!reportData.isEmpty() && ManagerView.promptExportToCsv()) {
+            boolean running = true;
+            while (running) {
+                String filename = ManagerView.promptCsvFileName();
+                if ((filename != null && !filename.trim().isEmpty())) {
+                    ManagerService.exportReportToCsv(reportData, filename);
+                    running = false;
+                } else {
+                    CommonView.displayError("Invalid filename. Please try again.");
+                    CommonView.prompt("Press Enter to continue...");
+                }
+            }
         }
     }
 }

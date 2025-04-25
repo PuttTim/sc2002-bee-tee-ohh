@@ -1,11 +1,16 @@
 package views;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import models.Application;
 import models.Project;
 import models.Registration;
+import models.enums.FlatType;
+import models.enums.MaritalStatus;
 import models.enums.RegistrationStatus;
 import utils.DateTimeUtils;
 
@@ -15,7 +20,8 @@ public class ManagerView {
             "Manage Officer Registrations",
             "Manage Applicant Applications",
             "Edit Project Details",
-            "View/Reply Enquiries"
+            "View/Reply Enquiries",
+            "Generate Booked Applications Reports" // Added report option
             );
         
         int choice = CommonView.displayMenuWithBacking("Select Manager Operation for " + project.getProjectName(), options);
@@ -135,5 +141,80 @@ public class ManagerView {
 
     public static void displayApplicationDetails(Application application) {
         OfficerView.displayApplicationDetails(application);
+    }
+
+    public static Map<String, String> promptFilterOptions() { 
+        CommonView.displayHeader("Report Filters");
+        Map<String, String> filters = new HashMap<>();
+
+        // Filter by Marital Status (1 = ANY, 2 = SINGLE, 3 = MARRIED, etc.)
+        CommonView.displayMessage("Filter by Marital Status:");
+        List<String> maritalOptions = Stream.of(MaritalStatus.values())
+                                            .map(Enum::name)
+                                            .collect(Collectors.toList());
+        maritalOptions.add(0, "ANY");
+        int maritalChoice = CommonView.displayMenu("Select Marital Status", maritalOptions);
+        if (maritalChoice > 1) { // If choice is not "ANY", which will not take any action on the list
+            filters.put("maritalStatus", maritalOptions.get(maritalChoice - 1));
+        }
+
+        // Filter by Flat Type (1 = ANY, 2 = TWO_ROOM, 3 = THREE_ROOM, etc.)
+        CommonView.displayMessage("\nFilter by Flat Type:");
+        List<String> flatTypeOptions = Stream.of(FlatType.values())
+                                             .map(FlatType::getDescription)
+                                             .collect(Collectors.toList());
+        flatTypeOptions.add(0, "ANY");
+        int flatTypeChoice = CommonView.displayMenu("Select Flat Type", flatTypeOptions);
+        if (flatTypeChoice > 1) { // If choice is not "ANY", which will not take any action on the list
+            String selectedDescription = flatTypeOptions.get(flatTypeChoice - 1);
+            FlatType selectedType = Stream.of(FlatType.values())
+                                          .filter(ft -> ft.getDescription().equals(selectedDescription))
+                                          .findFirst().orElse(null);
+            if (selectedType != null) {
+                filters.put("flatType", selectedType.name());
+            }
+        }
+
+        return filters;
+    }
+
+    public static void displayReport(List<Map<String, String>> reportData) {
+        CommonView.displayHeader("Applicant Booking Report");
+        if (reportData.isEmpty()) {
+            CommonView.displayMessage("No matching records found for the selected filters.");
+            return;
+        }
+
+        CommonView.displayMessage(String.format("%-15s | %-20s | %-5s | %-15s | %-25s | %-10s",
+                "Applicant NRIC", "Applicant Name", "Age", "Marital Status", "Project Name", "Flat Type"));
+        CommonView.displaySeparator();
+
+        for (Map<String, String> row : reportData) {
+            CommonView.displayMessage(String.format("%-15s | %-20s | %-5s | %-15s | %-25s | %-10s",
+                    row.getOrDefault("applicantNRIC", "N/A"),
+                    row.getOrDefault("applicantName", "N/A"),
+                    row.getOrDefault("age", "N/A"),
+                    row.getOrDefault("maritalStatus", "N/A"),
+                    row.getOrDefault("projectName", "N/A"),
+                    row.getOrDefault("flatType", "N/A")
+            ));
+        }
+        CommonView.displaySeparator();
+    }
+
+    public static boolean promptExportToCsv() {
+        return CommonView.promptYesNo("\nDo you want to export this report to a CSV file?");
+    }
+
+    public static String promptCsvFileName() {
+        return CommonView.prompt("Enter the desired CSV filename (e.g., report.csv): ");
+    }
+
+     public static void displayExportSuccess(String filename) {
+        CommonView.displaySuccess("Report successfully exported to " + filename);
+    }
+
+    public static void displayExportError(String filename, String message) {
+        CommonView.displayError("Error exporting report to " + filename + ": " + message);
     }
 }
