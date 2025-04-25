@@ -195,6 +195,13 @@ public class ManagerController {
         }
     }
 
+    /**
+     * Allows a manager to view and manage all applications for a specific project.
+     * The manager can approve or reject applications, and handle withdrawal requests.
+     *
+     * @param project The project whose applications are being managed.
+     * @param manager The manager performing the action.
+     */
     public void manageApplicantApplications(Project project, Manager manager) {
         while (true) {
             List<Application> applications = applicationService.getProjectApplications(project);
@@ -290,6 +297,11 @@ public class ManagerController {
         }
     }
 
+    /**
+     * Allows a manager to create a new housing project.
+     *
+     * @param manager The manager responsible for the new project.
+     */
     public void createProject(Manager manager) {
         CommonView.displayHeader("Create New BTO Project");
         String managerNRIC = manager.getUserNRIC();
@@ -317,6 +329,13 @@ public class ManagerController {
         }
     }
 
+    /**
+     * Allows a manager to edit the details of a selected project, such as name,
+     * location, application dates, officer slots, and visibility.
+     *
+     * @param project The project being edited.
+     * @param manager The manager performing the edit.
+     */
     public void editProjectDetails(Project project, Manager manager) {
         CommonView.displayHeader("Edit Project Details: " + project.getProjectName());
         boolean running = true;
@@ -418,6 +437,13 @@ public class ManagerController {
         }
     }
 
+    /**
+     * Deletes a specified project after confirming the manager's intent.
+     *
+     * @param project The project to be deleted.
+     * @param manager The manager requesting the deletion.
+     * @return true if the project was successfully deleted, false otherwise.
+     */
     public boolean deleteProject(Project project, Manager manager) {
         CommonView.displayHeader("Delete Project: " + project.getProjectName());
         if (CommonView.promptWordConfirmation(
@@ -434,7 +460,8 @@ public class ManagerController {
     }
 
     /**
-     * Displays all projects and lets the manager view their details.
+     * Displays a list of all projects in the system and allows the manager
+     * to view individual project details.
      */
     public void viewAllProjects() {
         CommonView.displayHeader("All BTO Projects");
@@ -459,6 +486,12 @@ public class ManagerController {
         }
     }
 
+    /**
+     * Displays all enquiries submitted for any project and allows the manager
+     * to respond to pending enquiries.
+     *
+     * @param manager The manager viewing and replying to enquiries.
+     */
     public void viewAllEnquiries(Manager manager) {
         List<Project> allProjects = projectService.getAllProjects();
         List<Enquiry> allEnquiries = new ArrayList<>();
@@ -509,6 +542,13 @@ public class ManagerController {
         }
     }
 
+    /**
+     * Generates a report of all booked applications for a given project.
+     * The manager can apply filters and choose to export the report as a CSV file.
+     *
+     * @param project The project for which the report is being generated.
+     * @param manager The manager requesting the report.
+     */
     public void generateReport(Project project, Manager manager) {
         CommonView.displayHeader("Generate Booked Applications Report for Project: " + project.getProjectName());
 
