@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import models.enums.FlatType;
 import models.enums.MaritalStatus;
-import utils.DateTimeUtils;
 
 /**
  * Represents a receipt issued for a housing project booking by an applicant.
