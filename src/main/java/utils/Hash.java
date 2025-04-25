@@ -2,7 +2,17 @@ package utils;
 
 import java.security.MessageDigest;
 
+/**
+ * Utility class for hashing strings and verifying hashed values using SHA-256.
+ */
 public class Hash {
+
+    /**
+     * Generates a SHA-256 hash of the input string.
+     *
+     * @param input the string to hash
+     * @return the hashed string in hexadecimal format
+     */
     public static String hash(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -22,5 +32,14 @@ public class Hash {
         }
     }
 
-    public static boolean verifyPassword(String inputPassword, String hashedPassword) { return hash(inputPassword).equals(hashedPassword); }
+    /**
+     * Verifies whether the hash of the input password matches the given hashed password.
+     *
+     * @param inputPassword the password to check
+     * @param hashedPassword the expected hash
+     * @return true if the input password matches the hash, false otherwise
+     */
+    public static boolean verifyPassword(String inputPassword, String hashedPassword) {
+        return hash(inputPassword).equals(hashedPassword);
+    }
 }
