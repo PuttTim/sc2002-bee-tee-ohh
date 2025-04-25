@@ -6,10 +6,15 @@ import models.enums.Role;
 import repositories.*;
 
 import services.AuthService;
+
 import utils.Hash;
 
 import views.AuthView;
 import views.CommonView;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Controller class to handle authentication processes.
@@ -127,7 +132,6 @@ public class AuthController {
             }
             case OFFICER -> {
                 while (running) {
-
                     switch (AuthView.showOfficerMainMenu()) {
                         case 1 -> {
                             UserRepository.setUserMode(Role.APPLICANT);

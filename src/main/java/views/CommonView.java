@@ -14,11 +14,19 @@ public class CommonView {
     private static final String SEPARATOR = "=====================================================================";
     private static final String SEPARATOR_SHORT = "---------------------------------------------------------------------";
 
+    // ANSI escape codes for colors
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\033[34m"; // Color for headers
+    public static final String ANSI_CYAN = "\u001B[36m"; // Color for menu options
+
     /** Displays a formatted header with the given title. */
     public static void displayHeader(String title) {
-        System.out.println("\n" + SEPARATOR);
-        System.out.println("       " + title);
-        System.out.println(SEPARATOR + "\n");
+        System.out.println("\n" + ANSI_BLUE + SEPARATOR + ANSI_RESET);
+        System.out.println(ANSI_BLUE + "       " + title + ANSI_RESET);
+        System.out.println(ANSI_BLUE + SEPARATOR + ANSI_RESET + "\n");
     }
 
     /** Displays a plain message. */
@@ -28,12 +36,12 @@ public class CommonView {
 
     /** Displays an error message. */
     public static void displayError(String errorMessage) {
-        System.out.println("ERROR: " + errorMessage);
+        System.out.println(ANSI_RED + "ERROR: " + errorMessage + ANSI_RESET);
     }
 
     /** Displays a success message. */
     public static void displaySuccess(String successMessage) {
-        System.out.println("SUCCESS: " + successMessage);
+        System.out.println(ANSI_GREEN + "SUCCESS: " + successMessage + ANSI_RESET);
     }
 
     /**
@@ -43,7 +51,7 @@ public class CommonView {
      * @return the trimmed input string
      */
     public static String prompt(String message) {
-        System.out.print(message);
+        System.out.print(ANSI_YELLOW + message + ANSI_RESET); // Prompt in yellow
         return scanner.nextLine().trim();
     }
 
@@ -97,7 +105,7 @@ public class CommonView {
         }
 
         for (int i = 0; i < options.size(); i++) {
-            System.out.println((i + 1) + ". " + options.get(i));
+            System.out.println(ANSI_CYAN + (i + 1) + ". " + options.get(i) + ANSI_RESET);
         }
 
         return promptInt("\nEnter your choice: ", 1, options.size());
@@ -119,27 +127,27 @@ public class CommonView {
         }
 
         for (int i = 0; i < options.size(); i++) {
-            System.out.println((i + 1) + ". " + options.get(i));
+            System.out.println(ANSI_CYAN + (i + 1) + ". " + options.get(i) + ANSI_RESET);
         }
 
-        System.out.println("0. Back to previous menu");
+        System.out.println(ANSI_CYAN + "0. Back to previous menu" + ANSI_RESET);
 
         return promptInt("\nEnter your choice: ", 0, options.size());
     }
 
     /** Displays a long separator line. */
     public static void displaySeparator() {
-        System.out.println(SEPARATOR);
+        System.out.println(ANSI_BLUE + SEPARATOR + ANSI_RESET); // Separator in blue like header
     }
 
     /** Displays a short separator line. */
     public static void displayShortSeparator() {
-        System.out.println(SEPARATOR_SHORT);
+        System.out.println(ANSI_BLUE + SEPARATOR_SHORT + ANSI_RESET); // Separator in blue like header
     }
 
     /** Pauses execution until the user presses Enter. */
     public static void pause() {
-        System.out.print("\nPress Enter to continue...");
+        System.out.print(ANSI_YELLOW + "\nPress Enter to continue..." + ANSI_RESET); // Pause prompt in yellow
         scanner.nextLine();
     }
 
@@ -193,14 +201,16 @@ public class CommonView {
 
     public static boolean promptWordConfirmation(String message, String confirmationWord) {
         while (true) {
+            // Prompt remains yellow due to the updated prompt() method
             String input = prompt(message + " (Type '" + confirmationWord + "' to confirm, or '0'/'cancel' to cancel): ");
             if (input.equalsIgnoreCase(confirmationWord)) {
                 return true;
             }
             if (input.equals("0") || input.equalsIgnoreCase("cancel")) {
-                displayMessage("Action cancelled.");
+                displayMessage("Action cancelled."); // Keep cancellation message default
                 return false;
             }
+            // Error message uses displayError() which is now red
             displayError("Incorrect confirmation word. Please type '" + confirmationWord + "' exactly, or '0'/'cancel' to cancel.");
         }
     }

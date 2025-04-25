@@ -2,6 +2,7 @@ package services;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -156,18 +157,28 @@ public class ProjectService implements IProjectService {
     public List<Project> getFilteredProjects(Map<String, String> filters) {
         Stream<Project> projectStream = getVisibleProjects().stream();
 
-        String locationFilter = filters.get("location");
-        if (locationFilter != null && !locationFilter.isEmpty()) {
-            projectStream = projectStream.filter(p -> p.getLocation().equalsIgnoreCase(locationFilter));
+        if (filters.containsKey("location")) {
+            String locationFilter = filters.get("location").toLowerCase();
+            projectStream = projectStream.filter(p -> p.getLocation().toLowerCase().contains(locationFilter));
         }
 
-        String flatTypeFilter = filters.get("flatType");
-        if (flatTypeFilter != null && !flatTypeFilter.isEmpty()) {
+        if (filters.containsKey("flatType")) {
+            String flatTypeFilterStr = filters.get("flatType");
             try {
-                FlatType filterType = FlatType.valueOf(flatTypeFilter);
-                projectStream = projectStream.filter(p -> p.getFlatTypes().contains(filterType));
+                FlatType flatTypeFilter = FlatType.valueOf(flatTypeFilterStr);
+                projectStream = projectStream.filter(project -> {
+                    List<FlatType> projectFlatTypes = project.getFlatTypes();
+                    List<Integer> projectUnits = project.getFlatTypeUnits();
+                    for (int i = 0; i < projectFlatTypes.size(); i++) {
+                        if (projectFlatTypes.get(i) == flatTypeFilter) {
+                            return projectUnits.get(i) > 0;
+                        }
+                    }
+                    return false;
+                });
             } catch (IllegalArgumentException e) {
-                System.err.println("Warning: Invalid flat type filter value: " + flatTypeFilter);
+                // Handle invalid flat type string if necessary, though FilterView should prevent this
+                System.err.println("Invalid flat type filter received: " + flatTypeFilterStr);
             }
         }
 

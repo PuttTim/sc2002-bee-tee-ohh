@@ -86,6 +86,7 @@ public class ApplicationRepository {
             record.put("ApprovedBy", application.getApprovedBy() != null ? application.getApprovedBy() : "");
             
             String statusHistory = application.getApplicationStatusHistory().entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
                 .map(entry -> entry.getKey().getKey() + ";" + DateTimeUtils.formatDateTime(entry.getValue()))
                 .collect(Collectors.joining("/"));
             record.put("ApplicationStatusHistory", statusHistory);
