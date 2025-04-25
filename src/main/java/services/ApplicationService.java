@@ -3,7 +3,9 @@ package services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import interfaces.IApplicationService;
 import models.Application;
+import models.Manager;
 import models.Officer;
 import models.Project;
 import models.Receipt;
@@ -13,26 +15,59 @@ import repositories.ProjectRepository;
 import repositories.ReceiptRepository;
 import views.CommonView;
 
-public class ApplicationService {
+/**
+ * Service class for managing housing application operations.
+ * <p>
+ * Provides functionality for retrieving, approving, rejecting, and booking housing applications.
+ * Interacts with repositories to persist changes and enforce business rules.
+ * </p>
+ */
+public class ApplicationService implements IApplicationService {
+    private static ApplicationService instance;
+    
+    private ApplicationService() {}
+    
+    public static ApplicationService getInstance() {
+        if (instance == null) {
+            instance = new ApplicationService();
+        }
+        return instance;
+    }
 
-    public static List<Application> getProjectApplications(Project project) {
+    /**
+     * Retrieves all applications for a specific project.
+     *
+     * @param project The project to filter applications by
+     * @return List of {@code Application} objects for the given project
+     */
+    @Override
+    public List<Application> getProjectApplications(Project project) {
         return ApplicationRepository.getAll().stream()
                 .filter(app -> app.getProjectId().equals(project.getProjectID()))
                 .collect(Collectors.toList());
     }
 
-    public static List<Application> getSuccessfulProjectApplications(Project project) {
-        return getProjectApplications(project).stream()
-                .filter(app -> app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL)
-                .collect(Collectors.toList());
-    }
-
-    public static boolean approveApplication(Application application, Officer officer) {
+    /**
+     * Approves an application if it meets approval criteria.
+     * The officer's NRIC is recorded
+     *
+     * @param application The application to approve
+     * @param manager The manager approving the application
+     * @return {@code true} if approval was successful, {@code false} otherwise
+     */
+    @Override
+    public boolean approveApplication(Application application, Manager manager) {
         if (application == null || !application.canApprove()) {
             return false;
         }
+        Project project = ProjectRepository.getById(application.getProjectId());
+        if (project == null || project.getAvailableUnits(application.getSelectedFlatType()) <= 0) {
+            CommonView.displayError("No available units left for this flat type.");
+            return false;
+        }
+
         try {
-            application.approve(officer.getUserNRIC());
+            application.approve(manager.getUserNRIC());
             ApplicationRepository.saveAll();
             return true;
         } catch (IllegalStateException e) {
@@ -45,12 +80,21 @@ public class ApplicationService {
         }
     }
 
-    public static boolean rejectApplication(Application application, Officer officer) {
+    /**
+     * Rejects an application if it meets rejection criteria.
+     * The officer's NRIC is recorded.
+     *
+     * @param application The application to reject
+     * @param manager The manager rejecting the application
+     * @return {@code true} if rejection was successful, {@code false} otherwise
+     */
+    @Override
+    public boolean rejectApplication(Application application, Manager manager) {
         if (application == null || !application.canReject()) {
             return false;
         }
         try {
-            application.reject(officer.getUserNRIC());
+            application.reject(manager.getUserNRIC());
             ApplicationRepository.saveAll();
             return true;
         } catch (IllegalStateException e) {
@@ -63,7 +107,61 @@ public class ApplicationService {
         }
     }
 
-    public static boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) { // Added unitNumber parameter
+    @Override
+    public boolean approveWithdrawal(Application application, Manager manager) {
+        if (application == null || !application.canApproveWithdrawal()) {
+            return false;
+        }
+        try {
+            application.approveWithdrawal(manager.getUserNRIC());
+            ApplicationRepository.saveAll();
+            return true;
+        } catch (IllegalStateException e) {
+            System.err.println("Error approving withdrawal: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred during withdrawal approval: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean rejectWithdrawal(Application application, Manager manager) {
+        if (application == null || !application.canRejectWithdrawal()) {
+            return false;
+        }
+        try {
+            application.rejectWithdrawal(manager.getUserNRIC());
+            ApplicationRepository.saveAll();
+            return true;
+        } catch (IllegalStateException e) {
+            System.err.println("Error rejecting withdrawal: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred during withdrawal rejection: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Books a unit for an approved application.
+     * <p>
+     * Performs several validations before booking:
+     * <ul>
+     *   <li>Checks if the application is in a bookable state</li>
+     *   <li>Verifies the unit number isn't already taken</li>
+     *   <li>Ensures the project has available units</li>
+     * </ul>
+     *
+     * @param application The application to book
+     * @param officer The officer processing the booking
+     * @param selectedUnitNumber The unit number being assigned
+     * @return {@code true} if booking was successful, {@code false} otherwise
+     */
+    @Override
+    public boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) {
         if (application == null || !application.canBook()) {
             return false;
         }
@@ -75,15 +173,11 @@ public class ApplicationService {
             return false;
         }
 
-        if (project == null) {
-            return false;
-        }
-
         if (project.getAvailableUnits(application.getSelectedFlatType()) <= 0) {
             return false;
         }
 
-        if (selectedUnitNumber == null || selectedUnitNumber.trim().isEmpty()) { // Basic validation for unit number
+        if (selectedUnitNumber == null || selectedUnitNumber.trim().isEmpty()) { 
              System.err.println("Error booking application: Unit number cannot be empty.");
              return false;
         }

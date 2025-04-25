@@ -1,116 +1,111 @@
 package views;
 
-import models.Filter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import java.util.*;
+import models.Project;
+import models.enums.FlatType;
 
+/**
+ * View class responsible for handling the display and interaction
+ * related to filtering projects.
+ */
 public class FilterView {
-    private static final List<String> LOCATION_OPTIONS = List.of("Jurong West", "Tampines", "Woodlands", "Yishun", "Punggol");
-    private static final List<String> FLAT_TYPE_OPTIONS = List.of("TWO_ROOM", "THREE_ROOM");
-    private static final List<String> PRICE_RANGE_OPTIONS = List.of("300k-400k", "400k-500k", "500k-600k", "600k-700k", "700k-800k", "800k-900k");
 
-    public static List<Filter> selectProjectFilters(Map<String, Set<String>> activeFilters) {
-        boolean running = true;
-        List<String> options = List.of(
-                "Filter By Location",
-                "Filter By Flat Type",
-                "Filter By Price Range",
-                "Apply Filters"
-        );
-        while (running) {
-            int choice = CommonView.displayMenu("Main Filter Menu", options);
-            try {
-                switch (choice) {
-                    case 1:
-                        Set<String> selectedLocations = activeFilters.computeIfAbsent("Location", k -> new HashSet<>());
-                        showFilterSubMenu("Location", LOCATION_OPTIONS, selectedLocations);
-                        if (selectedLocations.isEmpty()) {
-                            activeFilters.remove("Location");
-                        }
-                        break;
-
-                    case 2:
-                        Set<String> selectedFlatTypes = activeFilters.computeIfAbsent("Flat Type", k -> new HashSet<>());
-                        showFilterSubMenu("Flat Type", FLAT_TYPE_OPTIONS, selectedFlatTypes);
-                        if (selectedFlatTypes.isEmpty()) {
-                            activeFilters.remove("Flat Type");
-                        }
-                        break;
-
-                    case 3:
-                        Set<String> selectedPriceRange = activeFilters.computeIfAbsent("Price Range", k -> new HashSet<>());
-                        showFilterSubMenu("Price Range", PRICE_RANGE_OPTIONS, selectedPriceRange);
-                        if (selectedPriceRange.isEmpty()) {
-                            activeFilters.remove("Price Range");
-                        }
-                        break;
-                    case 4:
-                        System.out.println("\nFilter selection applied.");
-                        running = false;
-                        break;
-                }
-            } catch (NumberFormatException e) {
-                CommonView.displayError("Please enter a valid number!");
-            }
+    /**
+     * Displays the currently active filters.
+     * @param activeFilters A map containing the active filter criteria (e.g., "location", "flatType").
+     */
+    public static void displayActiveFilters(Map<String, String> activeFilters) {
+        if (activeFilters.isEmpty()) {
+            CommonView.displayMessage("Filters: None active.");
+        } else {
+            String filtersStr = activeFilters.entrySet().stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .collect(Collectors.joining(", "));
+            CommonView.displayMessage("Active Filters: " + filtersStr);
         }
-
-        return formatForOutput(activeFilters);
-
-//        List<Filter> filtersToApply = new ArrayList<>();
-//        for (Map.Entry<String, Set<String>> entry : activeFilters.entrySet()) {
-//            String key = entry.getKey().toLowerCase().replace(" ", "_");
-//            List<String> values = new ArrayList<>(entry.getValue());
-//            if (!values.isEmpty()) {
-//                filtersToApply.add(new Filter(key, values));
-//            }
-//        }
+        CommonView.displayShortSeparator();
     }
 
-    private static void showFilterSubMenu(String categoryName, List<String> availableOptions, Set<String> selectedInCategory) {
-        while (true) {
-            List<String> displayOptions = new ArrayList<>();
-            for (String option : availableOptions) {
-                if (selectedInCategory.contains(option)) {
-                    displayOptions.add(option + " (selected)");
-                } else {
-                    displayOptions.add(option);
-                }
-            }
-            displayOptions.add("Back");
-
-            int choice = CommonView.displayMenu(categoryName + " Filter", displayOptions);
-            if (choice <= 0 || choice > availableOptions.size() + 1) {
-                continue;
-            };
-
-            if (choice == availableOptions.size() + 1) {
-                break;
-            }
-
-            int chosenIndex = choice - 1;
-
-            String selectedOption = availableOptions.get(chosenIndex);
-
-            if (selectedInCategory.contains(selectedOption)) {
-                selectedInCategory.remove(selectedOption);
-                System.out.println("'" + selectedOption + "' filter DEACTIVATED.");
-            } else {
-                selectedInCategory.add(selectedOption);
-                System.out.println("'" + selectedOption + "' filter ACTIVATED.");
-            }
+    /**
+     * Displays the filter menu options.
+     * @param activeFilters A map indicating if filters are currently active.
+     * @return The user's menu choice.
+     */
+    public static int displayFilterMenu(Map<String, String> activeFilters) {
+        List<String> options = new ArrayList<>();
+        options.add("View Project Details");
+        options.add("Filter by Location" + (activeFilters.containsKey("location") ? " (Active)" : ""));
+        options.add("Filter by Flat Type" + (activeFilters.containsKey("flatType") ? " (Active)" : ""));
+        if (!activeFilters.isEmpty()) {
+            options.add("Clear All Filters");
         }
-//        return selectedInCategory.isEmpty();
+
+        return CommonView.displayMenuWithBacking("Project List Options", options);
     }
 
-    private static List<Filter> formatForOutput(Map<String, Set<String>> currentFilters) {
-        List<Filter> filtersToApply = new ArrayList<>();
-        for (Map.Entry<String, Set<String>> entry : currentFilters.entrySet()) {
-            String key = entry.getKey().toLowerCase().replace(" ", "_");
-            List<String> values = new ArrayList<>(entry.getValue());
-            if (!values.isEmpty()) {
-                filtersToApply.add(new Filter(key, values));
-            }
+    /**
+     * Prompts the user to enter a location filter by selecting from available locations.
+     * @param projects The list of projects to extract locations from.
+     * @return The location string selected by the user, or null to remove the filter.
+     */
+    public static String promptLocationFilter(List<Project> projects) {
+        CommonView.displayMessage("Filter by Location:");
+        List<String> locations = projects.stream()
+                                         .map(Project::getLocation)
+                                         .distinct()
+                                         .sorted()
+                                         .collect(Collectors.toList());
+
+        if (locations.isEmpty()) {
+            CommonView.displayMessage("No specific locations available to filter by in the current project list.");
+            return CommonView.prompt("Enter location to filter by (leave blank to remove filter): "); // Fallback to manual input if no locations found
         }
-        return filtersToApply;
+
+        locations.add(0, "ANY (Remove Filter)"); // Option 1 is now ANY
+
+        int choice = CommonView.displayMenu("Select Location", locations);
+
+        if (choice == 1) { // User chose "ANY"
+            return null; // Signal to remove the filter
+        } else if (choice > 1 && choice <= locations.size()) {
+            return locations.get(choice - 1); // Return selected location
+        } else {
+            CommonView.displayError("Invalid choice.");
+            return promptLocationFilter(projects); // Re-prompt on invalid choice
+        }
+    }
+
+    /**
+     * Prompts the user to select a flat type filter.
+     * @return The selected FlatType enum name, or null if the user wants to remove the filter.
+     */
+    public static String promptFlatTypeFilter() {
+        CommonView.displayMessage("Filter by Flat Type:");
+        List<String> flatTypeOptions = Stream.of(FlatType.values())
+                                             .map(FlatType::getDescription)
+                                             .collect(Collectors.toList());
+        flatTypeOptions.add(0, "ANY (Remove Filter)"); // Option 1 is now ANY
+
+        int choice = CommonView.displayMenu("Select Flat Type", flatTypeOptions);
+
+        if (choice == 1) { // User chose "ANY"
+            return null; // Signal to remove the filter
+        } else if (choice > 1 && choice <= flatTypeOptions.size()) {
+            String selectedDescription = flatTypeOptions.get(choice - 1);
+            // Find the FlatType enum corresponding to the description
+            return Stream.of(FlatType.values())
+                         .filter(ft -> ft.getDescription().equals(selectedDescription))
+                         .findFirst()
+                         .map(Enum::name)
+                         .orElse(null); 
+        } else {
+            CommonView.displayError("Invalid choice.");
+            return promptFlatTypeFilter();
+        }
     }
 }

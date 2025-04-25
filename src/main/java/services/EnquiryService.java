@@ -1,47 +1,89 @@
 package services;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import interfaces.IEnquiryService;
 import models.Applicant;
 import models.Enquiry;
 import models.Project;
 import models.enums.EnquiryStatus;
 
 import repositories.EnquiryRepository;
+import views.CommonView;
 
-public class EnquiryService {
-    public static List<Enquiry> getProjectEnquiries(Project project) {
+/**
+ * Service class for managing property enquiry operations.
+ * Provides functionality for creating, retrieving, editing, and responding to property enquiries.
+ * Enforces business rules regarding enquiry ownership and status transitions.
+ */
+public class EnquiryService implements IEnquiryService {
+    private static EnquiryService instance;
+    
+    private EnquiryService() {}
+    
+    public static EnquiryService getInstance() {
+        if (instance == null) {
+            instance = new EnquiryService();
+        }
+        return instance;
+    }
+
+    /**
+     * Retrieves all enquiries for a specific project.
+     *
+     * @param project the project to filter enquiries by
+     * @return list of enquiries associated with the given project
+     */
+    @Override
+    public List<Enquiry> getProjectEnquiries(Project project) {
         return EnquiryRepository.getEnquiriesByProject(project.getProjectID());
     }
 
-    public static List<Enquiry> getEnquiriesByApplicant(Applicant applicant) {
-        List<Enquiry> enquiries = EnquiryRepository.getAll();
-
-        List<Enquiry> filteredEnquiries = new ArrayList<Enquiry>();
-
-        for (Enquiry enquiry : enquiries) {
-            if (enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) {
-                filteredEnquiries.add(enquiry);
-            }
+    /**
+     * Retrieves all enquiries submitted by a specific applicant.
+     * Filters enquiries based on the applicant's NRIC.
+     *
+     * @param applicant the applicant whose enquiries to retrieve
+     * @return list of enquiries submitted by the applicant
+     */
+    @Override
+    public List<Enquiry> getEnquiriesByApplicant(Applicant applicant) {
+        if (applicant == null) {
+            throw new IllegalArgumentException("Applicant cannot be null");
         }
-
-        return filteredEnquiries;
-
-        // return EnquiryRepository.getAll().stream()
-        //         .filter(enquiry -> enquiry.getApplicantNRIC().equals(applicant.getUserNRIC()))
-        //         .collect(Collectors.toList());
+        return EnquiryRepository.getAll().stream()
+                .filter(enquiry -> enquiry.getApplicantNRIC().equals(applicant.getUserNRIC()))
+                .collect(java.util.stream.Collectors.toList());
     }
 
-    public static void createEnquiry(Enquiry enquiry) {
+    /**
+     * Creates a new enquiry.
+     * Validates the enquiry object.
+     *
+     * @param enquiry the enquiry to create
+     */
+    @Override
+    public void createEnquiry(Enquiry enquiry) {
         if (enquiry == null) {
             throw new IllegalArgumentException("Enquiry cannot be null");
+        }
+        if (enquiry.getQuery() == null || enquiry.getQuery().trim().isEmpty()) {
+            throw new IllegalArgumentException("Enquiry content cannot be empty");
         }
         EnquiryRepository.add(enquiry);
         EnquiryRepository.saveAll();
     }
 
-    public static void editEnquiry(Applicant applicant, String enquiryId, String newContent) {
+    /**
+     * Edits an existing enquiry.
+     * Only the owner can edit their enquiry, and only if it hasn't been responded to.
+     *
+     * @param applicant the applicant attempting to edit
+     * @param enquiryId the ID of the enquiry to edit
+     * @param newContent the new content for the enquiry
+     */
+    @Override
+    public void editEnquiry(Applicant applicant, String enquiryId, String newContent) {
         if (newContent == null || newContent.trim().isEmpty()) {
             throw new IllegalArgumentException("New enquiry content cannot be empty");
         }
@@ -63,10 +105,18 @@ public class EnquiryService {
         EnquiryRepository.saveAll();
     }
 
-    public static void deleteEnquiry(Applicant applicant, String enquiryId) {
+    /**
+     * Deletes an existing enquiry.
+     * Only the owner can delete their enquiry.
+     *
+     * @param applicant the applicant attempting to delete
+     * @param enquiryId the ID of the enquiry to delete
+     */
+    @Override
+    public void deleteEnquiry(Applicant applicant, String enquiryId) {
         Enquiry enquiry = EnquiryRepository.getEnquiryById(enquiryId);
         if (enquiry == null) {
-            throw new IllegalArgumentException("Enquiry not found");
+            throw new IllegalStateException("Enquiry not found");
         }
 
         if (!enquiry.getApplicantNRIC().equals(applicant.getUserNRIC())) {
@@ -77,20 +127,38 @@ public class EnquiryService {
         EnquiryRepository.saveAll();
     }
 
-    public static void replyToEnquiry(Enquiry enquiry, String response, String responderNRIC) {
-        if (enquiry == null) {
-            throw new IllegalArgumentException("Enquiry cannot be null");
-        }
-        
-        if (response == null || response.trim().isEmpty()) {
-            throw new IllegalArgumentException("Response cannot be empty");
+    /**
+     * Adds a response to an enquiry and marks it as responded.
+     * <p>
+     * Several validations are performed:
+     * <ul>
+     *   <li>The enquiry must exist</li>
+     *   <li>The response content is valid</li>
+     *   <li>The enquiry hasn't already been responded to</li>
+     * </ul>
+     *
+     * @param enquiry the enquiry to respond to
+     * @param response the response content
+     * @param responderNRIC the NRIC of the staff member responding
+     * @return {@code true} if response was successful, {@code false} otherwise
+     */
+    @Override
+    public boolean replyToEnquiry(Enquiry enquiry, String response, String responderNRIC) {
+        if (enquiry == null || response == null || response.trim().isEmpty() || responderNRIC == null || responderNRIC.trim().isEmpty()) {
+            return false;
         }
 
         if (enquiry.getEnquiryStatus() == EnquiryStatus.RESPONDED) {
-            throw new IllegalStateException("Enquiry has already been responded to");
+            CommonView.displayError("Enquiry has already been responded to.");
         }
 
-        enquiry.markAsResponded(responderNRIC, response);
-        EnquiryRepository.saveAll();
+        try {
+            enquiry.markAsResponded(responderNRIC, response.trim());
+            EnquiryRepository.saveAll();
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error responding to enquiry: " + e.getMessage());
+            return false;
+        }
     }
 }
