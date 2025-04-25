@@ -1,6 +1,7 @@
 package views;
 
 import java.util.List;
+import utils.ValidationUtils;
 
 /**
  * View class for authentication-related interactions and role-based menus.
@@ -18,7 +19,18 @@ public class AuthView {
      * @return the input NRIC or "exit" to quit
      */
     public static String getNRIC() {
-        return CommonView.prompt("Enter NRIC (or 'exit' to quit): ");
+        while (true) {
+            String nric = CommonView.prompt("Enter NRIC (or 'exit' to quit): ");
+            if (nric.equalsIgnoreCase("exit")) {
+                return "exit";
+            }
+            
+            if (!ValidationUtils.isValidNRIC(nric)) {
+                CommonView.displayError("Invalid NRIC format. NRIC must start with S or T, followed by 7 digits, and end with a letter.");
+                continue;
+            }
+            return nric;
+        }
     }
 
     /**
