@@ -9,7 +9,7 @@
 
 
 # Prerequisites
-    -Java JDK 11 or later
+    -Java JDK 17 or later
     -Apache Maven 3.6.0 or later
 
 # Setup Instructions
