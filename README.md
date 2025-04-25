@@ -22,5 +22,6 @@ mvn clean package
 
 ## 3. Running the application
 ```
-mvn exec:java -Dexec.mainClass="App"
+mvn exec:java "-Dexec.mainClass=App"
+
 ```
