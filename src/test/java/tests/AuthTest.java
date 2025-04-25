@@ -110,4 +110,34 @@ class AuthTest {
         mockedHash.verifyNoInteractions();
         mockedUserRepo.verify(() -> UserRepository.setActiveUser(any(User.class)), never());
     }
+
+    @Test
+    @DisplayName("Login successful after password change")
+    void login_PasswordChange_SuccessfulLogin() throws AuthenticationException {
+        String nric = "S1234567A";
+        String oldPassword = "oldpassword";
+        String hashedOldPassword = "f0a5cdf5a9b255d3a71acdee7bd29c6b320f27e71f105b86220696f21b67c6e9";
+        String newPassword = "password";
+        String hashedNewPassword = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
+
+        User mockUserFromRepo = new Applicant(nric, "PC Applicant", hashedOldPassword, 30, null);
+
+        mockedHash.when(() -> Hash.verifyPassword(oldPassword, hashedOldPassword)).thenReturn(true);
+        authService.changePassword(mockUserFromRepo, oldPassword, newPassword);
+        mockedUserRepo.when(() -> UserRepository.getByNRIC(nric)).thenReturn(
+                new Applicant(nric, "PC Applicant", hashedNewPassword, 30, null)
+        );
+        mockedHash.when(() -> Hash.verifyPassword(newPassword, hashedNewPassword)).thenReturn(true);
+        mockedUserRepo.when(() -> UserRepository.setActiveUser(any(User.class))).thenAnswer(invocation -> null);
+        User loggedInUser = authService.login(nric, newPassword);
+
+        assertNotNull(loggedInUser, "Logged in user should not be null on success");
+        assertEquals(hashedNewPassword, loggedInUser.getPassword(), "Password should be updated");
+        assertEquals("PC Applicant", loggedInUser.getName(), "Name should match");
+        assertEquals(Role.APPLICANT, loggedInUser.getRole(), "Role should match");
+
+        mockedUserRepo.verify(() -> UserRepository.getByNRIC(nric));
+        mockedHash.verify(() -> Hash.verifyPassword(newPassword, hashedNewPassword));
+        mockedUserRepo.verify(() -> UserRepository.setActiveUser(any(Applicant.class)));
+    }
 }
