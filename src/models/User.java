@@ -5,11 +5,18 @@ import models.enums.Role;
 import utils.Hash;
 
 /**
- * Represents a user in the system, which can be an applicant or an officer.
- * <p>
- * This class contains personal details about the user, including their NRIC, name,
- * age, marital status, role, and password. The password is stored in a hashed format for security.
- * </p>
+ * Represents a user in the system, which can be an applicant/officer/manager.
+ *
+ * <p>This class contains user details like:</p>
+ * <ul>
+ *     <li>NRIC</li>
+ *     <li>Name</li>
+ *     <li>Age</li>
+ *     <li>Marital status</li>
+ *     <li>Role (applicant/officer/manager)</li>
+ *     <li>Password, in hashed format</li>
+ * </ul>
+ * Allows extension by subclasses.
  */
 public class User {
     protected String userNRIC;
@@ -39,7 +46,7 @@ public class User {
     // Getters
 
     /**
-     * Retrieves the NRIC of the user.
+     * Gets the NRIC of the user.
      *
      * @return the NRIC of the user
      */
@@ -48,7 +55,7 @@ public class User {
     }
 
     /**
-     * Retrieves the name of the user.
+     * Gets the name of the user.
      *
      * @return the name of the user
      */
@@ -57,7 +64,7 @@ public class User {
     }
 
     /**
-     * Retrieves the password of the user.
+     * Gets the password of the user.
      *
      * @return the password of the user (hashed)
      */
@@ -66,7 +73,7 @@ public class User {
     }
 
     /**
-     * Retrieves the age of the user.
+     * Gets the age of the user.
      *
      * @return the age of the user
      */
@@ -75,7 +82,7 @@ public class User {
     }
 
     /**
-     * Retrieves the marital status of the user.
+     * Gets the marital status of the user.
      *
      * @return the marital status of the user
      */
@@ -84,7 +91,7 @@ public class User {
     }
 
     /**
-     * Retrieves the role of the user (e.g., officer or applicant).
+     * Gets the role of the user (e.g., officer or applicant).
      *
      * @return the role of the user
      */

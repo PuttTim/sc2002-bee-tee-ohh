@@ -9,12 +9,18 @@ import views.CommonView;
 
 /**
  * Represents a housing project managed by a manager with various flat types and applicants.
- * <p>
- * This class handles project details such as project ID, manager's NRIC, flat types, application
- * dates, officer slots, visibility status, and the list of applicants and officers. It provides
- * methods for adding/removing applicants and officers, checking application status, and managing
- * available units for each flat type.
- * </p>
+ *
+ * <p>This class handles project details:</p>
+ * <ul>
+ *     <li>Project ID</li>
+ *     <li>Manager's NRIC</li>
+ *     <li>Flat details</li>
+ *     <li>Application details</li>
+ *     <li>Officer slots</li>
+ *     <li>Visibility statuses</li>
+ *     <li>The applicants and officers</li>
+ *     <li>Methods for managing the project</li>
+ * </ul>
  */
 public class Project {
     private static int lastProjectID = 0;

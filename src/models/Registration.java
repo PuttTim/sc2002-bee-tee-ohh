@@ -6,11 +6,18 @@ import models.enums.RegistrationStatus;
 
 /**
  * Represents a registration for a housing project.
- * <p>
+ *
+ * <p>This class handles registration details:</p>
+ * <ul>
+ *     <li>Officer that registered</li>
+ *     <li>Registration status</li>
+ *     <li>Approval/rejection</li>
+ *     <li>ID of the project the officer registered for</li>
+ *     <li>Last updated timestamp for registration</li>
+ * </ul>
  * This class encapsulates the details of the registration, including the officer
  * responsible, the project being registered, the status of the registration, and
  * approval/rejection details. The registration can be approved or rejected by a manager.
- * </p>
  */
 public class Registration {
     private static int lastRegistrationID = 0;
@@ -74,7 +81,7 @@ public class Registration {
     // Getters
 
     /**
-     * Retrieves the registration ID.
+     * Gets the registration ID.
      *
      * @return the registration ID
      */
@@ -83,7 +90,7 @@ public class Registration {
     }
 
     /**
-     * Retrieves the officer handling the registration.
+     * Gets the officer handling the registration.
      *
      * @return the officer
      */
@@ -92,7 +99,7 @@ public class Registration {
     }
 
     /**
-     * Retrieves the project ID associated with the registration.
+     * Gets the project ID associated with the registration.
      *
      * @return the project ID
      */
@@ -101,7 +108,7 @@ public class Registration {
     }
 
     /**
-     * Retrieves the status of the registration.
+     * Gets the status of the registration.
      *
      * @return the registration status
      */
@@ -110,7 +117,7 @@ public class Registration {
     }
 
     /**
-     * Retrieves the date when the registration was created.
+     * Gets the date when the registration was created.
      *
      * @return the registration date
      */
@@ -119,7 +126,7 @@ public class Registration {
     }
 
     /**
-     * Retrieves the last updated timestamp for the registration.
+     * Gets the last updated timestamp for the registration.
      *
      * @return the last updated timestamp
      */
@@ -128,7 +135,7 @@ public class Registration {
     }
 
     /**
-     * Retrieves the manager who approved or rejected the registration.
+     * Gets the manager who approved or rejected the registration.
      *
      * @return the manager who approved/rejected the registration
      */

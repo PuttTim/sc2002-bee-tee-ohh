@@ -30,12 +30,11 @@ public class AuthController {
     private static final String TEST_PASSWORD = "password";
 
     /**
-     * Controller class to handle authentication processes.
-     * <p>Authentication processes include:</p>
+     * Runs the authentication process.
      * <ul>
-     *     <li>User login</li>
-     *     <li>Navigation based on roles</li>
-     *     <li>Password management</li>
+     *     <li>Handles login</li>
+     *     <li>Prompts users for login credentials like NRIC and password</li>
+     *     <li>Testing mode included for predefined users</li>
      * </ul>
      */
     public static void runAuthentication() {

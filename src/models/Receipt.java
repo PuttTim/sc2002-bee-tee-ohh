@@ -8,11 +8,15 @@ import utils.DateTimeUtils;
 
 /**
  * Represents a receipt issued for a housing project booking by an applicant.
- * <p>
- * This class encapsulates details about the applicant, the flat type they have booked,
- * the project details, and the officer who processed the application. Each receipt is
- * uniquely identified by a receipt ID and includes the booking timestamp.
- * </p>
+ *
+ * <p>This class handles receipt details:</p>
+ * <ul>
+ *     <li>Applicant details</li>
+ *     <li>Flat details</li>
+ *     <li>Project details</li>
+ *     <li>Officer that processed the application</li>
+ *     <li>Unique receipt ID and booking timestamp</li>
+ * </ul>
  */
 public class Receipt {
     private static int lastReceiptID = 0;
@@ -103,91 +107,91 @@ public class Receipt {
     // Getters
 
     /**
-     * Retrieves the receipt ID.
+     * Gets the receipt ID.
      *
      * @return the receipt ID
      */
     public String getReceiptId() { return receiptId; }
 
     /**
-     * Retrieves the name of the applicant.
+     * Gets the name of the applicant.
      *
      * @return the applicant's name
      */
     public String getApplicantName() { return applicantName; }
 
     /**
-     * Retrieves the NRIC of the applicant.
+     * Gets the NRIC of the applicant.
      *
      * @return the applicant's NRIC
      */
     public String getApplicantNRIC() { return applicantNRIC; }
 
     /**
-     * Retrieves the age of the applicant.
+     * Gets the age of the applicant.
      *
      * @return the applicant's age
      */
     public int getApplicantAge() { return applicantAge; }
 
     /**
-     * Retrieves the marital status of the applicant.
+     * Gets the marital status of the applicant.
      *
      * @return the marital status of the applicant
      */
     public MaritalStatus getMaritalStatus() { return maritalStatus; }
 
     /**
-     * Retrieves the type of the flat being booked.
+     * Gets the type of the flat being booked.
      *
      * @return the flat type
      */
     public FlatType getFlatType() { return flatType; }
 
     /**
-     * Retrieves the price of the flat.
+     * Gets the price of the flat.
      *
      * @return the flat price
      */
     public int getFlatPrice() { return flatPrice; }
 
     /**
-     * Retrieves the unit number of the booked flat.
+     * Gets the unit number of the booked flat.
      *
      * @return the unit number
      */
     public String getUnitNumber() { return unitNumber; }
 
     /**
-     * Retrieves the name of the project.
+     * Gets the name of the project.
      *
      * @return the project name
      */
     public String getProjectName() { return projectName; }
 
     /**
-     * Retrieves the project ID.
+     * Gets the project ID.
      *
      * @return the project ID
      */
     public String getProjectID() { return projectID; }
 
     /**
-     * Retrieves the location of the project.
+     * Gets the location of the project.
      *
      * @return the project location
      */
     public String getProjectLocation() { return projectLocation; }
 
     /**
-     * Retrieves the timestamp when the booking was made.
+     * Gets the timestamp when the booking was made.
      *
      * @return the booking timestamp
      */
     public LocalDateTime getBookingTimestamp() { return bookingTimestamp; }
 
     /**
-     * Retrieves the officer who processed the booking.
+     * Gets the officer who processed the booking.
      *
      * @return the officer
      */

@@ -101,6 +101,8 @@ public class Enquiry {
     // Getters
 
     /**
+     * Gets the enquiry ID.
+     *
      * @return the enquiry ID
      */
     public String getEnquiryID() {
@@ -108,6 +110,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets the applicant's NRIC.
+     *
      * @return the applicant's NRIC
      */
     public String getApplicantNRIC() {
@@ -115,6 +119,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets the project ID of the project the enquiry is related to.
+     *
      * @return the project ID the enquiry is about
      */
     public String getProjectID() {
@@ -122,6 +128,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets the contents of the applicant's enquiry.
+     *
      * @return the applicant's query
      */
     public String getQuery() {
@@ -129,6 +137,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets the enquiry's response.
+     *
      * @return the response to the enquiry
      */
     public String getResponse() {
@@ -136,6 +146,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets the current status of the enquiry.
+     *
      * @return the status of the enquiry
      */
     public EnquiryStatus getEnquiryStatus() {
@@ -143,6 +155,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets when the enquiry was made.
+     *
      * @return the date the enquiry was made
      */
     public LocalDateTime getEnquiryDate() {
@@ -150,6 +164,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets when the enquiry was last updated.
+     *
      * @return the last time the enquiry was updated
      */
     public LocalDateTime getLastUpdated() {
@@ -157,6 +173,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets who responded to the enquiry.
+     *
      * @return the person who responded to the enquiry
      */
     public String getRespondedBy() {
@@ -164,6 +182,8 @@ public class Enquiry {
     }
 
     /**
+     * Gets who responded to the enquiry.
+     *
      * @return the person who responded to the enquiry
      */
     public String getResponder() {

@@ -188,7 +188,7 @@ public class ManagerController {
     }
 
     /**
-     * Placeholder method. Use the version that accepts a Manager object.
+     * Allows the manager to view all handled projects.
      */
     public static void viewHandledProjects() {
         throw new UnsupportedOperationException("Unimplemented method 'viewHandledProjects'");
@@ -204,7 +204,7 @@ public class ManagerController {
     }
 
     /**
-     * Placeholder method. Use the version that accepts both Project and Manager objects.
+     * Allows the manager to manage officer registrations to projects.
      */
     public static void manageProjectOfficerRegistration(Project project) {
         throw new UnsupportedOperationException("Unimplemented method 'manageProjectOfficerRegistration'");

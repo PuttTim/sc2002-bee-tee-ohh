@@ -10,7 +10,7 @@ import models.enums.FlatType;
 /**
  * Represents an application made by an applicant for a project.
  * <p>
- * This class handles the details of an application, including:
+ * This class handles the details of an application:
  * <ul>
  *   <li>Managing application status and history</li>
  *   <li>Handling approval, rejection, booking, and withdrawal of applications</li>
@@ -280,20 +280,42 @@ public class Application {
         applicationStatusHistory.put(status, LocalDateTime.now());
     }
 
+    /**
+     * Checks if the application can be booked.
+     *
+     * @return <code>true</code> if application is successful, and no withdrawal is requested.
+     */
     public boolean canBook() {
         return applicationStatus == ApplicationStatus.SUCCESSFUL && !isWithdrawalRequested;
     }
 
+    /**
+     * Checks if application can be withdrawn.
+     *
+     * @return <code>true</code> if the application is not marked as successful or
+     * the application has not already bee withdrawn.
+     */
     public boolean canWithdraw() {
         return !isWithdrawalRequested &&
                 applicationStatus != ApplicationStatus.WITHDRAWN &&
                 applicationStatus != ApplicationStatus.UNSUCCESSFUL;
     }
 
+    /**
+     * Checks if an application can be approved.
+     *
+     * @return <code>true</code> if the application is still pending,
+     * and no withdrawal has been requested.
+     */
     public boolean canApprove() {
         return applicationStatus == ApplicationStatus.PENDING && !isWithdrawalRequested;
     }
 
+    /**
+     * Checks if an application can be rejected.
+     *
+     * @return <code>true</code> if the application is still pending.
+     */
     public boolean canReject() {
         return applicationStatus == ApplicationStatus.PENDING;
     }
