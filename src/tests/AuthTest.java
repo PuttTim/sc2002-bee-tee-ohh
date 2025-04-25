@@ -95,21 +95,24 @@ class AuthTest {
     }
 
     @Test
-    @DisplayName("Login fails when user not found")
+    @DisplayName("Login fails with incorrect NRIC")
     void login_UserNotFound() {
         String nric = "S9999999Z";
         String password = "password";
+        String expectedHashedPassword = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
+
+        User mockUserFromRepo = new User(nric, "Test User", expectedHashedPassword, 30);
 
         mockedUserRepo.when(() -> UserRepository.getByNRIC(nric)).thenReturn(null);
 
         AuthenticationException exception = assertThrows(AuthenticationException.class, () -> {
             AuthService.login(nric, password);
-        }, "AuthenticationException should be thrown for user not found");
+        }, "AuthenticationException should be thrown for incorrect NRIC");
 
-        assertEquals("Invalid NRIC or password", exception.getMessage(), "Exception message should indicate user not found");
+        assertEquals("Invalid NRIC or password", exception.getMessage(), "Exception message should indicate incorrect NRIC");
 
         mockedUserRepo.verify(() -> UserRepository.getByNRIC(nric));
-        mockedHash.verify(() -> Hash.verifyPassword(anyString(), anyString()), never());
+        mockedHash.verifyNoInteractions();
         mockedUserRepo.verify(() -> UserRepository.setActiveUser(any(User.class)), never());
     }
 }
