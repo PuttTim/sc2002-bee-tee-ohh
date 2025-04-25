@@ -33,9 +33,9 @@ public class App {
         RegistrationRepository.load();
         ApplicantRepository.load();
         ApplicationRepository.load();
-        ReceiptRepository.load();
         OfficerRepository.load();
         ManagerRepository.load();
+        ReceiptRepository.load();
     }
 
     private void initServices() {
