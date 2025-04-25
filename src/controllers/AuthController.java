@@ -167,8 +167,8 @@ public class AuthController {
                 switch (choice) {
                     case 1 -> ManagerController.viewAllProjects(); 
                     case 2 -> ManagerController.viewHandledProjects(manager);
-                    case 3 -> ManagerController.viewAllEnquiries(manager); // Pass manager object
-                    case 4 -> ManagerController.createProject();
+                    case 3 -> ManagerController.viewAllEnquiries(manager);
+                    case 4 -> ManagerController.createProject(manager);
                     case 0 -> {return;}
                 }
             } catch (NumberFormatException e) {

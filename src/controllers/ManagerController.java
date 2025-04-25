@@ -1,6 +1,10 @@
 package controllers;
 
 import models.Enquiry;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import models.Manager;
 import models.Project;
 import models.Registration;
@@ -12,6 +16,8 @@ import repositories.ProjectRepository;
 import repositories.UserRepository;
 import services.ApplicationService;
 import services.EnquiryService;
+import repositories.OfficerRepository;
+import repositories.ProjectRepository;
 import services.ProjectService;
 import services.RegistrationService;
 import views.CommonView;
@@ -66,8 +72,7 @@ public class ManagerController {
                     manageApplicantApplications(project, manager); // Updated call
                     break;
                 case 3: // Manage Project Details 
-                     // TODO: Implement project details editing
-                    CommonView.displayMessage("Manage Project Details - Not yet implemented.");
+                    editProjectDetails(project, manager);
                     break;
                 case 4: // View Enquiries
                     EnquiryController.manageProjectEnquiries(java.util.Optional.empty(), java.util.Optional.of(manager), project);
@@ -222,14 +227,154 @@ public class ManagerController {
         }
     }
 
-    public static void createProject() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createProject'");
+    public static void createProject(Manager manager) {
+        CommonView.displayHeader("Create New BTO Project");
+        String managerNRIC = manager.getUserNRIC(); 
+        String projectName = ProjectView.getProjectName();
+        String location = ProjectView.getProjectLocation();
+        
+        try {
+            LocalDateTime startDate = CommonView.promptDate("Enter application opening date: ");
+            LocalDateTime endDate = CommonView.promptDate("Enter application closing date: ");
+            
+            if (endDate.isBefore(startDate)) {
+                CommonView.displayError("End date cannot be before start date.");
+                return;
+            }
+        
+            int officerSlots = ProjectView.getOfficerSlots();
+            boolean visibility = ProjectView.getProjectVisibility();
+
+            ProjectService.createProject(managerNRIC, projectName, location, 
+                startDate, endDate, officerSlots, visibility);
+            System.out.println("PROJECT CREATE 4");
+            ProjectView.displayProjectCreationSuccess(projectName);
+        } catch (Exception e) {
+            CommonView.displayError("Error creating project: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void editProjectDetails(Project project, Manager manager) {
+        CommonView.displayHeader("Edit Project Details: " + project.getProjectName());
+        boolean running = true;
+
+        List<String> options = List.of(
+            "Edit Project Name",
+            "Edit Location",
+            "Edit Application Opening Date",
+            "Edit Application Closing Date",
+            "Edit Officer Slots Amount",
+            "Edit Project Visibility",
+            "Delete Project"
+        );
+
+        while (running) {
+            CommonView.displayShortSeparator();
+            ProjectView.displayProjectDetailsOfficerView(project);
+
+            int choice = CommonView.displayMenuWithBacking("Select detail to edit for " + project.getProjectName(), options);
+            boolean changed = false;
+
+            switch (choice) {
+                case 1: // Edit Project Name
+                    String newName = ProjectView.getProjectName();
+                    project.setProjectName(newName);
+                    changed = true;
+                    CommonView.displaySuccess("Project name updated.");
+                    break;
+                case 2: // Edit Location
+                    String newLocation = ProjectView.getProjectLocation();
+                    project.setLocation(newLocation);
+                    changed = true;
+                    CommonView.displaySuccess("Project location updated.");
+                    break;
+                case 3: // Edit Application Opening Date
+                    try {
+                        LocalDateTime newStartDate = CommonView.promptDate("Enter new opening date: ");
+                        if (newStartDate.isAfter(project.getApplicationCloseDate())) {
+                            CommonView.displayError("Opening date cannot be after closing date.");
+                        } else {
+                            project.setApplicationOpenDate(newStartDate);
+                            changed = true;
+                            CommonView.displaySuccess("Application opening date updated.");
+                        }
+                    } catch (Exception e) {
+                        CommonView.displayError("Invalid date format.");
+                    }
+                    break;
+                case 4: // Edit Application Closing Date
+                    try {
+                        LocalDateTime newEndDate = CommonView.promptDate("Enter new closing date: ");
+                        if (newEndDate.isBefore(project.getApplicationOpenDate())) {
+                            CommonView.displayError("Closing date cannot be before opening date.");
+                        } else {
+                            project.setApplicationCloseDate(newEndDate);
+                            changed = true;
+                            CommonView.displaySuccess("Application closing date updated.");
+                        }
+                    } catch (Exception e) {
+                        CommonView.displayError("Invalid date format.");
+                    }
+                    break;
+                case 5: // Edit Officer Slots
+                    int newSlots = ProjectView.getOfficerSlots();
+                    project.setOfficerSlots(newSlots);
+                    changed = true;
+                    CommonView.displaySuccess("Officer slots updated.");
+                    break;
+                case 6: // Edit Project Visibility
+                    boolean newVisibility = ProjectView.getProjectVisibility();
+                    project.setVisible(newVisibility);
+                    changed = true;
+                    CommonView.displaySuccess("Project visibility updated.");
+                    break;
+                case 7: // Delete Project
+                    if (deleteProject(project, manager)) {
+                        return;
+                    } else {
+                        continue;
+                    } 
+                case 0: 
+                    return;
+                default:
+                    CommonView.displayError("Invalid choice.");
+                    break;
+            }
+
+            if (changed) {
+                try {
+                    ProjectService.updateProjectDetails(project);
+                } catch (Exception e) {
+                    CommonView.displayError("Error saving project details: " + e.getMessage());
+                }
+            }
+
+            if (choice != 0) { 
+                 CommonView.prompt("Press Enter to continue editing...");
+            }
+        }
+    }
+
+    public static boolean deleteProject(Project project, Manager manager) {
+        CommonView.displayHeader("Delete Project: " + project.getProjectName());
+        if (CommonView.promptYesNo("Are you sure you want to delete this project? This action cannot be undone.")) {
+            try {
+                ProjectService.deleteProject(project.getProjectName());
+                ProjectView.displayProjectDeleteSuccess();
+                return true;
+            } catch (Exception e) {
+                CommonView.displayError("Error deleting project: " + e.getMessage());
+            }
+        } else {
+            CommonView.displayMessage("Project deletion cancelled.");
+        }
+        return false;
     }
 
     public static void viewAllProjects() {
-        List<Project> allProjects = ProjectService.getVisibleProjects();
-
+        CommonView.displayHeader("All BTO Projects");
+        List<Project> allProjects = ProjectService.getAllProjects();
         if (allProjects.isEmpty()) {
             CommonView.displayMessage("There are no projects in the system.");
             return;
@@ -248,6 +393,8 @@ public class ManagerController {
             ProjectView.displayProjectDetailsManagerView(selectedProject);
             CommonView.prompt("Press Enter to return to the project list...");
         }
+        ProjectView.displayProjectList(allProjects);
+        CommonView.prompt("Press Enter to return to the main menu...");
     }
 
     public static void viewAllEnquiries(Manager manager) {
@@ -299,22 +446,5 @@ public class ManagerController {
             }
             CommonView.prompt("Press Enter to return to the enquiry list...");
         }
-    }
-
-    // method to display all projects which then will ask the user to select a project
-    public static void viewHandledProjects() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'viewHandledProjects'");
-    }
-
-    // this will show a menu of actions that the manager can do on the project
-    public static void viewProjectDetails(Project project) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'viewProjectDetails'");
-    }
-
-    public static void manageProjectOfficerRegistration(Project project) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'manageProjectOfficerRegistration'");
     }
 }

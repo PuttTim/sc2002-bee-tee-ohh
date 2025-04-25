@@ -15,8 +15,10 @@ import models.enums.Role;
 
 import repositories.ProjectRepository;
 import repositories.UserRepository;
+import repositories.ManagerRepository;
 
 import utils.DateTimeUtils;
+import views.CommonView;
 
 
 public class ProjectService {
@@ -111,13 +113,25 @@ public class ProjectService {
                 .collect(Collectors.toList());
     }
 
-    public static void createProject(String projectId, String managerNRIC, String projectName, 
+    public static void createProject(String managerNRIC, String projectName, 
             String location, LocalDateTime startDate, LocalDateTime endDate, 
             int officerSlots, boolean visible) {
-        Project newProject = new Project(projectId, managerNRIC, projectName, location,
-                startDate, endDate, officerSlots, visible);
-        ProjectRepository.add(newProject);
-        ProjectRepository.saveAll();
+        Manager manager = ManagerRepository.getByNRIC(managerNRIC);
+        if (manager == null) {
+            throw new IllegalArgumentException("Manager with NRIC " + managerNRIC + " not found.");
+        }
+
+        Project project = new Project(managerNRIC, projectName, location, startDate, endDate, officerSlots, visible);
+        
+        int availableUnits1 = CommonView.promptInt("Enter number of 2-Room units: ", 0, Integer.MAX_VALUE);
+        int availableUnits2 = CommonView.promptInt("Enter number of 3-Room units: ", 0, Integer.MAX_VALUE);
+
+        project.addFlatType(FlatType.TWO_ROOM, availableUnits1, 400000);
+        project.addFlatType(FlatType.THREE_ROOM, availableUnits2, 600000);
+
+        System.out.println("PROJECT CREATE 1");
+        ProjectRepository.add(project);
+        System.out.println("PROJECT CREATE 2");
     }
 
     public static void updateProject(Project project, String location, 
@@ -125,14 +139,22 @@ public class ProjectService {
         project.setLocation(location);
         project.setApplicationOpenDate(startDate);
         project.setApplicationCloseDate(endDate);
-        ProjectRepository.saveAll();
+        ProjectRepository.update(project);
+    }
+
+    public static void updateProjectDetails(Project project) {
+        if (project == null) {
+            throw new IllegalArgumentException("Project cannot be null.");
+        }
+        ProjectRepository.update(project);
     }
 
     public static void deleteProject(String projectName) {
         Project project = getProjectByName(projectName);
         if (project != null) {
             ProjectRepository.remove(project);
-            ProjectRepository.saveAll();
+        } else {
+            throw new IllegalArgumentException("Project with name " + projectName + " not found.");
         }
     }
 

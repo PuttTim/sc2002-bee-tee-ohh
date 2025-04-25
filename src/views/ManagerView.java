@@ -12,11 +12,11 @@ import utils.DateTimeUtils;
 public class ManagerView {
     public static int showSelectHandledProjectMenu(Project project) {
         List<String> options = List.of(
-                "Manage Officer Registrations",
-                "Manage Applicant Applications",
-                "Manage Project Details",
-                "View Enquiries"
-                );
+            "Manage Officer Registrations",
+            "Manage Applicant Applications",
+            "Edit Project Details",
+            "View/Reply Enquiries"
+            );
         
         int choice = CommonView.displayMenuWithBacking("Select Manager Operation for " + project.getProjectName(), options);
 

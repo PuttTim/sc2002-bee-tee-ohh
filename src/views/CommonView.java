@@ -1,7 +1,5 @@
 package views;
 
-import interfaces.ICommonView;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
@@ -123,7 +121,8 @@ public class CommonView {
         while (true) {
             String dateStr = prompt(message + " (dd/MM/yyyy): ");
             try {
-                return DateTimeUtils.parseDateTime(dateStr);
+                // Use the specific formatter for dd-MM-yyyyTHH:mm:ss
+                return DateTimeUtils.parseDateTime(String.format("%sT%s", dateStr.replace("/", "-"), "23:59:59"), DateTimeUtils.DD_MM_YYYY_T_HH_MM_SS_FORMATTER);
             } catch (Exception e) {
                 displayError("Invalid date format. Please use dd/MM/yyyy.");
             }

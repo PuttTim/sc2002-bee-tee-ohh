@@ -48,17 +48,19 @@ public class Project {
         this.officers = new ArrayList<>();
     }
 
-    public Project(String projectID, String managerNRIC, String projectName, String location,
+    public Project(String managerNRIC, String projectName, String location,
                   LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
                   int officerSlots, boolean visible) {
-        this.projectID = projectID;
+        this.projectID = "P" + (++lastProjectID);
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
         this.location = location;
         this.applicationOpenDate = applicationOpenDate;
         this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
-        this.visible = visible;
+        this.isVisible = visible;
+        this.applicants = new ArrayList<>();
+        this.officers = new ArrayList<>();
     }
 
     // This constructor is used when loading from repository
@@ -213,6 +215,11 @@ public class Project {
         if (!applicants.contains(applicantNRIC)) {
             applicants.add(applicantNRIC);
         }
+    }
+
+    public void addFlatType(FlatType type, int units, int price) {
+        this.flatTypeToUnit.put(type, this.flatTypeToUnit.getOrDefault(type, 0) + units);
+        this.flatTypeToSellingPrice.put(type, price);
     }
 
     public void addOfficer(String officerNRIC) {

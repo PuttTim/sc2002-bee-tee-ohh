@@ -176,12 +176,7 @@ public class ProjectView {
     }
 
     public static boolean getProjectVisibility() {
-        String input = CommonView.prompt("Make project visible? (yes/no): ").toLowerCase();
-        while (!input.equals("yes") && !input.equals("no")) {
-            CommonView.displayError("Invalid input! Please enter (yes/no)");
-            input = CommonView.prompt("Make project visible? (yes/no): ").toLowerCase();
-        }
-        return input.equals("yes");
+        return CommonView.promptYesNo("Make project visible?: ");
     }
 
     public static int getProjectChoice(List<Project> projects) {
