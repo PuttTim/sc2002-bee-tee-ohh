@@ -91,6 +91,10 @@ public class ApplicantApplicationService {
             throw new IllegalStateException("No units available for selected flat type");
         }
 
+        if (applicant.getMaritalStatus() != MaritalStatus.MARRIED && flatType != FlatType.TWO_ROOM) {
+            throw new IllegalArgumentException("Singles/Divorced can only apply for two room flats.");
+        }
+
         Application application = new Application(applicant.getUserNRIC(), project.getProjectID(), flatType);
         ApplicationRepository.add(application);
         ApplicationRepository.saveAll();

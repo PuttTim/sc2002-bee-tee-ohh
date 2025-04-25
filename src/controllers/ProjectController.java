@@ -62,7 +62,7 @@ public class ProjectController {
             int officerSlots = ProjectView.getOfficerSlots();
             boolean visibility = ProjectView.getProjectVisibility();
 
-            ProjectService.createProject(projectId, managerNRIC, projectName, location, 
+            ProjectService.createProject(managerNRIC, projectName, location,
                 startDate, endDate, officerSlots, visibility);
             ProjectView.displayProjectCreationSuccess(projectName);
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,6 +12,7 @@ import models.Project;
 import models.Officer;
 import models.User;
 import models.enums.FlatType;
+import models.enums.MaritalStatus;
 import models.enums.Role;
 
 import repositories.ProjectRepository;
@@ -124,10 +126,19 @@ public class ProjectService {
                         .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime())
                                 && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
                         .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
+                        .filter(p -> {
+                            List<FlatType> flatTypes = p.getFlatTypes();
+
+                            if (user.getMaritalStatus() == MaritalStatus.MARRIED && user.getAge() >= 21) {
+                                return true;
+                            } else if ((user.getMaritalStatus() == MaritalStatus.SINGLE || user.getMaritalStatus() == MaritalStatus.DIVORCED) && user.getAge() >= 35) {
+                                return flatTypes.contains(FlatType.TWO_ROOM);
+                            }
+                            return false;
+                        })
                         .collect(Collectors.toList());
             case OFFICER:
-                return ProjectRepository.getAll().stream()
-                        .collect(Collectors.toList());
+                return new ArrayList<>(ProjectRepository.getAll());
             default:
                 if (user.getRole() == Role.MANAGER) {
                     return ProjectRepository.getAll();
