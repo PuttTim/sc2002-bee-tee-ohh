@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import models.enums.FlatType;
 import models.enums.MaritalStatus;
-import utils.DateTimeUtils;
 
 public class Receipt {
     private static int lastReceiptID = 0;

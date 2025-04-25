@@ -1,7 +1,5 @@
 package services;
 
-import interfaces.IOfficerService;
-
 import models.Officer;
 import repositories.OfficerRepository;
 

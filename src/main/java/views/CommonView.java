@@ -1,7 +1,5 @@
 package views;
 
-import interfaces.ICommonView;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;

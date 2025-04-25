@@ -2,10 +2,8 @@ package views;
 
 import models.*;
 import models.enums.ApplicationStatus;
-import models.enums.FlatType;
 import repositories.ProjectRepository;
 import repositories.UserRepository;
-import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 import java.util.List;
 

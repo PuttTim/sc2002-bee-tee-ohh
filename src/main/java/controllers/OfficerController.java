@@ -16,10 +16,8 @@ import repositories.ApplicantRepository;
 import repositories.ApplicationRepository;
 import repositories.EnquiryRepository;
 import repositories.OfficerRepository;
-import repositories.ProjectRepository;
 import repositories.ReceiptRepository;
 import repositories.RegistrationRepository;
-import repositories.UserRepository;
 import services.*;
 import views.*;
 

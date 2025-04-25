@@ -6,7 +6,6 @@ import models.Project;
 import models.Receipt;
 import models.User;
 import models.enums.FlatType;
-import models.enums.MaritalStatus;
 import utils.CsvReader;
 import utils.CsvWriter;
 import utils.DateTimeUtils;

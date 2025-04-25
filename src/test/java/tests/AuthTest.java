@@ -3,7 +3,6 @@ package tests;
 import exceptions.AuthenticationException;
 import models.Applicant;
 import models.User;
-import models.enums.MaritalStatus;
 import models.enums.Role;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -5,7 +5,6 @@ import java.util.List;
 import models.Applicant;
 import models.Project;
 
-import repositories.ProjectRepository;
 import services.ProjectService;
 import views.ApplicantApplicationView;
 

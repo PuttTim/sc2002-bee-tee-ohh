@@ -5,7 +5,6 @@ import interfaces.ICsvConfig;
 import java.io.IOException;
 import java.util.*;
 
-import models.Applicant;
 import models.User;
 import models.enums.MaritalStatus;
 import models.enums.Role;

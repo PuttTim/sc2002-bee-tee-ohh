@@ -1,15 +1,26 @@
 # Bee Tee Ohh README
 ---
 
+# Prerequisites
+    -Java JDK 11 or later
+    -Apache Maven 3.6.0 or later
 
 # Setup Instructions
 
-## Compiling the Java files
+
+
+## 1.  Clone the Repository:
 ```
-javac -d bin -sourcepath src src/App.java
+git clone https://github.com/PuttTim/sc2002-bee-tee-ohh.git
+cd sc2002-bee-tee-ohh
+```
+## 2.  Build the project:
+
+```
+mvn clean package
 ```
 
-## Running the application
+## 3. Running the application
 ```
-java -cp bin App
+mvn exec:java -Dexec.mainClass="App"
 ```
