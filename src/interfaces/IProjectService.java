@@ -3,7 +3,6 @@ package interfaces;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import models.Filter;
 import models.Manager;
 import models.Officer;
 import models.Project;
@@ -12,7 +11,6 @@ import models.Project;
  * Interface for managing project-related operations.
  */
 public interface IProjectService {
-    List<Project> getProjects(List<Filter> filters);
     List<Project> getAllProjects();
     List<Project> getVisibleProjects();
     Project getProjectByName(String projectName);

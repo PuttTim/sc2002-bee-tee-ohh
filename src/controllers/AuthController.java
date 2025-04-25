@@ -11,10 +11,6 @@ import utils.Hash;
 import views.AuthView;
 import views.CommonView;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Controller class to handle authentication processes.
  * <p>Authentication processes include:</p>
@@ -118,12 +114,11 @@ public class AuthController {
      */
     private void dispatchToController(User user) {
         boolean running = true;
-        Map<String, Set<String>> filters = new HashMap<>();
         switch (user.getRole()) {
             case APPLICANT -> {
                 while (running) {
                     switch (AuthView.showApplicantMainMenu()) {
-                        case 1 -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()), filters);
+                        case 1 -> showApplicantMenu(ApplicantRepository.getByNRIC(user.getUserNRIC()));
                         case 2 -> handleChangePassword(user);
                         case 3 -> { running = false; }
                         default -> CommonView.displayError("Invalid option. Please try again.");
@@ -132,10 +127,11 @@ public class AuthController {
             }
             case OFFICER -> {
                 while (running) {
+
                     switch (AuthView.showOfficerMainMenu()) {
                         case 1 -> {
                             UserRepository.setUserMode(Role.APPLICANT);
-                            showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()), filters);
+                            showApplicantMenu(OfficerRepository.getByNRIC(user.getUserNRIC()));
                         }
                         case 2 -> {
                             UserRepository.setUserMode(Role.OFFICER);

@@ -74,19 +74,7 @@ public class ManagerController {
             return;
         }
 
-        while (true) {
-            CommonView.displayHeader("Projects Managed by You");
-            ProjectView.displayProjectList(handledProjects);
-
-            int projectChoice = CommonView.promptInt("Select project number to manage (or 0 to go back): ", 0, handledProjects.size());
-
-            if (projectChoice == 0) {
-                break;
-            }
-
-            Project selectedProject = handledProjects.get(projectChoice - 1);
-            showProjectManagementMenu(selectedProject, manager);
-        }
+        ProjectView.displayAndFilterProjects(handledProjects, "Projects Handled By You");
     }
 
     /**
@@ -437,26 +425,13 @@ public class ManagerController {
      * Displays all projects and lets the manager view their details.
      */
     public void viewAllProjects() {
-        CommonView.displayHeader("All BTO Projects");
         List<Project> allProjects = projectService.getAllProjects();
         if (allProjects.isEmpty()) {
             CommonView.displayMessage("There are no projects in the system.");
             return;
         }
 
-        while (true) {
-            CommonView.displayHeader("All Projects in System");
-            ProjectView.displayProjectList(allProjects);
-            int choice = CommonView.promptInt("Enter the number of the project to view details (or 0 to go back): ", 0, allProjects.size());
-
-            if (choice == 0) {
-                break;
-            }
-
-            Project selectedProject = allProjects.get(choice - 1);
-            ProjectView.displayProjectDetailsManagerView(selectedProject);
-            CommonView.prompt("Press Enter to return to the project list...");
-        }
+        ProjectView.displayAndFilterProjects(allProjects, "All BTO Projects");
     }
 
     public void viewAllEnquiries(Manager manager) {
