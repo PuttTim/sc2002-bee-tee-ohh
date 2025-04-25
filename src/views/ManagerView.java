@@ -142,40 +142,6 @@ public class ManagerView {
         CommonView.displayError("Failed to " + action + " registration.");
     }
 
-    /**
-     * Displays a list of officer registrations and prompts the manager to approve/reject/withdraw registrations.
-     *
-     * @param registrations The list of officer registrations to be managed
-     * @return The selected registration number for action
-     */
-    public static int displayOfficerRegistrations(List<Registration> registrations) {
-        // TODO display all officer registrations and prompt for the manager to approve/reject/withdraw the officer registration
-        return 0;
-    }
-
-    /**
-     * Displays a list of applicant applications and prompts the manager to approve/reject/withdraw applications.
-     *
-     * @param applications The list of applications to be managed
-     * @return The selected application number for action
-     */
-    public static int displayApplicantApplications(List<Application> applications) {
-        // TODO display all applicant applications and prompt for the manager to approve/reject/withdraw the application
-        return 0;
-    }
-
-    /**
-     * Displays project details and prompts the manager to edit project details such as name, location, visibility, and flat types.
-     *
-     * @param project The project whose details are to be managed
-     * @return The action selected for editing the project details
-     */
-    public static int displayProjectDetails(Project project) {
-        // TODO display project details and prompt for the manager to edit the project details, such as edit project name, location, etc, toggle visibility, 
-        // and add/remove flat types, etc.
-        return 0;
-    }
-
     public static int promptApproveRejectWithdrawal() {
         return CommonView.promptInt("Action: [1] Approve Withdrawal [2] Reject Withdrawal [0] Cancel: ", 0, 2);
     }
