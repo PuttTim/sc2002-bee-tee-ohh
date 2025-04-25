@@ -7,19 +7,34 @@ import repositories.UserRepository;
 import utils.DateTimeUtils;
 import java.util.List;
 
+/**
+ * View class that handles the display of officer-related functionalities.
+ * It provides methods for displaying projects handled by the officer, managing applications,
+ * and viewing application details and status histories.
+ */
 public class OfficerView {
-    public static int showSelectHandledProjectMenu(Project projects) { 
+    /**
+     * Displays a menu for selecting officer operations for a given project.
+     *
+     * @param projects The project the officer is handling
+     * @return The choice selected by the officer
+     */
+    public static int showSelectHandledProjectMenu(Project projects) {
         List<String> options = List.of(
                 "View All Applications",
                 "Manage Successful Applications",
                 "View Enquiries"
-                );
-        
-        int choice = CommonView.displayMenuWithBacking("Select Officer Operation", options);
+        );
 
+        int choice = CommonView.displayMenuWithBacking("Select Officer Operation", options);
         return choice;
     }
 
+    /**
+     * Displays a list of projects handled by the officer.
+     *
+     * @param projects The list of projects handled by the officer
+     */
     public static void displayOfficerHandledProjects(List<Project> projects) {
         CommonView.displayHeader("Projects Handled by You");
 
@@ -41,6 +56,12 @@ public class OfficerView {
         }
     }
 
+    /**
+     * Displays a list of applications with relevant information and their status.
+     *
+     * @param applications The list of applications to be displayed
+     * @param header The header for the application list
+     */
     public static void displayApplicationList(List<Application> applications, String header) {
         if (applications.isEmpty()) {
             CommonView.displayMessage("No applications found.");
@@ -65,6 +86,11 @@ public class OfficerView {
         CommonView.displaySeparator();
     }
 
+    /**
+     * Displays detailed information about a specific application.
+     *
+     * @param application The application whose details are to be displayed
+     */
     public static void displayApplicationDetails(Application application) {
         if (application == null) {
             CommonView.displayMessage("Application details not available.");
@@ -84,7 +110,7 @@ public class OfficerView {
         if (application.getApprovedBy() != null) {
             User approver = UserRepository.getByNRIC(application.getApprovedBy());
             String action = (application.getApplicationStatus() == ApplicationStatus.SUCCESSFUL || application.getApplicationStatus() == ApplicationStatus.BOOKED) ? "Approved" : "Processed";
-             CommonView.displayMessage(action + " By: " + (approver != null ? approver.getName() : application.getApprovedBy()));
+            CommonView.displayMessage(action + " By: " + (approver != null ? approver.getName() : application.getApprovedBy()));
         }
 
         application.getApplicationStatusHistory().forEach((status, timestamp) -> 

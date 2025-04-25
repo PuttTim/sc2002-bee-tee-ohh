@@ -11,14 +11,32 @@ import models.enums.EnquiryStatus;
 import repositories.EnquiryRepository;
 import views.CommonView;
 
+/**
+ * Service class for managing property enquiry operations.
+ * Provides functionality for creating, retrieving, editing, and responding to property enquiries.
+ * Enforces business rules regarding enquiry ownership and status transitions.
+ */
 public class EnquiryService {
+
+    /**
+     * Retrieves all enquiries for a specific project.
+     *
+     * @param project the project to filter enquiries by
+     * @return list of enquiries associated with the given project
+     */
     public static List<Enquiry> getProjectEnquiries(Project project) {
         return EnquiryRepository.getEnquiriesByProject(project.getProjectID());
     }
 
+    /**
+     * Retrieves all enquiries submitted by a specific applicant.
+     * Filters enquiries based on the applicant's NRIC.
+     *
+     * @param applicant the applicant whose enquiries to retrieve
+     * @return list of enquiries submitted by the applicant
+     */
     public static List<Enquiry> getEnquiriesByApplicant(Applicant applicant) {
         List<Enquiry> enquiries = EnquiryRepository.getAll();
-
         List<Enquiry> filteredEnquiries = new ArrayList<Enquiry>();
 
         for (Enquiry enquiry : enquiries) {
@@ -28,12 +46,15 @@ public class EnquiryService {
         }
 
         return filteredEnquiries;
-
-        // return EnquiryRepository.getAll().stream()
-        //         .filter(enquiry -> enquiry.getApplicantNRIC().equals(applicant.getUserNRIC()))
-        //         .collect(Collectors.toList());
     }
 
+    /**
+     * Creates a new enquiry.
+     * Validates the enquiry object.
+     *
+     * @param enquiry the enquiry to create
+     * @throws IllegalArgumentException if enquiry is null
+     */
     public static void createEnquiry(Enquiry enquiry) {
         if (enquiry == null) {
             throw new IllegalArgumentException("Enquiry cannot be null");
@@ -42,6 +63,21 @@ public class EnquiryService {
         EnquiryRepository.saveAll();
     }
 
+    /**
+     * Edits an existing enquiry's content.
+     * Validates that:
+     * <ul>
+     *   <li>The enquiry exists</li>
+     *   <li>The applicant owns the enquiry</li>
+     *   <li>The enquiry hasn't been responded to</li>
+     *   <li>The new content is valid</li>
+     * </ul>
+     *
+     * @param applicant the applicant editing the enquiry
+     * @param enquiryId ID of the enquiry to edit
+     * @param newContent the updated enquiry content
+     * @throws IllegalArgumentException if validation fails
+     */
     public static void editEnquiry(Applicant applicant, String enquiryId, String newContent) {
         if (newContent == null || newContent.trim().isEmpty()) {
             throw new IllegalArgumentException("New enquiry content cannot be empty");
@@ -64,6 +100,18 @@ public class EnquiryService {
         EnquiryRepository.saveAll();
     }
 
+    /**
+     * Deletes an existing enquiry.
+     * Validates that:
+     * <ul>
+     *   <li>The enquiry exists</li>
+     *   <li>The applicant owns the enquiry</li>
+     * </ul>
+     *
+     * @param applicant the applicant deleting the enquiry
+     * @param enquiryId ID of the enquiry to delete
+     * @throws IllegalArgumentException if validation fails
+     */
     public static void deleteEnquiry(Applicant applicant, String enquiryId) {
         Enquiry enquiry = EnquiryRepository.getEnquiryById(enquiryId);
         if (enquiry == null) {
@@ -78,11 +126,25 @@ public class EnquiryService {
         EnquiryRepository.saveAll();
     }
 
+    /**
+     * Adds a response to an enquiry and marks it as responded.
+     * Validates that:
+     * <ul>
+     *   <li>The enquiry exists</li>
+     *   <li>The response content is valid</li>
+     *   <li>The enquiry hasn't already been responded to</li>
+     * </ul>
+     *
+     * @param enquiry the enquiry to respond to
+     * @param response the response content
+     * @param responderNRIC the NRIC of the staff member responding
+     * @return {@code true} if response was successful, {@code false} otherwise
+     */
     public static boolean replyToEnquiry(Enquiry enquiry, String response, String responderNRIC) {
         if (enquiry == null) {
             return false;
         }
-        
+
         if (response == null || response.trim().isEmpty()) {
             CommonView.displayError("Response cannot be empty");
             return false;

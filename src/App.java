@@ -1,10 +1,20 @@
 import controllers.*;
 import repositories.*;
 
+/**
+ * The main entry point of the housing project management application.
+ * Initializes the repositories, runs the authentication process, and handles exceptions.
+ */
 // This is the main entrypoint of our application.
 public class App {
     private App() {}
 
+    /**
+     * The main method that starts the application.
+     * Initializes repositories and triggers the authentication process.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         App app = new App();
         try {

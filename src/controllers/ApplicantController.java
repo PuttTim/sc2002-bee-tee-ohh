@@ -11,6 +11,14 @@ import services.ApplicantApplicationService;
 import views.ApplicantApplicationView;
 import views.CommonView;
 
+/**
+ * Controller class that is responsible for handling applicant-related actions.
+ * <p>Applicant-related actions include:</p>
+ * <ul>
+ *     <li>Making new applications</li>
+ *     <li>Viewing existing application statuses</li>
+ * </ul>
+ */
 public class ApplicantController {
 
     public static void manageApplications(Applicant applicant) {
@@ -32,6 +40,11 @@ public class ApplicantController {
         }
     }
 
+    /**
+     * Allows the applicant to view current application statuses and application menu options.
+     *
+     * @param applicant the applicant who has applied for a BTO project.
+     */
     private static void viewApplications(Applicant applicant) {
         List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
         ApplicantApplicationView.displayApplicationList(applications, "Your Applications");
@@ -54,6 +67,11 @@ public class ApplicantController {
         CommonView.prompt("Press Enter to continue...");
     }
 
+    /**
+     * Starts a new application for the applicant.
+     *
+     * @param applicant the applicant who is applying for a BTO project.
+     */
     private static void submitNewApplication(Applicant applicant) {
         List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant);
         if (eligibleProjects.isEmpty()) {
@@ -110,5 +128,6 @@ public class ApplicantController {
             }
         }
         CommonView.prompt("Press Enter to continue...");
+
     }
 }
