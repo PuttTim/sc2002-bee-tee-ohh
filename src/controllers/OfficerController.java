@@ -2,6 +2,7 @@ package controllers;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 import models.Applicant;
 import models.Application;
@@ -34,7 +35,16 @@ import views.*;
  * </ul>
  */
 public class OfficerController {
-    //register to join project as officer
+    private final ProjectService projectService;
+    private final EnquiryController enquiryController;
+    private final ApplicationService applicationService;
+    
+    public OfficerController() {
+        this.projectService = ProjectService.getInstance();
+        this.enquiryController = new EnquiryController();
+        this.applicationService = ApplicationService.getInstance();
+    }
+
     /**
      * <p>Registers an officer to handle a project.</p>
      * <ul>
@@ -44,8 +54,8 @@ public class OfficerController {
      * </ul>
      * @param officer The officer attempting to register for a project.
      */
-    public static void registerToHandleProject(Officer officer) {
-        List<Project> projects = ProjectService.getVisibleProjects();
+    public void registerToHandleProject(Officer officer) {
+        List<Project> projects = projectService.getVisibleProjects();
         List<Registration> officerRegistrations = RegistrationRepository.getByOfficer(officer);
         List<Project> registeredProjects = projects.stream()
                 .filter(p -> officerRegistrations.stream().filter(r -> r.getRegistrationStatus() != RegistrationStatus.REJECTED).anyMatch(r -> r.getProjectID().equals(p.getProjectID())))
@@ -111,9 +121,9 @@ public class OfficerController {
      * </ul>
      * @param officer The officer whose registration status is being checked.
      */
-    public static void checkHandlerRegistration(Officer officer) {
+    public void checkHandlerRegistration(Officer officer) {
         if (OfficerRepository.hasExistingProject(officer)) {
-            Project project = ProjectService.getProjectByOfficer(officer);
+            Project project = projectService.getProjectByOfficer(officer);
             if (project != null) {
                 CommonView.displayMessage("You are currently handling project: " + project.getProjectName());
             }
@@ -129,8 +139,8 @@ public class OfficerController {
      * </ul>
      * @param officer The officer viewing the project details.
      */
-    public static void viewHandledProjectDetails(Officer officer) {
-        List<Project> projects = ProjectService.getAllOfficersProjects(officer.getUserNRIC());
+    public void viewHandledProjectDetails(Officer officer) {
+        List<Project> projects = projectService.getAllOfficersProjects(officer.getUserNRIC());
         if (projects != null && !projects.isEmpty()) {
             while (true) {
                 OfficerView.displayOfficerHandledProjects(projects);
@@ -184,30 +194,8 @@ public class OfficerController {
      * @param project The project whose enquiries are being managed.
      * @param officer The officer responding to the enquiries.
      */
-    public static void manageProjectEnquiries(Project project, Officer officer) {
-        while (true) {
-            List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
-            ProjectController.viewProjectEnquiries(project);
-            int choice = CommonView.promptInt("Select an enquiry to reply to (or 0 to cancel): ", 0, enquiries.size());
-
-            if (choice == 0) {
-                CommonView.displayMessage("Cancelled replying to enquiries.");
-                break;
-            } else {
-                Enquiry selectedEnquiry = enquiries.get(choice - 1);
-                String response = CommonView.prompt("Enter your response: ");
-                if (response != null && !response.trim().isEmpty()) {
-                    selectedEnquiry.markAsResponded(officer.getUserNRIC(), response);
-                    EnquiryRepository.update(selectedEnquiry);
-                    CommonView.displayMessage("Enquiry Response sent successfully.");
-                    continue;
-                } else {
-                    CommonView.displayError("Response cannot be empty.");
-                }
-
-            }
-        }
-
+    public void manageProjectEnquiries(Project project, Officer officer) {
+        enquiryController.manageProjectEnquiries(Optional.of(officer), Optional.empty(), project);
     }
 
     /**
@@ -218,8 +206,8 @@ public class OfficerController {
      * @param project The project whose applications are being managed.
      * @param officer The officer managing the applications.
      */
-    public static void manageProjectApplications(Project project, Officer officer) {
-        List<Application> applications = ApplicationService.getProjectApplications(project);
+    public void manageProjectApplications(Project project, Officer officer) {
+        List<Application> applications = applicationService.getProjectApplications(project);
         OfficerView.displayApplicationList(applications, "All Applications for Project: " + project.getProjectName());
         CommonView.prompt("Press Enter to return to the project menu...");
     }
@@ -234,9 +222,9 @@ public class OfficerController {
      * @param project The project whose successful applications are being managed.
      * @param officer The officer managing the successful applications.
      */
-    public static void manageSuccessfulApplications(Project project, Officer officer) {
+    public void manageSuccessfulApplications(Project project, Officer officer) {
         while (true) {
-            List<Application> relevantApplications = ApplicationService.getProjectApplications(project).stream()
+            List<Application> relevantApplications = applicationService.getProjectApplications(project).stream()
                 .filter(app -> app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL || app.getApplicationStatus() == ApplicationStatus.BOOKED)
                 .collect(Collectors.toList());
             
@@ -295,7 +283,7 @@ public class OfficerController {
                         continue;
                     }
 
-                    boolean booked = ApplicationService.bookApplication(selectedApplication, officer, unitNumber);
+                    boolean booked = applicationService.bookApplication(selectedApplication, officer, unitNumber);
                     
                     if (booked) {
                         CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " successfully booked for unit " + unitNumber + ".");
@@ -326,7 +314,7 @@ public class OfficerController {
      * @param unitNumber The assigned unit number for the application.
      * @param project The project in which the application is being booked.
      */
-    private static void generateReceiptForBooking(Application application, Officer officer, String unitNumber, Project project) {
+    private void generateReceiptForBooking(Application application, Officer officer, String unitNumber, Project project) {
         Applicant applicant = ApplicantRepository.getByNRIC(application.getApplicantNRIC());
 
         if (applicant == null) {

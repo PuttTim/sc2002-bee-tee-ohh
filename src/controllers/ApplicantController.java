@@ -8,6 +8,8 @@ import models.Project;
 import models.enums.ApplicationStatus;
 
 import services.ApplicantApplicationService;
+import services.ApplicationService;
+import services.ProjectService;
 import views.ApplicantApplicationView;
 import views.CommonView;
 
@@ -20,8 +22,17 @@ import views.CommonView;
  * </ul>
  */
 public class ApplicantController {
+    private final ProjectService projectService;
+    private final ApplicationService applicationService;
+    private final ApplicantApplicationService applicantApplicationService;
 
-    public static void manageApplications(Applicant applicant) {
+    public ApplicantController() {
+        this.projectService = ProjectService.getInstance();
+        this.applicationService = ApplicationService.getInstance();
+        this.applicantApplicationService = ApplicantApplicationService.getInstance();
+    }
+
+    public void manageApplications(Applicant applicant) {
         boolean running = true;
         while (running) {
             int choice = ApplicantApplicationView.showMainMenu();
@@ -45,8 +56,8 @@ public class ApplicantController {
      *
      * @param applicant the applicant who has applied for a BTO project.
      */
-    private static void viewApplications(Applicant applicant) {
-        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
+    private void viewApplications(Applicant applicant) {
+        List<Application> applications = applicantApplicationService.getApplicationsByApplicant(applicant);
         ApplicantApplicationView.displayApplicationList(applications, "Your Applications");
         
         if (!applications.isEmpty()) {
@@ -61,8 +72,8 @@ public class ApplicantController {
         }
     }
 
-    private static void viewAvailableProjects(Applicant applicant) {
-        List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant);
+    public void viewAvailableProjects(Applicant applicant) {
+        List<Project> eligibleProjects = applicantApplicationService.getEligibleProjects(applicant);
         ApplicantApplicationView.displayEligibleProjects(eligibleProjects);
         CommonView.prompt("Press Enter to continue...");
     }
@@ -72,8 +83,8 @@ public class ApplicantController {
      *
      * @param applicant the applicant who is applying for a BTO project.
      */
-    private static void submitNewApplication(Applicant applicant) {
-        List<Project> eligibleProjects = ApplicantApplicationService.getEligibleProjects(applicant);
+    private void submitNewApplication(Applicant applicant) {
+        List<Project> eligibleProjects = applicantApplicationService.getEligibleProjects(applicant);
         if (eligibleProjects.isEmpty()) {
             CommonView.displayMessage("No eligible projects available for application.");
             return;
@@ -86,7 +97,7 @@ public class ApplicantController {
         int flatTypeChoice = ApplicantApplicationView.promptFlatTypeSelection(selectedProject);
         
         try {
-            boolean success = ApplicantApplicationService.submitApplication(
+            boolean success = applicantApplicationService.submitApplication(
                 applicant, 
                 selectedProject, 
                 selectedProject.getFlatTypes().get(flatTypeChoice - 1)
@@ -103,8 +114,8 @@ public class ApplicantController {
         CommonView.prompt("Press Enter to continue...");
     }
 
-    private static void handleWithdrawal(Applicant applicant) {
-        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant)
+    private void handleWithdrawal(Applicant applicant) {
+        List<Application> applications = applicantApplicationService.getApplicationsByApplicant(applicant)
             .stream()
             .filter(app -> app.getApplicationStatus() == ApplicationStatus.PENDING && !app.isWithdrawalRequested())
             .toList();
@@ -121,7 +132,7 @@ public class ApplicantController {
         if (choice > 0) {
             Application selectedApp = applications.get(choice - 1);
             try {
-                ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
+                applicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
                 ApplicantApplicationView.displayWithdrawalSuccess();
             } catch (Exception e) {
                 ApplicantApplicationView.displayWithdrawalError(e.getMessage());

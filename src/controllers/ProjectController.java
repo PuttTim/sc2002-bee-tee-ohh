@@ -25,6 +25,14 @@ import views.EnquiryView;
  */
 public class ProjectController {
 
+    private final ProjectService projectService;
+    private final EnquiryService enquiryService;
+
+    public ProjectController() {
+        this.projectService = ProjectService.getInstance();
+        this.enquiryService = EnquiryService.getInstance();
+    }
+
     /**
      * <p>Displays the list of available projects for an applicant to view.</p>
      * <ul>
@@ -33,8 +41,8 @@ public class ProjectController {
      * </ul>
      * @param applicant The applicant viewing the available projects.
      */
-    public static void viewAvailableProjects(Applicant applicant) {
-        List<Project> projects = ProjectService.getVisibleProjects();
+    public void viewAvailableProjects(Applicant applicant) {
+        List<Project> projects = projectService.getVisibleProjects();
         CommonView.displayHeader("Available Projects");
         ProjectView.displayAvailableProjects(projects);
         ProjectView.showProjectMenu(applicant, projects);
@@ -46,8 +54,8 @@ public class ProjectController {
      *   <li>Displays a list of all projects, including their details.</li>
      * </ul>
      */
-    public static void viewAllProjects() {
-        List<Project> projects = ProjectService.getAllProjects();
+    public void viewAllProjects() {
+        List<Project> projects = projectService.getAllProjects();
         CommonView.displayHeader("Available Projects");
         ProjectView.displayAvailableProjects(projects);
     }
@@ -60,8 +68,8 @@ public class ProjectController {
      * </ul>
      * @param project The project whose enquiries are being viewed.
      */
-    public static void viewProjectEnquiries(Project project) {
-        List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
+    public void viewProjectEnquiries(Project project) {
+        List<Enquiry> enquiries = enquiryService.getProjectEnquiries(project);
         if (enquiries.isEmpty()) {
             CommonView.displayMessage("No enquiries for this project.");
         } else {

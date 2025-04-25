@@ -14,6 +14,7 @@ import java.util.List;
  * View class for displaying and managing enquiry-related views.
  */
 public class EnquiryView {
+    private static final EnquiryController enquiryController = new EnquiryController();
 
     /**
      * Displays the enquiry menu for an applicant.
@@ -24,18 +25,17 @@ public class EnquiryView {
         List<String> options = List.of(
                 "Create New Enquiry",
                 "Edit Enquiry",
-                "Delete Enquiry",
-                "Back to Main Menu"
+                "Delete Enquiry"
         );
 
         while (true) {
-            int choice = CommonView.displayMenu("Enquiry Menu", options);
+            int choice = CommonView.displayMenuWithBacking("Enquiry Menu", options);
             try {
                 switch (choice) {
-                    case 1 -> EnquiryController.createNewEnquiry(applicant);
-                    case 2 -> EnquiryController.editEnquiry(applicant);
-                    case 3 -> EnquiryController.deleteEnquiry(applicant);
-                    case 4 -> {
+                    case 1 -> enquiryController.createNewEnquiry(applicant);
+                    case 2 -> enquiryController.editEnquiry(applicant);
+                    case 3 -> enquiryController.deleteEnquiry(applicant);
+                    case 0 -> {
                         return;
                     }
                 }

@@ -2,6 +2,7 @@ package services;
 
 import java.util.List;
 
+import interfaces.IOfficerService;
 import models.Officer;
 import models.Registration;
 import repositories.OfficerRepository;
@@ -15,7 +16,7 @@ import repositories.RegistrationRepository;
  * controllers and the officer data repository.
  * </p>
  */
-public class OfficerService {
+public class OfficerService implements IOfficerService {
 
     /**
      * Checks if an officer is currently assigned to any project.
@@ -24,7 +25,8 @@ public class OfficerService {
      * @return {@code true} if the officer has at least one project assignment,
      *         {@code false} otherwise
      */
-    public static boolean hasExistingProject(Officer officer) {
+    @Override
+    public boolean hasExistingProject(Officer officer) {
         return OfficerRepository.hasExistingProject(officer);
     }
 }

@@ -19,6 +19,7 @@ import java.util.List;
  * and managing officer registration status for projects.
  */
 public class ProjectView {
+    private static final EnquiryController enquiryController = new EnquiryController();
 
     /**
      * Displays the project menu for an applicant, allowing them to view project details or create an enquiry.
@@ -43,7 +44,7 @@ public class ProjectView {
                             displayProjectDetails(selectedProject);
                         }
                     }
-                    case 2 -> EnquiryController.createNewEnquiry(applicant);
+                    case 2 -> enquiryController.createNewEnquiry(applicant);
                     case 0 -> {
                         return;
                     }

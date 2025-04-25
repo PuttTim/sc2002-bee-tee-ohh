@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import interfaces.ICsvConfig;
+import interfaces.IManagerService;
 import models.Applicant;
 import models.Application;
 import models.Project;
@@ -24,8 +25,20 @@ import utils.CsvWriter;
 import utils.DateTimeUtils;
 import views.ManagerView;
 
-public class ManagerService {
-    public static List<Map<String, String>> generateApplicantReport(Project project, Map<String, String> filters) {
+public class ManagerService implements IManagerService {
+    private static ManagerService instance;
+    
+    private ManagerService() {}
+    
+    public static ManagerService getInstance() {
+        if (instance == null) {
+            instance = new ManagerService();
+        }
+        return instance;
+    }
+
+    @Override
+    public List<Map<String, String>> generateApplicantReport(Project project, Map<String, String> filters) {
         List<Application> bookedApplications = ApplicationRepository.getAll().stream()
                 .filter(app -> app.getProjectId().equals(project.getProjectID())) // Filter by project ID
                 .filter(app -> app.getApplicationStatus() == ApplicationStatus.BOOKED)
@@ -65,7 +78,8 @@ public class ManagerService {
         return reportData;
     }
 
-    public static void exportReportToCsv(List<Map<String, String>> reportData, String filename) {
+    @Override
+    public void exportReportToCsv(List<Map<String, String>> reportData, String filename) {
         ICsvConfig config = new ICsvConfig() {
             @Override
             public String getFilePath() {

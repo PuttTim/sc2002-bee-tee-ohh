@@ -38,6 +38,21 @@ import models.Application;
  * </ul>
  */
 public class ManagerController {
+    private final ManagerService managerService;
+    private final ProjectService projectService;
+    private final ApplicationService applicationService;
+    private final RegistrationService registrationService;
+    private final EnquiryService enquiryService;
+    private final EnquiryController enquiryController;
+    
+    public ManagerController() {
+        this.managerService = ManagerService.getInstance();
+        this.projectService = ProjectService.getInstance();
+        this.applicationService = ApplicationService.getInstance();
+        this.registrationService = RegistrationService.getInstance();
+        this.enquiryService = EnquiryService.getInstance();
+        this.enquiryController = new EnquiryController();
+    }
 
     /**
      * Displays all projects handled by a given manager and lets them manage selected projects.
@@ -51,8 +66,8 @@ public class ManagerController {
      *
      * @param manager the manager whose projects are to be displayed and managed
      */
-    public static void viewHandledProjects(Manager manager) {
-        List<Project> handledProjects = ProjectService.getProjectsByManager(manager);
+    public void viewHandledProjects(Manager manager) {
+        List<Project> handledProjects = projectService.getProjectsByManager(manager);
 
         if (handledProjects.isEmpty()) {
             CommonView.displayMessage("You are not managing any projects.");
@@ -88,7 +103,7 @@ public class ManagerController {
      * @param project the project to manage
      * @param manager the manager handling the project
      */
-    private static void showProjectManagementMenu(Project project, Manager manager) {
+    private void showProjectManagementMenu(Project project, Manager manager) {
         boolean running = true;
         while (running) {
             int choice = ManagerView.showSelectHandledProjectMenu(project);
@@ -97,13 +112,13 @@ public class ManagerController {
                     manageProjectOfficerRegistration(project, manager);
                     break;
                 case 2: // Manage Applicant Applications
-                    manageApplicantApplications(project, manager); // Updated call
+                    manageApplicantApplications(project, manager);
                     break;
                 case 3: // Manage Project Details 
                     editProjectDetails(project, manager);
                     break;
                 case 4:
-                    EnquiryController.manageProjectEnquiries(java.util.Optional.empty(), java.util.Optional.of(manager), project);
+                    enquiryController.manageProjectEnquiries(java.util.Optional.empty(), java.util.Optional.of(manager), project);
                     break;
                 case 5: // Generate Report
                     generateReport(project, manager);
@@ -130,9 +145,9 @@ public class ManagerController {
      * @param project the project for which officer registrations are managed
      * @param manager the manager approving or rejecting registrations
      */
-    public static void manageProjectOfficerRegistration(Project project, Manager manager) {
+    public void manageProjectOfficerRegistration(Project project, Manager manager) {
         while (true) {
-            List<Registration> allRegistrations = RegistrationService.getProjectRegistrations(project);
+            List<Registration> allRegistrations = registrationService.getProjectRegistrations(project);
             List<Registration> pendingRegistrations = allRegistrations.stream()
                     .filter(r -> r.getRegistrationStatus() == RegistrationStatus.PENDING)
                     .collect(Collectors.toList());
@@ -151,7 +166,7 @@ public class ManagerController {
 
             switch (action) {
                 case 1:
-                    success = RegistrationService.approveRegistration(selectedRegistration, manager);
+                    success = registrationService.approveRegistration(selectedRegistration, manager);
                     if (success) {
                         ManagerView.displayRegistrationApprovedSuccess(officerName);
                     } else {
@@ -159,7 +174,7 @@ public class ManagerController {
                     }
                     break;
                 case 2:
-                    success = RegistrationService.rejectRegistration(selectedRegistration, manager);
+                    success = registrationService.rejectRegistration(selectedRegistration, manager);
                     if (success) {
                         ManagerView.displayRegistrationRejectedSuccess(officerName);
                     } else {
@@ -180,9 +195,9 @@ public class ManagerController {
         }
     }
 
-    public static void manageApplicantApplications(Project project, Manager manager) {
+    public void manageApplicantApplications(Project project, Manager manager) {
         while (true) {
-            List<Application> applications = ApplicationService.getProjectApplications(project);
+            List<Application> applications = applicationService.getProjectApplications(project);
             ManagerView.displayApplicationList(applications, "Applications for Project: " + project.getProjectName());
             
             int choice = CommonView.promptInt("Select an application number to manage (or 0 to go back): ", 0, applications.size());
@@ -203,7 +218,7 @@ public class ManagerController {
                         case 1 -> { // Approve Withdrawal
                             if (CommonView.promptWordConfirmation(
                                     "Confirm APPROVAL of withdrawal request for application ID " + selectedApplication.getApplicationID() + "?", "APPROVE")) {
-                                success = ApplicationService.approveWithdrawal(selectedApplication, manager);
+                                success = applicationService.approveWithdrawal(selectedApplication, manager);
                                 if (success) {
                                     if (selectedApplication.getApplicationStatus() == ApplicationStatus.BOOKED) {
                                         project.incrementFlatCount(selectedApplication.getSelectedFlatType());
@@ -218,7 +233,7 @@ public class ManagerController {
                         case 2 -> { // Reject Withdrawal
                             if (CommonView.promptWordConfirmation(
                                     "Confirm REJECTION of withdrawal request for application ID " + selectedApplication.getApplicationID() + "?", "REJECT")) {
-                                success = ApplicationService.rejectWithdrawal(selectedApplication, manager);
+                                success = applicationService.rejectWithdrawal(selectedApplication, manager);
                                 if (success) {
                                     ManagerView.displayWithdrawalRejectedSuccess(applicantName);
                                 } else {
@@ -238,7 +253,7 @@ public class ManagerController {
                         boolean success = false;
                         switch (actionChoice) {
                             case 1 -> { // Approve Application
-                                success = ApplicationService.approveApplication(selectedApplication, manager);
+                                success = applicationService.approveApplication(selectedApplication, manager);
                                 if (success) {
                                     CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " approved.");
                                 } else {
@@ -249,7 +264,7 @@ public class ManagerController {
                                 }
                             }
                             case 2 -> { // Reject Application
-                                success = ApplicationService.rejectApplication(selectedApplication, manager);
+                                success = applicationService.rejectApplication(selectedApplication, manager);
                                 if (success) {
                                     CommonView.displaySuccess("Application ID " + selectedApplication.getApplicationID() + " rejected.");
                                 } else {
@@ -275,7 +290,7 @@ public class ManagerController {
         }
     }
 
-    public static void createProject(Manager manager) {
+    public void createProject(Manager manager) {
         CommonView.displayHeader("Create New BTO Project");
         String managerNRIC = manager.getUserNRIC(); 
         String projectName = ProjectView.getProjectName();
@@ -293,9 +308,8 @@ public class ManagerController {
             int officerSlots = ProjectView.getOfficerSlots();
             boolean visibility = ProjectView.getProjectVisibility();
 
-            ProjectService.createProject(managerNRIC, projectName, location, 
+            projectService.createProject(managerNRIC, projectName, location, 
                 startDate, endDate, officerSlots, visibility);
-            System.out.println("PROJECT CREATE 4");
             ProjectView.displayProjectCreationSuccess(projectName);
         } catch (Exception e) {
             CommonView.displayError("Error creating project: " + e.getMessage());
@@ -303,7 +317,7 @@ public class ManagerController {
         }
     }
 
-    public static void editProjectDetails(Project project, Manager manager) {
+    public void editProjectDetails(Project project, Manager manager) {
         CommonView.displayHeader("Edit Project Details: " + project.getProjectName());
         boolean running = true;
 
@@ -392,7 +406,7 @@ public class ManagerController {
 
             if (changed) {
                 try {
-                    ProjectService.updateProjectDetails(project);
+                    projectService.updateProjectDetails(project);
                 } catch (Exception e) {
                     CommonView.displayError("Error saving project details: " + e.getMessage());
                 }
@@ -404,12 +418,12 @@ public class ManagerController {
         }
     }
 
-    public static boolean deleteProject(Project project, Manager manager) {
+    public boolean deleteProject(Project project, Manager manager) {
         CommonView.displayHeader("Delete Project: " + project.getProjectName());
         if (CommonView.promptWordConfirmation(
                 "Are you sure you want to permanently delete project '" + project.getProjectName() + "'? This action cannot be undone.", "DELETE")) {
             try {
-                ProjectService.deleteProject(project.getProjectName());
+                projectService.deleteProject(project.getProjectName());
                 ProjectView.displayProjectDeleteSuccess();
                 return true;
             } catch (Exception e) {
@@ -422,9 +436,9 @@ public class ManagerController {
     /**
      * Displays all projects and lets the manager view their details.
      */
-    public static void viewAllProjects() {
+    public void viewAllProjects() {
         CommonView.displayHeader("All BTO Projects");
-        List<Project> allProjects = ProjectService.getAllProjects();
+        List<Project> allProjects = projectService.getAllProjects();
         if (allProjects.isEmpty()) {
             CommonView.displayMessage("There are no projects in the system.");
             return;
@@ -445,8 +459,8 @@ public class ManagerController {
         }
     }
 
-    public static void viewAllEnquiries(Manager manager) {
-        List<Project> allProjects = ProjectService.getAllProjects(); 
+    public void viewAllEnquiries(Manager manager) {
+        List<Project> allProjects = projectService.getAllProjects(); 
         List<Enquiry> allEnquiries = new ArrayList<>();
 
         if (allProjects.isEmpty()) {
@@ -455,7 +469,7 @@ public class ManagerController {
         }
 
         for (Project project : allProjects) {
-            allEnquiries.addAll(EnquiryService.getProjectEnquiries(project));
+            allEnquiries.addAll(enquiryService.getProjectEnquiries(project));
         }
 
         if (allEnquiries.isEmpty()) {
@@ -482,10 +496,9 @@ public class ManagerController {
                 if (CommonView.promptYesNo("Do you want to reply to this enquiry?")) {
                     String reply = CommonView.prompt("Enter your reply: ");
                     if (reply != null && !reply.trim().isEmpty()) {
-                        EnquiryService.replyToEnquiry(selectedEnquiry, reply, manager.getUserNRIC());
+                        enquiryService.replyToEnquiry(selectedEnquiry, reply, manager.getUserNRIC());
                         EnquiryView.displaySuccess("Reply submitted successfully.");
                         CommonView.prompt("Press Enter to continue...");
-
                         break; 
                     } else {
                         EnquiryView.displayError("Reply cannot be empty.");
@@ -496,12 +509,12 @@ public class ManagerController {
         }
     }
 
-    public static void generateReport(Project project, Manager manager) {
+    public void generateReport(Project project, Manager manager) {
         CommonView.displayHeader("Generate Booked Applications Report for Project: " + project.getProjectName());
 
         Map<String, String> filters = ManagerView.promptFilterOptions();
 
-        List<Map<String, String>> reportData = ManagerService.generateApplicantReport(project, filters);
+        List<Map<String, String>> reportData = managerService.generateApplicantReport(project, filters);
 
         ManagerView.displayReport(reportData);
 
@@ -510,7 +523,7 @@ public class ManagerController {
             while (running) {
                 String filename = ManagerView.promptCsvFileName();
                 if ((filename != null && !filename.trim().isEmpty())) {
-                    ManagerService.exportReportToCsv(reportData, filename);
+                    managerService.exportReportToCsv(reportData, filename);
                     running = false;
                 } else {
                     CommonView.displayError("Invalid filename. Please try again.");

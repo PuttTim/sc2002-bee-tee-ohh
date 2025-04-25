@@ -1,32 +1,30 @@
 package interfaces;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import models.Filter;
+import models.Manager;
 import models.Officer;
 import models.Project;
 
 /**
- * <p>Interface for managing project-related operations, such as checking officer slots and retrieving handled projects.</p>
- * <ul>
- * <li>Checks if a project has officer slots available.</li>
- * <li>Gets the list of projects handled by a specific officer.</li>
- * </ul>
+ * Interface for managing project-related operations.
  */
 public interface IProjectService {
-
-    /**
-     * Checks if a project has available officer slots.
-     *
-     * @param project The project to check.
-     * @return true if the project has officer slots, false otherwise.
-     */
-    public boolean hasOfficerSlots(Project project);
-
-    /**
-     * Gets a list of projects handled by the officer.
-     *
-     * @param officer The officer whose handled projects are to be retrieved.
-     * @return A list of projects handled by the officer.
-     */
-    public List<Project> getHandledProjects(Officer officer);
+    List<Project> getProjects(List<Filter> filters);
+    List<Project> getAllProjects();
+    List<Project> getVisibleProjects();
+    Project getProjectByName(String projectName);
+    Project getProjectByOfficer(Officer officer);
+    List<Project> getProjectsByManager(Manager manager);
+    void createProject(String managerNRIC, String projectName, String location, LocalDateTime startDate, LocalDateTime endDate, int officerSlots, boolean visible);
+    void updateProject(Project project, String location, LocalDateTime startDate, LocalDateTime endDate);
+    void updateProjectDetails(Project project);
+    void deleteProject(String projectName);
+    void toggleProjectVisibility(String projectName, boolean visible);
+    List<Project> getAllOfficersProjects(String officerNRIC);
+    // Method from original IProjectService - keep or remove based on usage?
+    // boolean hasOfficerSlots(Project project); 
+    // List<Project> getHandledProjects(Officer officer);
 }

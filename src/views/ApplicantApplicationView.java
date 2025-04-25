@@ -12,6 +12,8 @@ import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 
 public class ApplicantApplicationView {
+    private static final ApplicantApplicationService applicantApplicationService = ApplicantApplicationService.getInstance();
+
     public static int showMainMenu() {
         List<String> options = List.of(
             "View My Applications",
@@ -117,7 +119,7 @@ public class ApplicantApplicationView {
     }
 
     public static void handleWithdraw(Applicant applicant) {
-        List<Application> applications = ApplicantApplicationService.getApplicationsByApplicant(applicant);
+        List<Application> applications = applicantApplicationService.getApplicationsByApplicant(applicant);
         if (applications.isEmpty()) {
             CommonView.displayMessage("No applications available to withdraw.");
             return;
@@ -142,7 +144,7 @@ public class ApplicantApplicationView {
             if (CommonView.promptWordConfirmation(
                     "Are you sure you want to request withdrawal for application ID " + selectedApp.getApplicationID() + "?", "WITHDRAW")) {
                 try {
-                    ApplicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
+                    applicantApplicationService.withdrawApplication(applicant, selectedApp.getApplicationID());
                     displayWithdrawalSuccess();
                 } catch (Exception e) {
                     displayWithdrawalError(e.getMessage());
