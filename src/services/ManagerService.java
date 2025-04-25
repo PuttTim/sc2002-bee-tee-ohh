@@ -105,6 +105,14 @@ public class ManagerService implements IManagerService {
     @Override
     public void exportReportToCsv(List<Map<String, String>> reportData, String filename) {
         ICsvConfig config = new ICsvConfig() {
+            /**
+             * Returns the file path for saving the CSV report.
+             *
+             * This method generates a unique file path by appending the current date and time to the provided filename.
+             * It ensures the file path ends with a `.csv` extension and is stored in the "reports" directory.
+             *
+             * @return The file path, including the filename with timestamp, where the CSV report will be saved.
+             */
             @Override
             public String getFilePath() {
                 LocalDateTime currentTime = DateTimeUtils.getCurrentDateTime();
@@ -124,6 +132,14 @@ public class ManagerService implements IManagerService {
                 }
             }
 
+            /**
+             * Returns the headers for the CSV report.
+             *
+             * This method provides a list of column headers to be used in the CSV file when exporting data.
+             * These headers correspond to the key names in the report data and help format the CSV output appropriately.
+             *
+             * @return A list of strings representing the column headers for the CSV file.
+             */
             @Override
             public List<String> getHeaders() {
                 return List.of("applicantNRIC", "applicantName", "age", "maritalStatus", "projectName", "flatType");

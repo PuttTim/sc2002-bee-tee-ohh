@@ -229,6 +229,17 @@ public class ProjectService implements IProjectService {
         ProjectRepository.update(project);
     }
 
+    /**
+     * Updates the details of the specified project in the repository.
+     *
+     * This method checks if the provided project is valid (non-null) and then updates its details in the project repository.
+     * If the project is null, an IllegalArgumentException is thrown.
+     *
+     * @param project The project whose details are to be updated.
+     * @throws IllegalArgumentException if the provided project is null.
+     * @see ProjectRepository#update(Project) for the project update operation.
+     */
+
     @Override
     public void updateProjectDetails(Project project) {
         if (project == null) {

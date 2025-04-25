@@ -113,6 +113,20 @@ public class ApplicationService implements IApplicationService {
         }
     }
 
+    /**
+     * Approves the withdrawal request for a given application.
+     *
+     * This method checks if the withdrawal can be approved based on the current state of the application.
+     * If approval is possible, it updates the application's status to reflect the approval and saves the updated
+     * state to the repository.
+     *
+     * @param application The application for which the withdrawal request is to be approved.
+     * @param manager The manager performing the approval action.
+     * @return boolean Returns true if the withdrawal was successfully approved, false otherwise.
+     * @throws IllegalStateException if the application cannot approve the withdrawal due to its current state.
+     * @throws Exception if any unexpected error occurs during the approval process.
+     */
+
     @Override
     public boolean approveWithdrawal(Application application, Manager manager) {
         if (application == null || !application.canApproveWithdrawal()) {
@@ -131,6 +145,20 @@ public class ApplicationService implements IApplicationService {
             return false;
         }
     }
+
+    /**
+     * Rejects the withdrawal request for a given application.
+     *
+     * This method checks if the withdrawal can be rejected based on the current state of the application.
+     * If rejection is possible, it updates the application's status to reflect the rejection and saves the updated
+     * state to the repository.
+     *
+     * @param application The application for which the withdrawal request is to be rejected.
+     * @param manager The manager performing the rejection action.
+     * @return boolean Returns true if the withdrawal was successfully rejected, false otherwise.
+     * @throws IllegalStateException if the application cannot reject the withdrawal due to its current state.
+     * @throws Exception if any unexpected error occurs during the rejection process.
+     */
 
     @Override
     public boolean rejectWithdrawal(Application application, Manager manager) {

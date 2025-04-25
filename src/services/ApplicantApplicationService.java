@@ -37,6 +37,17 @@ public class ApplicantApplicationService implements IApplicantApplicationService
         return instance;
     }
 
+    /**
+     * Retrieves a list of eligible projects for a given user.
+     *
+     * This method filters and returns a list of projects that the user is eligible for, based on the user's eligibility criteria
+     * and the list of projects made visible by the project service.
+     *
+     * @param user The user for whom eligible projects are being retrieved.
+     * @return A list of eligible projects for the specified user.
+     * @see ProjectService#getVisibleProjects() for the list of projects visible to the user.
+     */
+
     @Override
     public List<Project> getEligibleProjects(User user) {
         return getEligibleProjects(user, projectService.getVisibleProjects());
