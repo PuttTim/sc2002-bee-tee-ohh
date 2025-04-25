@@ -132,7 +132,6 @@ public class AuthController {
             }
             case OFFICER -> {
                 while (running) {
-
                     switch (AuthView.showOfficerMainMenu()) {
                         case 1 -> {
                             UserRepository.setUserMode(Role.APPLICANT);
