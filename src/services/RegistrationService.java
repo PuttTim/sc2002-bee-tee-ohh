@@ -31,18 +31,6 @@ public class RegistrationService {
     }
 
     /**
-     * Retrieves all pending registrations for a specific project.
-     *
-     * @param project the project to retrieve pending registrations for
-     * @return a list of pending registrations for the given project
-     */
-    public static List<Registration> getPendingProjectRegistrations(Project project) {
-        return RegistrationRepository.getByProject(project.getProjectID()).stream()
-                .filter(r -> r.getRegistrationStatus() == RegistrationStatus.PENDING)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Approves a given registration if the project has available officer slots.
      * Also adds the officer to the project and updates repositories.
      *

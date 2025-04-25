@@ -36,18 +36,6 @@ public class ApplicationService {
     }
 
     /**
-     * Retrieves all applications for a specific project.
-     *
-     * @param project The project to filter applications by
-     * @return List of {@code Application} objects for the given project
-     */
-    public static List<Application> getSuccessfulProjectApplications(Project project) {
-        return getProjectApplications(project).stream()
-                .filter(app -> app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Approves an application if it meets approval criteria.
      * The officer's NRIC is recorded
      *

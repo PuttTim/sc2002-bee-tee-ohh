@@ -127,21 +127,6 @@ public class UserRepository {
     }
 
     /**
-     * Removes a user by their NRIC.
-     * <p>
-     * The method removes the user from the list and saves the updated list to the CSV file.
-     * </p>
-     *
-     * @param nric the NRIC of the user to remove
-     */
-    public static void remove(String nric) {
-        boolean removed = users.removeIf(user -> user.getUserNRIC().equals(nric));
-        if (removed) {
-            saveAll();
-        }
-    }
-
-    /**
      * Retrieves a user by their NRIC.
      *
      * @param nric the NRIC of the user

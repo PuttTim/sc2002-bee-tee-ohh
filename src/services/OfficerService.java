@@ -1,7 +1,11 @@
 package services;
 
+import java.util.List;
+
 import models.Officer;
+import models.Registration;
 import repositories.OfficerRepository;
+import repositories.RegistrationRepository;
 
 /**
  * Service class for managing officer-related operations.
@@ -22,26 +26,5 @@ public class OfficerService {
      */
     public static boolean hasExistingProject(Officer officer) {
         return OfficerRepository.hasExistingProject(officer);
-    }
-
-    /**
-     * Checks if an officer has an existing registration.
-     *
-     * @param officer the officer to check registration status for
-     * @return {@code true} if the officer has existing registration,
-     *         {@code false} otherwise
-     */
-    public static boolean hasExistingRegistration(Officer officer) {
-        // TODO: Implement this
-        return false;
-    }
-
-    /**
-     * Completes the registration process for an officer.
-     *
-     * @param officer the officer to mark as registered
-     */
-    public static void setOfficerRegistration(Officer officer) {
-        // TODO: Implement this
     }
 }

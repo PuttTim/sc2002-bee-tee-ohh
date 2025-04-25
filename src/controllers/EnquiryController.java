@@ -128,16 +128,6 @@ public class EnquiryController {
     }
 
     /**
-     * Displays all enquiries made for a specific project.
-     *
-     * @param project the project which enquiries are to be viewed
-     */
-    public static void viewProjectEnquiries(Project project) {
-        List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
-        EnquiryView.displayEnquiryList(enquiries);
-    }
-
-    /**
      * Allows an officer or manager to manage enquiries for a project.
      * <p>
      * Managing includes these actions:

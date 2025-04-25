@@ -267,44 +267,6 @@ public class ProjectService {
     }
 
     /**
-     * Checks if a project has available officer slots.
-     *
-     * @param project the project to check
-     * @return {@code true} if officer slots are available, {@code false} otherwise
-     */
-    public static boolean hasOfficerSlots(Project project) {
-        return project != null && project.getOfficerSlots() > 0;
-    }
-
-    /**
-     * Assigns an officer to a project.
-     * Reduces available officer slots when successful.
-     *
-     * @param project the project to assign to
-     * @param officerNRIC NRIC of the officer to assign
-     */
-    public static void addOfficerToProject(Project project, String officerNRIC) {
-        if (project != null && !project.getOfficers().contains(officerNRIC)) {
-            project.addOfficer(officerNRIC);
-            project.reduceOfficerSlot();
-            ProjectRepository.saveAll();
-        }
-    }
-
-    /**
-     * Removes an officer from a project.
-     *
-     * @param project The project to remove from
-     * @param officerNRIC NRIC of the officer to remove
-     */
-    public static void removeOfficerFromProject(Project project, String officerNRIC) {
-        if (project != null && project.getOfficers().contains(officerNRIC)) {
-            project.removeOfficer(officerNRIC);
-            ProjectRepository.saveAll();
-        }
-    }
-
-    /**
      * Retrieves all projects assigned to a specific officer.
      *
      * @param officerNRIC NRIC of the officer

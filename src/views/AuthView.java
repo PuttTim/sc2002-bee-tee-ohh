@@ -145,24 +145,6 @@ public class AuthView {
         CommonView.displayHeader("Change Password (0 to cancel)");
     }
 
-    /**
-     * Prompts the user to enter a project name.
-     *
-     * @return the input project name
-     */
-    public static String getProjectName() {
-        return CommonView.prompt("Enter project name: ");
-    }
-
-    /**
-     * Prompts the user to enter a new project location.
-     *
-     * @return the input location
-     */
-    public static String getNewLocation() {
-        return CommonView.prompt("Enter new location: ");
-    }
-
     /** Displays a success message after a password change. */
     public static void displayPasswordChangeSuccess() {
         CommonView.displaySuccess("Password changed successfully!");
@@ -175,11 +157,6 @@ public class AuthView {
      */
     public static void displayPasswordChangeError(String message) {
         CommonView.displayError(message);
-    }
-
-    /** Displays an error message when a project is not found. */
-    public static void displayProjectNotFound() {
-        CommonView.displayError("Project not found!");
     }
 
     /**
