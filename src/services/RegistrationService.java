@@ -11,6 +11,8 @@ import views.CommonView;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import interfaces.IRegistrationService;
+
 /**
  * Provides services related to the registration process for projects.
  * <p>
@@ -18,7 +20,18 @@ import java.util.stream.Collectors;
  * approving and rejecting them, and checking for slot availability.
  * </p>
  */
-public class RegistrationService {
+public class RegistrationService implements IRegistrationService {
+
+    private static RegistrationService instance;
+
+    private RegistrationService() {}
+
+    public static RegistrationService getInstance() {
+        if (instance == null) {
+            instance = new RegistrationService();
+        }
+        return instance;
+    }
 
     /**
      * Retrieves all registrations for a specific project.
@@ -26,20 +39,9 @@ public class RegistrationService {
      * @param project the project to retrieve registrations for
      * @return a list of all registrations for the given project
      */
-    public static List<Registration> getProjectRegistrations(Project project) {
+    @Override
+    public List<Registration> getProjectRegistrations(Project project) {
         return RegistrationRepository.getByProject(project.getProjectID());
-    }
-
-    /**
-     * Retrieves all pending registrations for a specific project.
-     *
-     * @param project the project to retrieve pending registrations for
-     * @return a list of pending registrations for the given project
-     */
-    public static List<Registration> getPendingProjectRegistrations(Project project) {
-        return RegistrationRepository.getByProject(project.getProjectID()).stream()
-                .filter(r -> r.getRegistrationStatus() == RegistrationStatus.PENDING)
-                .collect(Collectors.toList());
     }
 
     /**
@@ -50,7 +52,8 @@ public class RegistrationService {
      * @param manager the manager performing the approval
      * @return true if the registration was successfully approved, false otherwise
      */
-    public static boolean approveRegistration(Registration registration, Manager manager) {
+    @Override
+    public boolean approveRegistration(Registration registration, Manager manager) {
         Project project = ProjectRepository.getById(registration.getProjectID());
         if (project == null) {
             CommonView.displayError("Project not found for this registration.");
@@ -80,7 +83,8 @@ public class RegistrationService {
      * @param manager the manager performing the rejection
      * @return true if the registration was successfully rejected, false otherwise
      */
-    public static boolean rejectRegistration(Registration registration, Manager manager) {
+    @Override
+    public boolean rejectRegistration(Registration registration, Manager manager) {
         try {
             registration.reject(manager);
             RegistrationRepository.update(registration);

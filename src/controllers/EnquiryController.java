@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import models.Applicant;
 import models.Project;
+import models.enums.EnquiryStatus;
 import models.Enquiry;
 import models.Manager;
 import models.Officer;
@@ -28,13 +29,19 @@ import views.EnquiryView;
  */
 public class EnquiryController {
 
+    private final EnquiryService enquiryService;
+
+    public EnquiryController() {
+        this.enquiryService = EnquiryService.getInstance();
+    }
+
     /**
      * Displays a list of enquiries submitted by a specific applicant and shows the enquiry menu.
      *
      * @param applicant the applicant whose enquiries are to be displayed
      */
-    public static void viewApplicantEnquiries(Applicant applicant) {
-        List<Enquiry> enquiries = EnquiryService.getEnquiriesByApplicant(applicant);
+    public void viewApplicantEnquiries(Applicant applicant) {
+        List<Enquiry> enquiries = enquiryService.getEnquiriesByApplicant(applicant);
         EnquiryView.displayEnquiryList(enquiries);
         EnquiryView.showEnquiryMenu(applicant);
     }
@@ -51,14 +58,14 @@ public class EnquiryController {
      *
      * @param applicant the applicant who is submitting the enquiry
      */
-    public static void createNewEnquiry(Applicant applicant) {
+    public void createNewEnquiry(Applicant applicant) {
         List<Project> availableProjects = ProjectRepository.getAll().stream()
                 .filter(Project::isVisible)
                 .collect(Collectors.toList());
 
         Enquiry enquiry = EnquiryView.getEnquiryInput(applicant.getUserNRIC(), availableProjects);
         if (enquiry != null) {
-            EnquiryService.createEnquiry(enquiry);
+            enquiryService.createEnquiry(enquiry);
             EnquiryView.displayEnquiryCreatedMessage();
         }
     }
@@ -75,8 +82,8 @@ public class EnquiryController {
      *
      * @param applicant the applicant editing the enquiry
      */
-    public static void editEnquiry(Applicant applicant) {
-        List<Enquiry> existingEnquiries = EnquiryService.getEnquiriesByApplicant(applicant);
+    public void editEnquiry(Applicant applicant) {
+        List<Enquiry> existingEnquiries = enquiryService.getEnquiriesByApplicant(applicant);
         if (existingEnquiries.isEmpty()) {
             EnquiryView.displayError("No enquiries available to edit");
             return;
@@ -88,7 +95,7 @@ public class EnquiryController {
         if (editIndex >= 0 && editIndex < existingEnquiries.size()) {
             String newContent = EnquiryView.getUpdatedContents();
             if (newContent != null) {
-                EnquiryService.editEnquiry(applicant, existingEnquiries.get(editIndex).getEnquiryID(), newContent);
+                enquiryService.editEnquiry(applicant, existingEnquiries.get(editIndex).getEnquiryID(), newContent);
                 EnquiryView.displaySuccess("Enquiry updated successfully");
                 EnquiryView.showEnquiryMenu(applicant);
             }
@@ -109,8 +116,8 @@ public class EnquiryController {
      *
      * @param applicant the applicant deleting their enquiry
      */
-    public static void deleteEnquiry(Applicant applicant) {
-        List<Enquiry> enquiriesToDelete = EnquiryService.getEnquiriesByApplicant(applicant);
+    public void deleteEnquiry(Applicant applicant) {
+        List<Enquiry> enquiriesToDelete = enquiryService.getEnquiriesByApplicant(applicant);
         if (enquiriesToDelete.isEmpty()) {
             EnquiryView.displayError("No enquiries available to delete");
             return;
@@ -120,21 +127,11 @@ public class EnquiryController {
         int deleteIndex = EnquiryView.getEnquiryToEditOrDelete("delete", enquiriesToDelete.size());
 
         if (deleteIndex >= 0 && deleteIndex < enquiriesToDelete.size()) {
-            EnquiryService.deleteEnquiry(applicant, enquiriesToDelete.get(deleteIndex).getEnquiryID());
+            enquiryService.deleteEnquiry(applicant, enquiriesToDelete.get(deleteIndex).getEnquiryID());
             EnquiryView.displaySuccess("Enquiry deleted successfully");
         } else {
             EnquiryView.displayError("Invalid selection");
         }
-    }
-
-    /**
-     * Displays all enquiries made for a specific project.
-     *
-     * @param project the project which enquiries are to be viewed
-     */
-    public static void viewProjectEnquiries(Project project) {
-        List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
-        EnquiryView.displayEnquiryList(enquiries);
     }
 
     /**
@@ -151,10 +148,10 @@ public class EnquiryController {
      * @param manager optional manager managing the enquiry
      * @param project the project associated with the enquiries
      */
-    public static void manageProjectEnquiries(Optional<Officer> officer, Optional<Manager> manager, Project project) {
+    public void manageProjectEnquiries(Optional<Officer> officer, Optional<Manager> manager, Project project) {
         String nric = officer.map(Officer::getUserNRIC).orElse(manager.map(Manager::getUserNRIC).orElse(null));
 
-        List<Enquiry> enquiries = EnquiryService.getProjectEnquiries(project);
+        List<Enquiry> enquiries = enquiryService.getProjectEnquiries(project);
         if (enquiries.isEmpty()) {
             EnquiryView.displayEmptyMessage();
             return;
@@ -176,12 +173,25 @@ public class EnquiryController {
         EnquiryView.displayEnquiry(selectedEnquiry);
 
         if (CommonView.promptYesNo("Do you want to reply to this enquiry?")) {
+            if (selectedEnquiry.getEnquiryStatus() == EnquiryStatus.RESPONDED) {
+                EnquiryView.displayError("This enquiry has already been replied to.");
+                if (CommonView.promptYesNo("Do you still want to reply to this enquiry?")) {
+                } else {
+                    return;
+                }
+            }
+    
             String reply = CommonView.prompt("Enter your reply: ");
-            if (EnquiryService.replyToEnquiry(selectedEnquiry, reply, nric)) {
+            if (enquiryService.replyToEnquiry(selectedEnquiry, reply, nric)) {
                 EnquiryView.displaySuccess("Reply submitted successfully");
             } else {
                 EnquiryView.displayError("Failed to submit reply. Please try again.");
             }
         }
+        else {
+            return;
+        }
+
+
     }
 }

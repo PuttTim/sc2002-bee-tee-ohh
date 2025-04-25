@@ -2,10 +2,8 @@ package views;
 
 import models.*;
 import models.enums.ApplicationStatus;
-import models.enums.FlatType;
 import repositories.ProjectRepository;
 import repositories.UserRepository;
-import services.ApplicantApplicationService;
 import utils.DateTimeUtils;
 import java.util.List;
 
@@ -15,7 +13,6 @@ import java.util.List;
  * and viewing application details and status histories.
  */
 public class OfficerView {
-
     /**
      * Displays a menu for selecting officer operations for a given project.
      *
@@ -24,7 +21,7 @@ public class OfficerView {
      */
     public static int showSelectHandledProjectMenu(Project projects) {
         List<String> options = List.of(
-                "Manage Applications",
+                "View All Applications",
                 "Manage Successful Applications",
                 "View Enquiries"
         );
@@ -76,14 +73,14 @@ public class OfficerView {
             Application app = applications.get(i);
             Project project = ProjectRepository.getById(app.getProjectId());
             User applicant = UserRepository.getByNRIC(app.getApplicantNRIC());
-            CommonView.displayMessage(String.format("%d. ID: %s | Applicant: %s (%s) | Project: %s | Flat: %s | Status: %s",
-                    i + 1,
-                    app.getApplicationID(),
-                    applicant != null ? applicant.getName() : "N/A",
-                    app.getApplicantNRIC(),
-                    project != null ? project.getProjectName() : "N/A",
-                    app.getSelectedFlatType(),
-                    getStatusDisplay(app.getApplicationStatus())
+            CommonView.displayMessage(String.format("%d. ID: %s | Applicant: %s (%s) | Project: %s | Flat: %s | Status: %s", 
+                i + 1, 
+                app.getApplicationID(),
+                applicant != null ? applicant.getName() : "N/A",
+                app.getApplicantNRIC(),
+                project != null ? project.getProjectName() : "N/A",
+                app.getSelectedFlatType().getDescription(), 
+                app.getApplicationStatus().getDescription()
             ));
         }
         CommonView.displaySeparator();
@@ -108,34 +105,17 @@ public class OfficerView {
         CommonView.displayMessage("Project Name: " + (project != null ? project.getProjectName() : "N/A"));
         CommonView.displayMessage("Selected Flat Type: " + application.getSelectedFlatType().getDescription());
         CommonView.displayMessage("Application Date: " + DateTimeUtils.formatDateTime(application.getApplicationDate()));
-        CommonView.displayMessage("Current Status: " + getStatusDisplay(application.getApplicationStatus()));
-
+        CommonView.displayMessage("Current Status: " + application.getApplicationStatus().getDescription());
+        
         if (application.getApprovedBy() != null) {
             User approver = UserRepository.getByNRIC(application.getApprovedBy());
             String action = (application.getApplicationStatus() == ApplicationStatus.SUCCESSFUL || application.getApplicationStatus() == ApplicationStatus.BOOKED) ? "Approved" : "Processed";
             CommonView.displayMessage(action + " By: " + (approver != null ? approver.getName() : application.getApprovedBy()));
         }
 
-        application.getApplicationStatusHistory().forEach((status, timestamp) ->
-                CommonView.displayMessage(String.format("  - %s: %s", getStatusDisplay(status), DateTimeUtils.formatDateTime(timestamp)))
+        application.getApplicationStatusHistory().forEach((status, timestamp) -> 
+            CommonView.displayMessage(String.format("  - %s: %s", status.getDescription(), DateTimeUtils.formatDateTime(timestamp)))
         );
         CommonView.displaySeparator();
-    }
-
-    /**
-     * Converts an application status to its string representation.
-     *
-     * @param status The application status to be converted
-     * @return The string representation of the status
-     */
-    private static String getStatusDisplay(ApplicationStatus status) {
-        return switch (status) {
-            case PENDING -> "Pending";
-            case SUCCESSFUL -> "Approved";
-            case UNSUCCESSFUL -> "Rejected";
-            case WITHDRAWN -> "Withdrawn";
-            case BOOKED -> "Booked";
-            default -> status.toString();
-        };
     }
 }

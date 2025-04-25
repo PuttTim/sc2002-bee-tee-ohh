@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
  */
 public class DateTimeUtils {
     private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    public static final DateTimeFormatter DD_MM_YYYY_T_HH_MM_SS_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
+    
 
     /**
      * Parses a date-time string into a {@link LocalDateTime} using the specified formatter.
@@ -21,13 +23,13 @@ public class DateTimeUtils {
      */
     public static LocalDateTime parseDateTime(String dateTimeStr, DateTimeFormatter formatter) {
         if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
-            return null;
+            return null; 
         }
         try {
             return LocalDateTime.parse(dateTimeStr.trim(), formatter != null ? formatter : DEFAULT_FORMATTER);
         } catch (Exception e) {
-            System.err.println("Error parsing date: " + dateTimeStr + " - " + e.getMessage());
-            return null;
+            System.err.println("Error parsing date: '" + dateTimeStr + "' - " + e.getMessage());
+            return null; 
         }
     }
 

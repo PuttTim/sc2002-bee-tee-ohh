@@ -216,15 +216,11 @@ public class Application {
      * @param manager The name of the manager approving the application.
      * @throws IllegalStateException if the application is not pending.
      */
-    public void approve(String manager) {
-        if (this.applicationStatus != ApplicationStatus.PENDING) {
-            throw new IllegalStateException("Can only approve pending applications");
+    public void approve(String userNRIC) {
+        if (!canApprove()) {
+            throw new IllegalStateException("Application cannot be approved in its current state (Status: " + applicationStatus + ", Withdrawal Requested: " + isWithdrawalRequested + ")");
         }
-        if (this.isWithdrawalRequested) {
-            throw new IllegalStateException("Cannot approve an application with withdrawal requested");
-        }
-        this.applicationStatus = ApplicationStatus.SUCCESSFUL;
-        this.approvedBy = manager;
+        this.approvedBy = userNRIC; 
         recordStatusChange(ApplicationStatus.SUCCESSFUL);
     }
 
@@ -233,12 +229,11 @@ public class Application {
      * @param manager The name of the manager rejecting the application.
      * @throws IllegalStateException if the application is not pending.
      */
-    public void reject(String manager) {
-        if (this.applicationStatus != ApplicationStatus.PENDING) {
-            throw new IllegalStateException("Can only reject pending applications");
+    public void reject(String userNRIC) { 
+        if (!canReject()) {
+            throw new IllegalStateException("Application cannot be rejected in its current state (Status: " + applicationStatus + ")");
         }
-        this.applicationStatus = ApplicationStatus.UNSUCCESSFUL;
-        this.approvedBy = manager;
+        this.approvedBy = userNRIC;
         recordStatusChange(ApplicationStatus.UNSUCCESSFUL);
     }
 
@@ -247,13 +242,9 @@ public class Application {
      * @throws IllegalStateException if the application is not successful.
      */
     public void book() {
-        if (this.applicationStatus != ApplicationStatus.SUCCESSFUL) {
-            throw new IllegalStateException("Can only book successful applications");
+        if (!canBook()) {
+            throw new IllegalStateException("Application cannot be booked in its current state (Status: " + applicationStatus + ", Withdrawal Requested: " + isWithdrawalRequested + ")");
         }
-        if (this.isWithdrawalRequested) {
-            throw new IllegalStateException("Cannot book an application with withdrawal requested");
-        }
-        this.applicationStatus = ApplicationStatus.BOOKED;
         recordStatusChange(ApplicationStatus.BOOKED);
     }
 
@@ -272,12 +263,31 @@ public class Application {
             throw new IllegalStateException("Cannot withdraw an unsuccessful application");
         }
         this.isWithdrawalRequested = true;
-        this.applicationStatus = ApplicationStatus.WITHDRAWN;
+        recordStatusChange(ApplicationStatus.WITHDRAWAL_REQUESTED);
+    }
+
+    public void approveWithdrawal(String managerNRIC) {
+        if (!canApproveWithdrawal()) {
+            throw new IllegalStateException("Withdrawal cannot be approved in its current state");
+        }
+        this.approvedBy = managerNRIC;
+        this.isWithdrawalRequested = false;
         recordStatusChange(ApplicationStatus.WITHDRAWN);
     }
 
+    public void rejectWithdrawal(String managerNRIC) {
+        if (!canRejectWithdrawal()) {
+            throw new IllegalStateException("Withdrawal cannot be rejected in its current state");
+        }
+        this.isWithdrawalRequested = false;
+        this.approvedBy = managerNRIC;
+        recordStatusChange(this.applicationStatus);
+    }
+
+
     private void recordStatusChange(ApplicationStatus status) {
         applicationStatusHistory.put(status, LocalDateTime.now());
+        this.applicationStatus = status;
     }
 
     /**
@@ -317,6 +327,14 @@ public class Application {
      * @return <code>true</code> if the application is still pending.
      */
     public boolean canReject() {
-        return applicationStatus == ApplicationStatus.PENDING;
+        return applicationStatus == ApplicationStatus.PENDING && !isWithdrawalRequested;
+    }
+
+    public boolean canApproveWithdrawal() {
+        return isWithdrawalRequested;
+    }
+
+    public boolean canRejectWithdrawal() {
+        return isWithdrawalRequested;
     }
 }

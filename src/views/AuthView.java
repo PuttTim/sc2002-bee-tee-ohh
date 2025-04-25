@@ -1,6 +1,7 @@
 package views;
 
 import java.util.List;
+import utils.ValidationUtils;
 
 /**
  * View class for authentication-related interactions and role-based menus.
@@ -18,7 +19,18 @@ public class AuthView {
      * @return the input NRIC or "exit" to quit
      */
     public static String getNRIC() {
-        return CommonView.prompt("Enter NRIC (or 'exit' to quit): ");
+        while (true) {
+            String nric = CommonView.prompt("Enter NRIC (or 'exit' to quit): ");
+            if (nric.equalsIgnoreCase("exit")) {
+                return "exit";
+            }
+            
+            if (!ValidationUtils.isValidNRIC(nric)) {
+                CommonView.displayError("Invalid NRIC format. NRIC must start with S or T, followed by 7 digits, and end with a letter.");
+                continue;
+            }
+            return nric;
+        }
     }
 
     /**
@@ -64,11 +76,10 @@ public class AuthView {
      */
     public static int showApplicantMenu() {
         List<String> options = List.of(
-                "View Available Projects",
-                "Submit Project Application",
-                "View My Applications",
-                "Create New Enquiry",
-                "View My Enquiries"
+            "View Available Projects",
+            "Manage My Applications",
+            "View My Enquiries",
+            "Create New Enquiry"
         );
         return CommonView.displayMenuWithBacking("Applicant Menu", options);
     }
@@ -80,9 +91,9 @@ public class AuthView {
      */
     public static int showOfficerMenu() {
         List<String> options = List.of(
-                "Register to Handle Project",
-                "Check Registration Status",
-                "View Handled Projects"
+            "Register to Handle Project",
+            "Check Registration Status",
+            "View All Handled Projects" 
         );
         return CommonView.displayMenuWithBacking("Officer Menu", options);
     }
@@ -94,10 +105,10 @@ public class AuthView {
      */
     public static int showManagerMenu() {
         List<String> options = List.of(
-                "View All Projects",
-                "View All Handled Projects",
-                "View All Enquiries",
-                "Create New Project"
+            "View All Projects",
+            "View All Managed Projects",
+            "View All Enquiries",
+            "Create New Project"
         );
         return CommonView.displayMenuWithBacking("Manager Menu", options);
     }
@@ -146,24 +157,6 @@ public class AuthView {
         CommonView.displayHeader("Change Password (0 to cancel)");
     }
 
-    /**
-     * Prompts the user to enter a project name.
-     *
-     * @return the input project name
-     */
-    public static String getProjectName() {
-        return CommonView.prompt("Enter project name: ");
-    }
-
-    /**
-     * Prompts the user to enter a new project location.
-     *
-     * @return the input location
-     */
-    public static String getNewLocation() {
-        return CommonView.prompt("Enter new location: ");
-    }
-
     /** Displays a success message after a password change. */
     public static void displayPasswordChangeSuccess() {
         CommonView.displaySuccess("Password changed successfully!");
@@ -176,11 +169,6 @@ public class AuthView {
      */
     public static void displayPasswordChangeError(String message) {
         CommonView.displayError(message);
-    }
-
-    /** Displays an error message when a project is not found. */
-    public static void displayProjectNotFound() {
-        CommonView.displayError("Project not found!");
     }
 
     /**

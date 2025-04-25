@@ -3,7 +3,9 @@ package services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import interfaces.IApplicationService;
 import models.Application;
+import models.Manager;
 import models.Officer;
 import models.Project;
 import models.Receipt;
@@ -20,18 +22,16 @@ import views.CommonView;
  * Interacts with repositories to persist changes and enforce business rules.
  * </p>
  */
-public class ApplicationService {
-
-    /**
-     * Retrieves all applications for a specific project.
-     *
-     * @param project The project to filter applications by
-     * @return List of {@code Application} objects for the given project
-     */
-    public static List<Application> getProjectApplications(Project project) {
-        return ApplicationRepository.getAll().stream()
-                .filter(app -> app.getProjectId().equals(project.getProjectID()))
-                .collect(Collectors.toList());
+public class ApplicationService implements IApplicationService {
+    private static ApplicationService instance;
+    
+    private ApplicationService() {}
+    
+    public static ApplicationService getInstance() {
+        if (instance == null) {
+            instance = new ApplicationService();
+        }
+        return instance;
     }
 
     /**
@@ -40,9 +40,10 @@ public class ApplicationService {
      * @param project The project to filter applications by
      * @return List of {@code Application} objects for the given project
      */
-    public static List<Application> getSuccessfulProjectApplications(Project project) {
-        return getProjectApplications(project).stream()
-                .filter(app -> app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL)
+    @Override
+    public List<Application> getProjectApplications(Project project) {
+        return ApplicationRepository.getAll().stream()
+                .filter(app -> app.getProjectId().equals(project.getProjectID()))
                 .collect(Collectors.toList());
     }
 
@@ -51,15 +52,22 @@ public class ApplicationService {
      * The officer's NRIC is recorded
      *
      * @param application The application to approve
-     * @param officer The officer approving the application
+     * @param manager The manager approving the application
      * @return {@code true} if approval was successful, {@code false} otherwise
      */
-    public static boolean approveApplication(Application application, Officer officer) {
+    @Override
+    public boolean approveApplication(Application application, Manager manager) {
         if (application == null || !application.canApprove()) {
             return false;
         }
+        Project project = ProjectRepository.getById(application.getProjectId());
+        if (project == null || project.getAvailableUnits(application.getSelectedFlatType()) <= 0) {
+            CommonView.displayError("No available units left for this flat type.");
+            return false;
+        }
+
         try {
-            application.approve(officer.getUserNRIC());
+            application.approve(manager.getUserNRIC());
             ApplicationRepository.saveAll();
             return true;
         } catch (IllegalStateException e) {
@@ -77,15 +85,16 @@ public class ApplicationService {
      * The officer's NRIC is recorded.
      *
      * @param application The application to reject
-     * @param officer The officer rejecting the application
+     * @param manager The manager rejecting the application
      * @return {@code true} if rejection was successful, {@code false} otherwise
      */
-    public static boolean rejectApplication(Application application, Officer officer) {
+    @Override
+    public boolean rejectApplication(Application application, Manager manager) {
         if (application == null || !application.canReject()) {
             return false;
         }
         try {
-            application.reject(officer.getUserNRIC());
+            application.reject(manager.getUserNRIC());
             ApplicationRepository.saveAll();
             return true;
         } catch (IllegalStateException e) {
@@ -93,6 +102,44 @@ public class ApplicationService {
             return false;
         } catch (Exception e) {
             System.err.println("An unexpected error occurred during rejection: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean approveWithdrawal(Application application, Manager manager) {
+        if (application == null || !application.canApproveWithdrawal()) {
+            return false;
+        }
+        try {
+            application.approveWithdrawal(manager.getUserNRIC());
+            ApplicationRepository.saveAll();
+            return true;
+        } catch (IllegalStateException e) {
+            System.err.println("Error approving withdrawal: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred during withdrawal approval: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean rejectWithdrawal(Application application, Manager manager) {
+        if (application == null || !application.canRejectWithdrawal()) {
+            return false;
+        }
+        try {
+            application.rejectWithdrawal(manager.getUserNRIC());
+            ApplicationRepository.saveAll();
+            return true;
+        } catch (IllegalStateException e) {
+            System.err.println("Error rejecting withdrawal: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred during withdrawal rejection: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -113,7 +160,8 @@ public class ApplicationService {
      * @param selectedUnitNumber The unit number being assigned
      * @return {@code true} if booking was successful, {@code false} otherwise
      */
-    public static boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) { // Added unitNumber parameter
+    @Override
+    public boolean bookApplication(Application application, Officer officer, String selectedUnitNumber) {
         if (application == null || !application.canBook()) {
             return false;
         }
@@ -125,15 +173,11 @@ public class ApplicationService {
             return false;
         }
 
-        if (project == null) {
-            return false;
-        }
-
         if (project.getAvailableUnits(application.getSelectedFlatType()) <= 0) {
             return false;
         }
 
-        if (selectedUnitNumber == null || selectedUnitNumber.trim().isEmpty()) { // Basic validation for unit number
+        if (selectedUnitNumber == null || selectedUnitNumber.trim().isEmpty()) { 
              System.err.println("Error booking application: Unit number cannot be empty.");
              return false;
         }

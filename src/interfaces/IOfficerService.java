@@ -1,14 +1,11 @@
 package interfaces;
 
+import java.util.List;
 import models.Officer;
+import models.Project;
 
 /**
- * <p>Interface for managing officer-related operations, such as checking existing projects and registrations.</p>
- * <ul>
- * <li>Checks if an officer has an existing project.</li>
- * <li>Checks if an officer has an existing registration.</li>
- * <li>Sets the registration for an officer.</li>
- * </ul>
+ * Interface for managing officer-related operations.
  */
 public interface IOfficerService {
 
@@ -18,7 +15,7 @@ public interface IOfficerService {
      * @param officer The officer to check.
      * @return true if the officer has an existing project, false otherwise.
      */
-    public boolean hasExistingProject(Officer officer);
+    boolean hasExistingProject(Officer officer);
 
     /**
      * Checks if the officer has an existing registration.
@@ -26,12 +23,52 @@ public interface IOfficerService {
      * @param officer The officer to check.
      * @return true if the officer has an existing registration, false otherwise.
      */
-    public boolean hasExistingRegistration(Officer officer);
+    boolean hasExistingRegistration(Officer officer);
 
     /**
-     * Sets the registration for the officer.
+     * Sets the officer's registration.
      *
-     * @param officer The officer to set the registration for.
+     * @param officer The officer whose registration is to be set.
      */
-    public void setOfficerRegistration(Officer officer);
+    void setOfficerRegistration(Officer officer);
+
+    /**
+     * Retrieves a list of available projects.
+     *
+     * @return A list of available projects.
+     */
+    List<Project> getAvailableProjects();
+
+    /**
+     * Checks if a project is eligible for registration for a given officer.
+     *
+     * @param project The project to check.
+     * @param officer The officer to check.
+     * @return true if the project is eligible for registration, false otherwise.
+     */
+    boolean isProjectEligibleForRegistration(Project project, Officer officer);
+
+    /**
+     * Registers an officer for a project.
+     *
+     * @param officer The officer to register.
+     * @param project The project for registration.
+     */
+    void registerOfficerForProject(Officer officer, Project project);
+
+    /**
+     * Retrieves the project associated with a given officer.
+     *
+     * @param officer The officer whose project is to be retrieved.
+     * @return The project associated with the officer.
+     */
+    Project getProjectByOfficer(Officer officer);
+
+    /**
+     * Retrieves a list of projects handled by a given officer.
+     *
+     * @param officer The officer whose handled projects are to be retrieved.
+     * @return A list of projects handled by the officer.
+     */
+    List<Project> getHandledProjects(Officer officer);
 }

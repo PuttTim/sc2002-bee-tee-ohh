@@ -1,6 +1,7 @@
 package services;
 
 import exceptions.AuthenticationException;
+import interfaces.IAuthService;
 import models.User;
 import repositories.UserRepository;
 import utils.Hash;
@@ -12,7 +13,18 @@ import utils.Hash;
  * Interacts with {@code UserRepository} to manage user sessions and credentials.
  * </p>
  */
-public class AuthService {
+public class AuthService implements IAuthService {
+
+    private static AuthService instance;
+
+    private AuthService() {}
+
+    public static AuthService getInstance() {
+        if (instance == null) {
+            instance = new AuthService();
+        }
+        return instance;
+    }
 
     /**
      * Authenticates a user with their NRIC and password.
@@ -27,7 +39,8 @@ public class AuthService {
      * @return the authenticated {@code User} object
      * @throws AuthenticationException if credentials are invalid
      */
-    public static User login(String nric, String password) throws AuthenticationException {
+    @Override
+    public User login(String nric, String password) throws AuthenticationException {
         User user = UserRepository.getByNRIC(nric);
 
         if (user == null || !Hash.verifyPassword(password, user.getPassword())) {
@@ -43,7 +56,8 @@ public class AuthService {
      * Terminates the current user session.
      * Clears the active user from the {@code UserRepository}.
      */
-    public static void logout() {
+    @Override
+    public void logout() {
         UserRepository.clearActiveUser();
     }
 
@@ -60,7 +74,8 @@ public class AuthService {
      * @param newPassword the desired new password
      * @throws AuthenticationException if validation fails
      */
-    public static void changePassword(User user, String oldPassword, String newPassword) throws AuthenticationException {
+    @Override
+    public void changePassword(User user, String oldPassword, String newPassword) throws AuthenticationException {
         if (!Hash.verifyPassword(oldPassword, user.getPassword())) {
             throw new AuthenticationException("Current password is incorrect");
         }

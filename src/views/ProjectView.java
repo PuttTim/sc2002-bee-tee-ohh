@@ -2,11 +2,13 @@ package views;
 
 import controllers.EnquiryController;
 import models.Applicant;
+import models.Manager;
 import models.Officer;
 import models.Project;
 import models.Registration;
 import models.enums.FlatType;
 import repositories.ApplicationRepository;
+import repositories.ManagerRepository;
 import repositories.ProjectRepository;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
  * and managing officer registration status for projects.
  */
 public class ProjectView {
+    private static final EnquiryController enquiryController = new EnquiryController();
 
     /**
      * Displays the project menu for an applicant, allowing them to view project details or create an enquiry.
@@ -41,7 +44,7 @@ public class ProjectView {
                             displayProjectDetails(selectedProject);
                         }
                     }
-                    case 2 -> EnquiryController.createNewEnquiry(applicant);
+                    case 2 -> enquiryController.createNewEnquiry(applicant);
                     case 0 -> {
                         return;
                     }
@@ -115,6 +118,25 @@ public class ProjectView {
         // how many officer slots are remaining and who is the manager of the project (name)
         CommonView.displayMessage("Project Name: " + project.getProjectName());
         CommonView.displayMessage("Location: " + project.getLocation());
+        Manager manager = ManagerRepository.getByNRIC(project.getManagerNRIC());
+        CommonView.displayMessage("Manager: " + (manager != null ? String.format("%s (%s)", manager.getName(), manager.getUserNRIC()) : "N/A"));
+        CommonView.displayMessage("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
+        CommonView.displayMessage("Available Flat Types:");
+        List<FlatType> flatTypes = project.getFlatTypes();
+        for (int i = 0; i < flatTypes.size(); i++) {
+            CommonView.displayMessage((i + 1) + ". " + flatTypes.get(i).getDescription());
+            CommonView.displayMessage("   Available Units: " + project.getFlatTypeUnits().get(i));
+            CommonView.displayMessage("   Price: " + project.getFlatTypeSellingPrice().get(i));
+        }
+    }
+
+    public static void displayProjectDetailsManagerView(Project project) {
+        CommonView.displayShortSeparator();
+
+        CommonView.displayMessage("Project Name: " + project.getProjectName());
+        CommonView.displayMessage("Location: " + project.getLocation());
+        Manager manager = ManagerRepository.getByNRIC(project.getManagerNRIC());
+        CommonView.displayMessage("Manager: " + (manager != null ? String.format("%s (%s)", manager.getName(), manager.getUserNRIC()) : "N/A"));
         CommonView.displayMessage("Application Period: " + project.getApplicationOpenDate() + " to " + project.getApplicationCloseDate());
         CommonView.displayMessage("Available Flat Types:");
         List<FlatType> flatTypes = project.getFlatTypes();
@@ -217,12 +239,7 @@ public class ProjectView {
      * @return A boolean indicating whether the project is visible or not
      */
     public static boolean getProjectVisibility() {
-        String input = CommonView.prompt("Make project visible? (yes/no): ").toLowerCase();
-        while (!input.equals("yes") && !input.equals("no")) {
-            CommonView.displayError("Invalid input! Please enter (yes/no)");
-            input = CommonView.prompt("Make project visible? (yes/no): ").toLowerCase();
-        }
-        return input.equals("yes");
+        return CommonView.promptYesNo("Make project visible?: ");
     }
 
     /**

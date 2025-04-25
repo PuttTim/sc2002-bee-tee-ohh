@@ -6,13 +6,10 @@ import models.enums.Role;
 import repositories.*;
 
 import services.AuthService;
-import services.ProjectService;
-
 import utils.Hash;
 
 import views.AuthView;
 import views.CommonView;
-import views.ProjectView;
 
 /**
  * Controller class to handle authentication processes.
@@ -29,6 +26,22 @@ public class AuthController {
     private static final String TEST_MANAGER_NRIC = "S6543210I";
     private static final String TEST_PASSWORD = "password";
 
+    private final AuthService authService;
+    private final ApplicantController applicantController;
+    private final OfficerController officerController;
+    private final ManagerController managerController;
+    private final ProjectController projectController;
+    private final EnquiryController enquiryController;
+    
+    public AuthController() {
+        this.authService = AuthService.getInstance();
+        this.applicantController = new ApplicantController();
+        this.officerController = new OfficerController();
+        this.managerController = new ManagerController();
+        this.projectController = new ProjectController();
+        this.enquiryController = new EnquiryController();
+    }
+
     /**
      * Runs the authentication process.
      * <ul>
@@ -37,7 +50,7 @@ public class AuthController {
      *     <li>Testing mode included for predefined users</li>
      * </ul>
      */
-    public static void runAuthentication() {
+    public void runAuthentication() {
         while (true) {
             AuthView.displayLoginHeader();
             boolean isTestingMode = AuthView.showTestingMenu();
@@ -55,7 +68,7 @@ public class AuthController {
             String password = AuthView.getPassword();
             
             try {
-                User user = AuthService.login(nric, password);
+                User user = authService.login(nric, password);
                 AuthView.displayLoginSuccess(user.getName());
                 dispatchToController(user);
             } catch (AuthenticationException e) {
@@ -70,7 +83,7 @@ public class AuthController {
     /**
      * Handles login for predefined users, for testing purposes.
      */
-    private static void handleTestLogin() {
+    private void handleTestLogin() {
         int choice = AuthView.showTestUserOptions();
         String nric;
         
@@ -85,7 +98,7 @@ public class AuthController {
         }
 
         try {
-            User user = AuthService.login(nric, TEST_PASSWORD);
+            User user = authService.login(nric, TEST_PASSWORD);
             AuthView.displayLoginSuccess(user.getName());
             dispatchToController(user);
         } catch (AuthenticationException e) {
@@ -98,7 +111,7 @@ public class AuthController {
      *
      * @param user the user who is shown different menus based on their role (applicant, officer or manager).
      */
-    private static void dispatchToController(User user) {
+    private void dispatchToController(User user) {
         boolean running = true;
         switch (user.getRole()) {
             case APPLICANT -> {
@@ -142,7 +155,7 @@ public class AuthController {
             default -> throw new IllegalStateException("Unknown role: " + user.getRole());
         }
 
-        AuthService.logout();
+        authService.logout();
         CommonView.displayMessage("Logged out of: " + user.getName());
     }
 
@@ -151,24 +164,23 @@ public class AuthController {
      *
      * @param user an applicant for a project.
      */
-    private static void showApplicantMenu(Applicant user) {
+    private void showApplicantMenu(Applicant user) {
         boolean running = true;
         while (running) {
             int choice = AuthView.showApplicantMenu();
             try {
                 switch (choice) {
-                    case 1 -> ProjectController.viewAvailableProjects(user);
-                    case 2 -> ApplicantController.newApplication(user);
-                    case 3 -> ApplicantController.viewMyApplications(user);
-                    case 4 -> EnquiryController.createNewEnquiry(user);
-                    case 5 -> EnquiryController.viewApplicantEnquiries(user);
+                    case 1 -> applicantController.viewAvailableProjects(user);
+                    case 2 -> applicantController.manageApplications(user);
+                    case 3 -> enquiryController.viewApplicantEnquiries(user);
+                    case 4 -> enquiryController.createNewEnquiry(user);
                     case 0 -> {return;}
+                    default -> CommonView.displayError("Invalid option. Please try again.");
                 }
-            } catch (NumberFormatException e) {
-                CommonView.displayError("Please enter a valid number!");
+            } catch (Exception e) {
+                CommonView.displayError("An error occurred: " + e.getMessage());
             }
         }
-        // System.out.println("Logging out of user: " + applicant.getName());
     }
 
     /**
@@ -176,16 +188,16 @@ public class AuthController {
      *
      * @param officer an officer for projects.
      */
-    private static void showOfficerMenu(Officer officer) {
+    private void showOfficerMenu(Officer officer) {
         boolean running = true;
 
         while (running) {
             int choice = AuthView.showOfficerMenu();
             try {
                 switch (choice) {
-                    case 1 -> OfficerController.registerToHandleProject(officer);
-                    case 2 -> OfficerController.checkHandlerRegistration(officer);
-                    case 3 -> OfficerController.viewHandledProjectDetails(officer);
+                    case 1 -> officerController.registerToHandleProject(officer);
+                    case 2 -> officerController.checkHandlerRegistration(officer);
+                    case 3 -> officerController.viewHandledProjectDetails(officer);
                     case 0 -> {return;}
                     default -> CommonView.displayError("Invalid choice. Please try again.");
                 }
@@ -203,16 +215,16 @@ public class AuthController {
      *
      * @param manager the manager for projects.
      */
-    private static void showManagerMenu(Manager manager) {
+    private void showManagerMenu(Manager manager) {
         boolean running = true;
         while (running) {
             int choice = AuthView.showManagerMenu();
             try {
                 switch (choice) {
-                    case 1 -> ManagerController.viewAllProjects(); 
-                    case 2 -> ManagerController.viewHandledProjects(manager);
-                    case 3 -> ManagerController.viewAllEnquiries();
-                    case 4 -> ManagerController.createProject();
+                    case 1 -> managerController.viewAllProjects(); 
+                    case 2 -> managerController.viewHandledProjects(manager);
+                    case 3 -> managerController.viewAllEnquiries(manager);
+                    case 4 -> managerController.createProject(manager);
                     case 0 -> {return;}
                 }
             } catch (NumberFormatException e) {
@@ -227,7 +239,7 @@ public class AuthController {
      *
      * @param user that wants to change their password.
      */
-    private static void handleChangePassword(User user) {
+    private void handleChangePassword(User user) {
         AuthView.showChangePasswordHeader();
         String oldPassword = CommonView.prompt("Enter old password: ");
         if (oldPassword.equals("0")) {
@@ -270,7 +282,7 @@ public class AuthController {
         }
 
         try {
-            AuthService.changePassword(user, oldPassword, newPassword);
+            authService.changePassword(user, oldPassword, newPassword);
             AuthView.displayPasswordChangeSuccess();
         } catch (AuthenticationException e) {
             AuthView.displayPasswordChangeError(e.getMessage());

@@ -3,20 +3,23 @@ package services;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import interfaces.IProjectService;
 import models.Filter;
 import models.Manager;
 import models.Project;
 import models.Officer;
 import models.User;
 import models.enums.FlatType;
+import models.enums.MaritalStatus;
 import models.enums.Role;
 
 import repositories.ProjectRepository;
 import repositories.UserRepository;
+import repositories.ManagerRepository;
 
 import utils.DateTimeUtils;
+import views.CommonView;
 
 /**
  * Service class for managing project-related operations.
@@ -28,7 +31,17 @@ import utils.DateTimeUtils;
  *   <li>Project retrieval by various criteria</li>
  * </ul>
  */
-public class ProjectService {
+public class ProjectService implements IProjectService {
+    private static ProjectService instance;
+
+    private ProjectService() {}
+    
+    public static ProjectService getInstance() {
+        if (instance == null) {
+            instance = new ProjectService();
+        }
+        return instance;
+    }
 
     /**
      * Retrieves projects matching specified filters.
@@ -41,28 +54,18 @@ public class ProjectService {
      * @param filters List of filters to apply
      * @return List of projects matching all filters
      */
-    public static List<Project> getProjects(List<Filter> filters) {
-        Stream<Project> projectStream = ProjectRepository.getAll().stream();
-
-        if (!filters.isEmpty()) {
-            projectStream = projectStream.filter(project ->
-                    filters.stream().allMatch(filter ->
-                            checkPassesFilter(project, filter)
-                    )
-            );
+    @Override
+    public List<Project> getProjects(List<Filter> filters) {
+        if (filters == null || filters.isEmpty()) {
+            return ProjectRepository.getAll();
         }
 
-        return projectStream.collect(Collectors.toList());
+        return ProjectRepository.getAll().stream()
+            .filter(project -> filters.stream().allMatch(filter -> checkPassesFilter(project, filter)))
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Checks if a project passes a single filter criteria.
-     *
-     * @param project The project to check
-     * @param filter The filter to apply
-     * @return {@code true} if project matches filter, {@code false} otherwise
-     */
-    private static boolean checkPassesFilter(Project project, Filter filter) {
+    private boolean checkPassesFilter(Project project, Filter filter) {
         if (project == null) {
             return true;
         }
@@ -91,7 +94,8 @@ public class ProjectService {
      *
      * @return List of all projects
      */
-    public static List<Project> getAllProjects() {
+    @Override
+    public List<Project> getAllProjects() {
         return ProjectRepository.getAll();
     }
 
@@ -106,33 +110,29 @@ public class ProjectService {
      *
      * @return List of visible projects
      */
-    public static List<Project> getVisibleProjects() {
+    @Override
+    public List<Project> getVisibleProjects() {
+        List<Project> projects = ProjectRepository.getAll();
         User user = UserRepository.getActiveUser();
-        Role userMode;
-        if (user.getRole() == Role.OFFICER) {
-            userMode = UserRepository.getUserMode();
-        } else {
-            userMode = user.getRole();
-        }
 
-        switch (userMode) {
-            case APPLICANT:
-                return ProjectRepository.getAll().stream()
+        if (user.getRole() == Role.APPLICANT) {
+            return projects.stream()
                         .filter(Project::isVisible)
-                        .filter(p -> p.getApplicationOpenDate().isBefore(DateTimeUtils.getCurrentDateTime())
-                                && p.getApplicationCloseDate().isAfter(DateTimeUtils.getCurrentDateTime()))
                         .filter(p -> !p.getOfficers().contains(user.getUserNRIC()))
+                        .filter(p -> {
+                            List<FlatType> flatTypes = p.getFlatTypes();
+
+                            if (user.getMaritalStatus() == MaritalStatus.MARRIED && user.getAge() >= 21) {
+                                return true;
+                            } else if ((user.getMaritalStatus() == MaritalStatus.SINGLE || user.getMaritalStatus() == MaritalStatus.DIVORCED) && user.getAge() >= 35) {
+                                return flatTypes.contains(FlatType.TWO_ROOM);
+                            } else {
+                                return false;
+                            }
+                        })
                         .collect(Collectors.toList());
-            case OFFICER:
-                return ProjectRepository.getAll().stream()
-                        .collect(Collectors.toList());
-            default:
-                if (user.getRole() == Role.MANAGER) {
-                    return ProjectRepository.getAll();
-                } else {
-                    return List.of();
-                }
         }
+        return projects;
     }
 
     /**
@@ -141,17 +141,22 @@ public class ProjectService {
      * @param projectName Name of the project to find
      * @return The matching project or {@code null} if not found
      */
-    public static Project getProjectByName(String projectName) {
-        return ProjectRepository.getByName(projectName);
+    @Override
+    public Project getProjectByName(String projectName) {
+        return ProjectRepository.getAll().stream()
+                .filter(p -> p.getProjectName().equals(projectName))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
      * Retrieves the project assigned to a specific officer.
      *
-     * @param officer The officer to find project for
-     * @return The officer's assigned project or {@code null} if none
+     * @param officer The officer to find projects for
+     * @return The project assigned to the officer, or null if not found
      */
-    public static Project getProjectByOfficer(Officer officer) {
+    @Override
+    public Project getProjectByOfficer(Officer officer) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getOfficers().contains(officer.getUserNRIC()))
                 .findFirst()
@@ -164,16 +169,16 @@ public class ProjectService {
      * @param manager The manager to find projects for
      * @return List of projects managed by the specified manager
      */
-    public static List<Project> getProjectsByManager(Manager manager) {
+    @Override
+    public List<Project> getProjectsByManager(Manager manager) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getManagerNRIC().equals(manager.getUserNRIC()))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Creates a new project with the specified details.
+     * Creates a new project with initial settings.
      *
-     * @param projectId Unique project identifier
      * @param managerNRIC NRIC of the managing manager
      * @param projectName Name of the project
      * @param location Project location
@@ -182,13 +187,24 @@ public class ProjectService {
      * @param officerSlots Number of available officer slots
      * @param visible Visibility status
      */
-    public static void createProject(String projectId, String managerNRIC, String projectName,
-                                     String location, LocalDateTime startDate, LocalDateTime endDate,
-                                     int officerSlots, boolean visible) {
-        Project newProject = new Project(projectId, managerNRIC, projectName, location,
-                startDate, endDate, officerSlots, visible);
-        ProjectRepository.add(newProject);
-        ProjectRepository.saveAll();
+    @Override
+    public void createProject(String managerNRIC, String projectName, 
+            String location, LocalDateTime startDate, LocalDateTime endDate, 
+            int officerSlots, boolean visible) {
+        Manager manager = ManagerRepository.getByNRIC(managerNRIC);
+        if (manager == null) {
+            throw new IllegalArgumentException("Manager with NRIC " + managerNRIC + " not found.");
+        }
+
+        Project project = new Project(managerNRIC, projectName, location, startDate, endDate, officerSlots, visible);
+        
+        int availableUnits1 = CommonView.promptInt("Enter number of 2-Room units: ", 0, Integer.MAX_VALUE);
+        int availableUnits2 = CommonView.promptInt("Enter number of 3-Room units: ", 0, Integer.MAX_VALUE);
+
+        project.addFlatType(FlatType.TWO_ROOM, availableUnits1, 400000);
+        project.addFlatType(FlatType.THREE_ROOM, availableUnits2, 600000);
+
+        ProjectRepository.add(project);
     }
 
     /**
@@ -199,12 +215,21 @@ public class ProjectService {
      * @param startDate the new application opening date
      * @param endDate the new application closing date
      */
-    public static void updateProject(Project project, String location,
+    @Override
+    public void updateProject(Project project, String location,
                                      LocalDateTime startDate, LocalDateTime endDate) {
         project.setLocation(location);
         project.setApplicationOpenDate(startDate);
         project.setApplicationCloseDate(endDate);
-        ProjectRepository.saveAll();
+        ProjectRepository.update(project);
+    }
+
+    @Override
+    public void updateProjectDetails(Project project) {
+        if (project == null) {
+            throw new IllegalArgumentException("Project cannot be null.");
+        }
+        ProjectRepository.update(project);
     }
 
     /**
@@ -212,11 +237,13 @@ public class ProjectService {
      *
      * @param projectName name of the project to delete
      */
-    public static void deleteProject(String projectName) {
+    @Override
+    public void deleteProject(String projectName) {
         Project project = getProjectByName(projectName);
         if (project != null) {
             ProjectRepository.remove(project);
-            ProjectRepository.saveAll();
+        } else {
+            throw new IllegalArgumentException("Project with name " + projectName + " not found.");
         }
     }
 
@@ -226,48 +253,11 @@ public class ProjectService {
      * @param projectName the name of the project to update
      * @param visible the new visibility status
      */
-    public static void toggleProjectVisibility(String projectName, boolean visible) {
+    @Override
+    public void toggleProjectVisibility(String projectName, boolean visible) {
         Project project = getProjectByName(projectName);
         if (project != null) {
             project.setVisible(visible);
-            ProjectRepository.saveAll();
-        }
-    }
-
-    /**
-     * Checks if a project has available officer slots.
-     *
-     * @param project the project to check
-     * @return {@code true} if officer slots are available, {@code false} otherwise
-     */
-    public static boolean hasOfficerSlots(Project project) {
-        return project != null && project.getOfficerSlots() > 0;
-    }
-
-    /**
-     * Assigns an officer to a project.
-     * Reduces available officer slots when successful.
-     *
-     * @param project the project to assign to
-     * @param officerNRIC NRIC of the officer to assign
-     */
-    public static void addOfficerToProject(Project project, String officerNRIC) {
-        if (project != null && !project.getOfficers().contains(officerNRIC)) {
-            project.addOfficer(officerNRIC);
-            project.reduceOfficerSlot();
-            ProjectRepository.saveAll();
-        }
-    }
-
-    /**
-     * Removes an officer from a project.
-     *
-     * @param project The project to remove from
-     * @param officerNRIC NRIC of the officer to remove
-     */
-    public static void removeOfficerFromProject(Project project, String officerNRIC) {
-        if (project != null && project.getOfficers().contains(officerNRIC)) {
-            project.removeOfficer(officerNRIC);
             ProjectRepository.saveAll();
         }
     }
@@ -278,7 +268,8 @@ public class ProjectService {
      * @param officerNRIC NRIC of the officer
      * @return List of projects the officer is assigned to
      */
-    public static List<Project> getAllOfficersProjects(String officerNRIC) {
+    @Override
+    public List<Project> getAllOfficersProjects(String officerNRIC) {
         return ProjectRepository.getAll().stream()
                 .filter(p -> p.getOfficers().contains(officerNRIC))
                 .collect(Collectors.toList());

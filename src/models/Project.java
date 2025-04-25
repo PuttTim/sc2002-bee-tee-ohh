@@ -2,7 +2,9 @@ package models;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import models.enums.FlatType;
 import views.CommonView;
@@ -29,9 +31,8 @@ public class Project {
     private String managerNRIC;
     private String projectName;
     private String location;
-    private List<FlatType> flatTypes;
-    private List<Integer> flatTypeUnits;
-    private List<Integer> flatTypeSellingPrice;
+    private Map<FlatType, Integer> flatTypeToUnit;
+    private Map<FlatType, Integer> flatTypeToSellingPrice;
     private LocalDateTime applicationOpenDate;
     private LocalDateTime applicationCloseDate;
     private int officerSlots;
@@ -62,9 +63,12 @@ public class Project {
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
         this.location = location;
-        this.flatTypes = flatTypes;
-        this.flatTypeUnits = flatTypeUnits;
-        this.flatTypeSellingPrice = flatTypeSellingPrice;
+        this.flatTypeToUnit = new HashMap<>();
+        this.flatTypeToSellingPrice = new HashMap<>();
+        for (int i = 0; i < flatTypes.size(); i++) {
+            this.flatTypeToUnit.put(flatTypes.get(i), flatTypeUnits.get(i));
+            this.flatTypeToSellingPrice.put(flatTypes.get(i), flatTypeSellingPrice.get(i));
+        }
         this.applicationOpenDate = applicationOpenDate;
         this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
@@ -73,10 +77,10 @@ public class Project {
         this.officers = new ArrayList<>();
     }
 
+
     /**
      * Constructs a new Project with the specified details, used for loading from repository.
      *
-     * @param projectID the ID of the project
      * @param managerNRIC the NRIC of the manager responsible for the project
      * @param projectName the name of the project
      * @param location the location of the project
@@ -85,17 +89,19 @@ public class Project {
      * @param officerSlots the number of officer slots available for the project
      * @param visible the visibility status of the project
      */
-    public Project(String projectID, String managerNRIC, String projectName, String location,
-                   LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
-                   int officerSlots, boolean visible) {
-        this.projectID = projectID;
+    public Project(String managerNRIC, String projectName, String location,
+                  LocalDateTime applicationOpenDate, LocalDateTime applicationCloseDate,
+                  int officerSlots, boolean visible) {
+        this.projectID = "P" + (++lastProjectID);
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
         this.location = location;
         this.applicationOpenDate = applicationOpenDate;
         this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
-        this.visible = visible;
+        this.isVisible = visible;
+        this.applicants = new ArrayList<>();
+        this.officers = new ArrayList<>();
     }
 
     /**
@@ -124,9 +130,12 @@ public class Project {
         this.managerNRIC = managerNRIC;
         this.projectName = projectName;
         this.location = location;
-        this.flatTypes = flatTypes;
-        this.flatTypeUnits = flatTypeUnits;
-        this.flatTypeSellingPrice = flatTypeSellingPrice;
+        this.flatTypeToUnit = new HashMap<>();
+        this.flatTypeToSellingPrice = new HashMap<>();
+        for (int i = 0; i < flatTypes.size(); i++) {
+            this.flatTypeToUnit.put(flatTypes.get(i), flatTypeUnits.get(i));
+            this.flatTypeToSellingPrice.put(flatTypes.get(i), flatTypeSellingPrice.get(i));
+        }
         this.applicationOpenDate = applicationOpenDate;
         this.applicationCloseDate = applicationCloseDate;
         this.officerSlots = officerSlots;
@@ -187,7 +196,7 @@ public class Project {
      * @return a list of flat types
      */
     public List<FlatType> getFlatTypes() {
-        return new ArrayList<>(flatTypes);
+        return new ArrayList<>(flatTypeToUnit.keySet());
     }
 
     /**
@@ -196,7 +205,7 @@ public class Project {
      * @return a list of available units for each flat type
      */
     public List<Integer> getFlatTypeUnits() {
-        return new ArrayList<>(flatTypeUnits);
+        return new ArrayList<>(flatTypeToUnit.values());
     }
 
     /**
@@ -205,7 +214,7 @@ public class Project {
      * @return a list of selling prices for each flat type
      */
     public List<Integer> getFlatTypeSellingPrice() {
-        return new ArrayList<>(flatTypeSellingPrice);
+        return new ArrayList<>(flatTypeToSellingPrice.values());
     }
 
     /**
@@ -306,7 +315,10 @@ public class Project {
      * @param flatTypes a list of flat types
      */
     public void setFlatTypes(List<FlatType> flatTypes) {
-        this.flatTypes = new ArrayList<>(flatTypes);
+        this.flatTypeToUnit.clear();
+        for (int i = 0; i < flatTypes.size(); i++) {
+            this.flatTypeToUnit.put(flatTypes.get(i), flatTypeToUnit.get(flatTypes.get(i)));
+        }
     }
 
     /**
@@ -315,7 +327,10 @@ public class Project {
      * @param flatTypeUnits a list of available units for each flat type
      */
     public void setFlatTypeUnits(List<Integer> flatTypeUnits) {
-        this.flatTypeUnits = new ArrayList<>(flatTypeUnits);
+        int i = 0;
+        for (FlatType flatType : flatTypeToUnit.keySet()) {
+            this.flatTypeToUnit.put(flatType, flatTypeUnits.get(i++));
+        }
     }
 
     /**
@@ -324,7 +339,10 @@ public class Project {
      * @param flatTypeSellingPrice a list of selling prices for each flat type
      */
     public void setFlatTypeSellingPrice(List<Integer> flatTypeSellingPrice) {
-        this.flatTypeSellingPrice = new ArrayList<>(flatTypeSellingPrice);
+        int i = 0;
+        for (FlatType flatType : flatTypeToSellingPrice.keySet()) {
+            this.flatTypeToSellingPrice.put(flatType, flatTypeSellingPrice.get(i++));
+        }
     }
 
     /**
@@ -394,6 +412,15 @@ public class Project {
         }
     }
 
+    public void addFlatType(FlatType type, int units, int price) {
+        if (flatTypeToUnit == null) {
+            flatTypeToUnit = new HashMap<>();
+            flatTypeToSellingPrice = new HashMap<>();
+        }
+        flatTypeToUnit.put(type, units);
+        flatTypeToSellingPrice.put(type, price);
+    }
+
     /**
      * Adds an officer to the project.
      *
@@ -442,10 +469,17 @@ public class Project {
      * @param type the flat type to reduce
      */
     public void reduceFlatCount(FlatType type) {
-        int index = flatTypes.indexOf(type);
-        if (index != -1 && flatTypeUnits.get(index) > 0) {
-            flatTypeUnits.set(index, flatTypeUnits.get(index) - 1);
+        if (!flatTypeToUnit.containsKey(type)) {
+            throw new IllegalArgumentException("Flat type not found in project");
         }
+        flatTypeToUnit.put(type, flatTypeToUnit.get(type) - 1);
+    }
+
+    public void incrementFlatCount(FlatType flatType) {
+        if (!flatTypeToUnit.containsKey(flatType)) {
+            throw new IllegalArgumentException("Flat type not found in project");
+        }
+        flatTypeToUnit.put(flatType, flatTypeToUnit.get(flatType) + 1);
     }
 
     /**
@@ -455,6 +489,7 @@ public class Project {
      * @return the index of the flat type, or -1 if not found
      */
     public int getFlatTypeIndex(FlatType type) {
+        List<FlatType> flatTypes = getFlatTypes();
         return flatTypes.indexOf(type);
     }
 
@@ -466,7 +501,7 @@ public class Project {
      */
     public int getAvailableUnits(FlatType type) {
         int index = getFlatTypeIndex(type);
-        return index != -1 ? flatTypeUnits.get(index) : 0;
+        return index != -1 ? flatTypeToUnit.get(type) : 0;
     }
 
     /**
@@ -477,6 +512,6 @@ public class Project {
      */
     public int getFlatPrice(FlatType type) {
         int index = getFlatTypeIndex(type);
-        return index != -1 ? flatTypeSellingPrice.get(index) : 0;
+        return index != -1 ? flatTypeToSellingPrice.get(type) : 0;
     }
 }
