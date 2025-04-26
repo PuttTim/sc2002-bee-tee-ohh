@@ -285,8 +285,7 @@ public class OfficerController {
         Applicant applicant = ApplicantRepository.getByNRIC(application.getApplicantNRIC());
 
         if (applicant == null) {
-            CommonView.displayError("Critical Error: Could not find applicant details for NRIC " + application.getApplicantNRIC() + ". Receipt not generated.");
-            return;
+            applicant = OfficerRepository.getByNRIC(application.getApplicantNRIC());
         }
 
         Receipt receipt = new Receipt(
